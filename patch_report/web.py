@@ -30,21 +30,21 @@ def index():
 
 @app.route('/patches')
 def patches():
-    patch_set = patch_report.PatchSet.from_file_refresh_if_not_present(
-            STATE_FILE, PATCH_REPO_PATH)
-
+    state = patch_report.PatchRepoState(STATE_FILE)
+    patch_set = state.load()
     sort_key = flask.request.args.get('sort_key', 'idx')
     sort_dir = flask.request.args.get('sort_dir', 'desc')
     patches = patch_set.get_sorted_patches(sort_key, sort_dir)
+    last_updated_at = state.get_last_updated_at()
     return flask.render_template('patches.html',
                                  patches=patches,
                                  sort_key=sort_key,
-                                 sort_dir=sort_dir)
+                                 sort_dir=sort_dir,
+                                 last_updated_at=last_updated_at)
 
 
 if __name__ == '__main__':
-    PATCH_REPO_PATH = patch_report.get_patch_repo_path()
-    STATE_FILE = patch_report.get_state_file()
+    STATE_FILE = os.environ.get('STATE_FILE', 'repo_state.pickle')
     host = os.environ.get('HOST')
     port = int(os.environ.get('PORT', 5000))
     app.run(host=host, port=port)

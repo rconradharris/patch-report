@@ -94,7 +94,7 @@
         <title>PatchRepo</title>
         <link href="static/css/bootstrap.min.css" rel="stylesheet">
         <style>
-            #main { margin-top: 50px; }
+            #main { margin-top: 50px; margin-bottom: 50px; }
             #sort-caret { float: right; }
             .sort-key { background: #eee; }
             .sort-link { display: block; width: 100%; height: 100%; }
@@ -173,6 +173,7 @@
                 </tr>
             {% endfor %}
             </table>
+            Last Updated: {{ last_updated_at }} UTC
         </div>
         <script src="static/js/jquery.min.js"></script>
         <script src="static/js/bootstrap.min.js"></script>

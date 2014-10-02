@@ -143,6 +143,26 @@ class Patch(object):
         self.line_count = line_count
 
 
+class PatchRepoState(object):
+    def __init__(self, filename):
+        self.filename = filename
+
+    def load(self):
+        with open(self.filename) as f:
+            patch_set = pickle.load(f)
+        return patch_set
+
+    def save(self, patch_set):
+        with open(self.filename, 'w') as f:
+            pickle.dump(patch_set, f)
+
+    def get_last_updated_at(self):
+        if not os.path.exists(self.filename):
+            return None
+        epoch_secs = os.path.getmtime(self.filename)
+        return datetime.datetime.fromtimestamp(epoch_secs)
+
+
 class PatchSet(object):
     def __init__(self, path):
         self.path = path
@@ -164,45 +184,3 @@ class PatchSet(object):
                 patch.refresh()
                 self.patches.append(patch)
                 idx += 1
-
-    def to_file(self, filename):
-        with open(filename, 'w') as f:
-            pickle.dump(self, f)
-
-    @classmethod
-    def from_file(cls, filename):
-        with open(filename) as f:
-            patch_set = pickle.load(f)
-        return patch_set
-
-    @classmethod
-    def refresh_and_write_to_file(cls, filename, path):
-        patch_set = cls(path)
-        patch_set.refresh()
-        patch_set.to_file(filename)
-        return patch_set
-
-    @classmethod
-    def from_file_refresh_if_not_present(cls, filename, path):
-        """Try to load state from the given file; if file doesn't exist yet,
-        then create if by `refresh`ing, then write out the file so we can use
-        it next time.
-        """
-        if os.path.exists(filename):
-            patch_set = cls.from_file(filename)
-        else:
-            patch_set = cls.refresh_and_write_to_file(filename, path)
-
-        return patch_set
-
-
-def get_patch_repo_path():
-    path = os.environ.get('PATCH_REPO_PATH')
-    assert path, "Must define PATCH_REPO_PATH environment variable"
-    assert os.path.exists(path), "PATCH_REPO_PATH path '%s' doesn't"\
-                                 " exist" % path
-    return path
-
-
-def get_state_file():
-    return os.environ.get('STATE_FILE', 'patch_set.pickle')
