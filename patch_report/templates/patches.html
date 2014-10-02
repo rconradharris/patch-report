@@ -1,8 +1,8 @@
 {% macro sort_heading(key, name=None) %}
-    {% set is_sort_key = key == patch_set.sort_key %}
+    {% set is_sort_key = key == sort_key %}
     <th class="{{ 'sort-key' if is_sort_key else '' }}">
     {% if is_sort_key %}
-        {% set sort_dir = 'desc' if patch_set.sort_dir == 'asc' else 'asc' %}
+        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
     {% else %}
         {% set sort_dir = 'asc' %}
     {% endif %}
@@ -12,7 +12,7 @@
     <a href="{{ url_for('patches', sort_key=key, sort_dir=sort_dir) }}"
        class="sort-link">{{ name }}
     {% if is_sort_key %}
-        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if patch_set.sort_dir == 'asc' else 'down' }}"</span>
+        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
     {% endif %}
     </th>
 </a>
@@ -146,7 +146,7 @@
                                     name='Upstream Reviews') }}
                 </tr>
             </thead>
-            {% for patch in patch_set %}
+            {% for patch in patches %}
                 <tr>
                     <td>{{ patch.idx }} </td>
                     <td>{{ patch.date.date() }} </td>
