@@ -38,6 +38,7 @@
 
 {% macro gr_link(gr) %}
     <a class="btn btn-success btn-xs"
+       target="_blank"
        href="{{ gr.url }}">{{ gr.change_id[:5] }}</a>
    {% endmacro %}
 
@@ -57,6 +58,7 @@
 
 {% macro rm_link(rm_issue) %}
     <a class="btn btn-danger btn-xs"
+       target="_blank"
        href="{{ rm_issue.url }}">{{ rm_issue.id }}</a>
 {% endmacro %}
 
