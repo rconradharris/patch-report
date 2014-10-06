@@ -1,0 +1,5 @@
+- Cache Redmine lookups since they're excrutiatingly slow
+- Add Redmine status to modal
+- Add Gerrit title/status to modal
+- Add setup.py
+- Add gunicorn support

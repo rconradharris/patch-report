@@ -59,7 +59,12 @@
 {% macro rm_link(rm_issue) %}
     <a class="btn btn-danger btn-xs"
        target="_blank"
-       href="{{ rm_issue.url }}">{{ rm_issue.id }}</a>
+       href="{{ rm_issue.url }}">{{ rm_issue.issue_id }}</a>
+{% endmacro %}
+
+
+{% macro pluralize(count, singular, plural) %}
+    {{ singular if count == 1 else plural }}
 {% endmacro %}
 
 
@@ -67,11 +72,12 @@
     {% call modal('rm-modal-%s' % patch.idx, 'Redmine Issues') %}
         <ol class="btn-list">
             {% for rm_issue in patch.rm_issues %}
-                <li>{{ rm_link(rm_issue) }}</li>
+                <li>{{ rm_link(rm_issue) }} {{ rm_issue.subject or '<Issue Not Found>'}}</li>
             {% endfor %}
         </ol>
     {% endcall %}
-    <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}" href="javascript:void(0)">{{ patch.rm_issues|count }} issues</a>
+    <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}"
+        href="javascript:void(0)">{{ patch.rm_issues|count }} {{ pluralize(patch.rm_issues|count, 'issue', 'issues') }}</a>
 {% endmacro %}
 
 
@@ -157,10 +163,7 @@
                     <td>{{ patch.line_count }}</td>
                     <td>{{ file_list_modal(patch) }}</td>
                     <td>
-                        {% if patch.rm_issue_count == 0 %}
-                        {% elif patch.rm_issue_count == 1 %}
-                            {{ rm_link(patch.rm_issues[0]) }}
-                        {% else %}
+                        {% if patch.rm_issue_count > 0 %}
                             {{ rm_list_modal(patch) }}
                         {% endif %}
                     </td>

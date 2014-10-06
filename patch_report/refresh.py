@@ -44,11 +44,10 @@ if __name__ == '__main__':
                              " '%s'" % state_file
         sys.exit(1)
 
-
     refresh_git(path)
 
-    patch_set = patch_report.PatchSet(path)
-    patch_set.refresh()
+    pr = patch_report.PatchReport(path)
+    pr.refresh()
 
     state = patch_report.PatchRepoState(state_file)
-    state.save(patch_set)
+    state.save(pr)

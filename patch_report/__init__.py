@@ -4,12 +4,13 @@ import os
 import pickle
 import re
 
+import redmine
+
 
 class GerritReview(object):
     BASE_URL = "https://review.openstack.org/#q,%s,n,z"
 
-    def __init__(self, patch, change_id):
-        self.patch = patch
+    def __init__(self, change_id):
         self.change_id = change_id
 
     @property
@@ -17,19 +18,58 @@ class GerritReview(object):
         return self.BASE_URL % self.change_id
 
 
+class RedmineException(Exception):
+    pass
+
+
+class RedmineAuthException(RedmineException):
+    pass
+
+
+class Redmine(object):
+    def __init__(self, url, username, password, verify_cert=False, debug=True):
+        self.url = url
+        self.username = username
+        self.password = password
+        self.verify_cert = verify_cert
+        self.debug = debug
+
+        self.redmine = redmine.Redmine(url,
+                                       requests={'verify': verify_cert},
+                                       username=username,
+                                       password=password,
+                                       raise_attr_exception=debug)
+
+    def get_issue(self, issue_id):
+        if self.debug:
+            print 'Fetching Redmine Issue %s' % issue_id
+
+        try:
+            issue = self.redmine.issue.get(issue_id)
+        except redmine.exceptions.AuthError as auth_ex:
+            raise RedmineAuthException(
+                "Authentication error: %s" % auth_ex)
+        except redmine.exceptions.ResourceNotFoundError as res_ex:
+            subject = None
+        else:
+            subject = issue.subject
+
+        return RedmineIssue(issue_id, subject=subject)
+
+
 class RedmineIssue(object):
     BASE_URL = "https://redmine.ohthree.com/issues"
 
-    def __init__(self, patch, issue_id):
-        self.patch = patch
-        self.id = issue_id
+    def __init__(self, issue_id, subject=None):
+        self.issue_id = issue_id
+        self.subject = subject
 
     @property
     def url(self):
-        return os.path.join(self.BASE_URL, self.id)
+        return os.path.join(self.BASE_URL, self.issue_id)
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.issue_id == other.issue_id
 
 
 class Patch(object):
@@ -42,8 +82,8 @@ class Patch(object):
     # FIXME: Until UTF-8 is supported...
     NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
 
-    def __init__(self, patch_set, idx, filename):
-        self.patch_set = patch_set
+    def __init__(self, patch_report, idx, filename):
+        self.patch_report = patch_report
         self.idx = idx
         self.filename = filename
 
@@ -74,7 +114,7 @@ class Patch(object):
 
     @property
     def path(self):
-        return os.path.join(self.patch_set.path, self.filename)
+        return os.path.join(self.patch_report.path, self.filename)
 
     def _parse_author(self, line):
         if not line.startswith('From:'):
@@ -107,7 +147,7 @@ class Patch(object):
             match = re.match(self.RE_RM_LINK, line)
         if match:
             issue_id = match.group(1)
-            rm_issue = RedmineIssue(self, issue_id)
+            rm_issue = self.patch_report.redmine.get_issue(issue_id)
             # Avoid dup if there's a tag *and* a link
             if rm_issue not in self.rm_issues:
                 self.rm_issues.append(rm_issue)
@@ -125,7 +165,7 @@ class Patch(object):
             return
 
         change_id = line.split(' ', 1)[1].strip()
-        gr = GerritReview(self, change_id)
+        gr = GerritReview(change_id)
         self.gerrit_reviews.append(gr)
 
     def refresh(self):
@@ -149,12 +189,12 @@ class PatchRepoState(object):
 
     def load(self):
         with open(self.filename) as f:
-            patch_set = pickle.load(f)
-        return patch_set
+            patch_report = pickle.load(f)
+        return patch_report
 
-    def save(self, patch_set):
+    def save(self, patch_report):
         with open(self.filename, 'w') as f:
-            pickle.dump(patch_set, f)
+            pickle.dump(patch_report, f)
 
     def get_last_updated_at(self):
         if not os.path.exists(self.filename):
@@ -163,10 +203,20 @@ class PatchRepoState(object):
         return datetime.datetime.fromtimestamp(epoch_secs)
 
 
-class PatchSet(object):
+class PatchReport(object):
     def __init__(self, path):
         self.path = path
         self.patches = []
+
+    @property
+    def redmine(self):
+        url = os.environ.get('REDMINE_URL')
+        username = os.environ.get('REDMINE_USERNAME')
+        password = os.environ.get('REDMINE_PASSWORD')
+        assert all([url, username, password]),\
+               'Must provide REDMINE_URL, REDMINE_USERNAME, and'\
+               ' REDMINE_PASSWORD environment variables'
+        return Redmine(url, username, password)
 
     def get_sorted_patches(self, sort_key, sort_dir):
         key = lambda p: getattr(p, sort_key)
