@@ -27,6 +27,8 @@ class RedmineAuthException(RedmineException):
 
 
 class Redmine(object):
+    RM_CACHE = 'redmine_issues.pickle'
+
     def __init__(self, url, username, password, verify_cert=False, debug=True):
         self.url = url
         self.username = username
@@ -40,7 +42,7 @@ class Redmine(object):
                                        password=password,
                                        raise_attr_exception=debug)
 
-    def get_issue(self, issue_id):
+    def _fetch_remote_issue(self, issue_id):
         if self.debug:
             print 'Fetching Redmine Issue %s' % issue_id
 
@@ -54,7 +56,34 @@ class Redmine(object):
         else:
             subject = issue.subject
 
-        return RedmineIssue(issue_id, subject=subject)
+        return {'subject': subject}
+
+    @property
+    def cached_issues(self):
+        if not hasattr(self, '_cached_issues'):
+            if os.path.exists(self.RM_CACHE):
+                with open(self.RM_CACHE) as f:
+                    self._cached_issues = pickle.load(f)
+            else:
+                self._cached_issues = {}
+
+        return self._cached_issues
+
+    def _add_cached_issue(self, issue):
+        self.cached_issues[issue.issue_id] = issue
+        with open(self.RM_CACHE, 'w') as f:
+            pickle.dump(self.cached_issues, f)
+
+    def get_issue(self, issue_id):
+        issue = self.cached_issues.get(issue_id)
+        if issue:
+            return issue
+
+        issue_kwargs = self._fetch_remote_issue(issue_id)
+        issue = RedmineIssue(issue_id, **issue_kwargs)
+
+        self._add_cached_issue(issue)
+        return issue
 
 
 class RedmineIssue(object):
