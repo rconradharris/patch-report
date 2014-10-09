@@ -23,6 +23,9 @@ app.debug = os.environ.get('DEBUG') == '1'
 import patch_report
 
 
+STATE_FILE = os.environ.get('STATE_FILE', 'repo_state.pickle')
+
+
 @app.route('/')
 def index():
     return flask.redirect(flask.url_for('patches'))
@@ -44,7 +47,6 @@ def patches():
 
 
 if __name__ == '__main__':
-    STATE_FILE = os.environ.get('STATE_FILE', 'repo_state.pickle')
     host = os.environ.get('HOST')
     port = int(os.environ.get('PORT', 5000))
     app.run(host=host, port=port)
