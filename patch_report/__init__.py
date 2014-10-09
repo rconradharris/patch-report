@@ -53,10 +53,13 @@ class Redmine(object):
                 "Authentication error: %s" % auth_ex)
         except redmine.exceptions.ResourceNotFoundError as res_ex:
             subject = None
+            status = None
         else:
             subject = issue.subject
+            status = issue.status.name
 
-        return {'subject': subject}
+        return {'subject': subject,
+                'status': status}
 
     @property
     def cached_issues(self):
@@ -89,9 +92,10 @@ class Redmine(object):
 class RedmineIssue(object):
     BASE_URL = "https://redmine.ohthree.com/issues"
 
-    def __init__(self, issue_id, subject=None):
+    def __init__(self, issue_id, subject=None, status=None):
         self.issue_id = issue_id
         self.subject = subject
+        self.status = status
 
     @property
     def url(self):

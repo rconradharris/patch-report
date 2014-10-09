@@ -36,6 +36,11 @@
 {% endmacro %}
 
 
+{% macro pluralize(count, singular, plural) %}
+    {{ singular if count == 1 else plural }}
+{% endmacro %}
+
+
 {% macro gr_link(gr) %}
     <a class="btn btn-success btn-xs"
        target="_blank"
@@ -56,28 +61,47 @@
 {% endmacro %}
 
 
-{% macro rm_link(rm_issue) %}
-    <a class="btn btn-danger btn-xs"
-       target="_blank"
-       href="{{ rm_issue.url }}">{{ rm_issue.issue_id }}</a>
-{% endmacro %}
-
-
-{% macro pluralize(count, singular, plural) %}
-    {{ singular if count == 1 else plural }}
-{% endmacro %}
-
-
 {% macro rm_list_modal(patch) %}
-    {% call modal('rm-modal-%s' % patch.idx, 'Redmine Issues') %}
-        <ol class="btn-list">
-            {% for rm_issue in patch.rm_issues %}
-                <li>{{ rm_link(rm_issue) }} {{ rm_issue.subject or '<Issue Not Found>'}}</li>
-            {% endfor %}
-        </ol>
+    {% call modal('rm-modal-%s' % patch.idx,
+                  'Redmine Issues for %s' % patch.filename) %}
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Issue #</th>
+                    <th>Description</th>
+                    <th class="rightcol">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rm_issue in patch.rm_issues %}
+                <tr>
+                    <td>
+                        <span class="label label-danger">{{ rm_issue.issue_id }}</span>
+                    </td>
+                    <td>
+                        <a target="_blank"
+                            href="{{ rm_issue.url }}">{{ rm_issue.subject or '<Issue Not Found>'}}</a>
+                    </td>
+                    <td class="rightcol">
+                        <span class="label label-default">{{ rm_issue.status }}</span>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endcall %}
     <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}"
-        href="javascript:void(0)">{{ patch.rm_issues|count }} {{ pluralize(patch.rm_issues|count, 'issue', 'issues') }}</a>
+        href="javascript:void(0)">
+        {% with issue_count = patch.rm_issues|count %}
+            {% if issue_count == 1 %}
+                <span class="label label-danger">{{ patch.rm_issues[0].issue_id }}</span>
+            {% else %}
+                {{ issue_count }} {{ pluralize(issue_count, 'issue', 'issues') }}
+            {% endif %}
+        {% endwith %}
+    </a>
 {% endmacro %}
 
 
@@ -107,6 +131,7 @@
             .sort-key { background: #eee; }
             .sort-link { display: block; width: 100%; height: 100%; }
             ol.btn-list li { margin-bottom: 5px; }
+            .rightcol { text-align: right; }
         </style>
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
