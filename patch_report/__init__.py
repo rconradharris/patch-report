@@ -6,6 +6,7 @@ import pickle
 import re
 
 from patch_report import config
+from patch_report.models import gerrit
 from patch_report.models import redmine
 
 
@@ -17,17 +18,6 @@ def temp_chdir(dirname):
         yield
     finally:
         os.chdir(orig_path)
-
-
-class GerritReview(object):
-    BASE_URL = "https://review.openstack.org/#q,%s,n,z"
-
-    def __init__(self, change_id):
-        self.change_id = change_id
-
-    @property
-    def url(self):
-        return self.BASE_URL % self.change_id
 
 
 class Patch(object):
@@ -123,7 +113,7 @@ class Patch(object):
             return
 
         change_id = line.split(' ', 1)[1].strip()
-        gr = GerritReview(change_id)
+        gr = gerrit.GerritReview(change_id)
         self.gerrit_reviews.append(gr)
 
     def refresh(self):
