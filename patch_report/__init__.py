@@ -267,14 +267,13 @@ class PatchReport(object):
                 self.patches.append(patch)
                 idx += 1
 
+        with open(self._get_save_path(), 'w') as f:
+            pickle.dump(self, f)
+
     @staticmethod
     def _get_save_path():
         datadir = config.get('patch_report', 'data_directory')
         return os.path.join(datadir, 'repo_state.pickle')
-
-    def save(self):
-        with open(self._get_save_path(), 'w') as f:
-            pickle.dump(self, f)
 
     @classmethod
     def load(cls):
