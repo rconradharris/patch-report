@@ -16,8 +16,6 @@ class RedmineAuthException(RedmineException):
 
 
 class RedmineIssue(object):
-    BASE_URL = "https://redmine.ohthree.com/issues"
-
     def __init__(self, issue_id, subject=None, status=None):
         self.issue_id = issue_id
         self.subject = subject
@@ -25,7 +23,8 @@ class RedmineIssue(object):
 
     @property
     def url(self):
-        return os.path.join(self.BASE_URL, self.issue_id)
+        base = config.get('redmine', 'url')
+        return os.path.join(base, 'issues', self.issue_id)
 
     def __eq__(self, other):
         return self.issue_id == other.issue_id
