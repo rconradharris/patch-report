@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+"""
+Refresh patch_report state.
+
+Intended to be run from a cron-job.
+"""
+import patch_report
+patch_report.refresh_patch_series()
