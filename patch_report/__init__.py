@@ -5,7 +5,6 @@ import pickle
 
 from patch_report import config
 from patch_report.models import patch
-from patch_report.models import redmine
 
 
 @contextlib.contextmanager
@@ -26,13 +25,6 @@ class PatchReport(object):
     def path(self):
         return config.get('patch_report', 'repo_path')
 
-    @property
-    def redmine(self):
-        url = config.get('redmine', 'url')
-        username = config.get('redmine', 'username')
-        password = config.get('redmine', 'password')
-        return redmine.Redmine(url, username, password)
-
     def get_sorted_patches(self, sort_key, sort_dir):
         key = lambda p: getattr(p, sort_key)
         reverse = sort_dir == 'desc'
@@ -48,7 +40,7 @@ class PatchReport(object):
                 line = line.strip()
                 if not line:
                     continue
-                p = patch.Patch(self, idx, line)
+                p = patch.Patch(idx, line)
                 p.refresh()
                 self.patches.append(p)
                 idx += 1

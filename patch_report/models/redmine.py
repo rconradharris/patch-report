@@ -94,3 +94,23 @@ class Redmine(object):
 
         self._add_cached_issue(issue)
         return issue
+
+
+
+_REDMINE = None
+
+
+def _load():
+    global _REDMINE
+
+    url = config.get('redmine', 'url')
+    username = config.get('redmine', 'username')
+    password = config.get('redmine', 'password')
+    _REDMINE = Redmine(url, username, password)
+
+
+def get_issue(issue_id):
+    if _REDMINE is None:
+        _load()
+
+    return _REDMINE.get_issue(issue_id)

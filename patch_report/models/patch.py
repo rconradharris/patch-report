@@ -3,7 +3,9 @@ from email.utils import parsedate_tz, mktime_tz
 import os
 import re
 
+from patch_report import config
 from patch_report.models import gerrit
+from patch_report.models import redmine
 
 
 class Patch(object):
@@ -16,8 +18,7 @@ class Patch(object):
     # FIXME: Until UTF-8 is supported...
     NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
 
-    def __init__(self, patch_report, idx, filename):
-        self.patch_report = patch_report
+    def __init__(self, idx, filename):
         self.idx = idx
         self.filename = filename
 
@@ -48,7 +49,8 @@ class Patch(object):
 
     @property
     def path(self):
-        return os.path.join(self.patch_report.path, self.filename)
+        repo_path = config.get('patch_report', 'repo_path')
+        return os.path.join(repo_path, self.filename)
 
     def _parse_author(self, line):
         if not line.startswith('From:'):
@@ -81,7 +83,7 @@ class Patch(object):
             match = re.match(self.RE_RM_LINK, line)
         if match:
             issue_id = match.group(1)
-            rm_issue = self.patch_report.redmine.get_issue(issue_id)
+            rm_issue = redmine.get_issue(issue_id)
             # Avoid dup if there's a tag *and* a link
             if rm_issue not in self.rm_issues:
                 self.rm_issues.append(rm_issue)
