@@ -1,0 +1,13 @@
+[patch_report]
+repo_path=foo
+data_directory=/tmp
+
+[redmine]
+url=https://redmine.example.com
+username=foo
+password=bar
+
+[web]
+debug=true
+host=127.0.0.1
+port=5000

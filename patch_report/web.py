@@ -7,20 +7,14 @@ From command-line run:
 
 From webrowser navigate to:
     http://localhost:5000
-
-The following environment variables are used to configure the server:
-
-    HOST: host IP to bind to
-    PORT: port to bind to
-    DEBUG: enable debug mode
 """
 import os
 
 import flask
 app = flask.Flask(__name__)
-app.debug = os.environ.get('DEBUG') == '1'
 
 import patch_report
+from patch_report import config
 
 
 @app.route('/')
@@ -43,8 +37,7 @@ def patches():
                                  sort_dir=sort_dir,
                                  last_updated_at=last_updated_at)
 
-
 if __name__ == '__main__':
-    host = os.environ.get('HOST')
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host=host, port=port)
+    app.debug = config.get('web', 'debug')
+    app.run(host=config.get('web', 'host'),
+            port=config.get('web', 'port'))

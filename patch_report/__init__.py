@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 from email.utils import parsedate_tz, mktime_tz
 import os
@@ -6,8 +7,17 @@ import re
 
 import redmine
 
+from patch_report import config
 
-DATA_DIRECTORY = os.environ.get('DATA_DIRECTORY', '/tmp')
+
+@contextlib.contextmanager
+def temp_chdir(dirname):
+    orig_path = os.getcwd()
+    os.chdir(dirname)
+    try:
+        yield
+    finally:
+        os.chdir(orig_path)
 
 
 class GerritReview(object):
@@ -64,7 +74,8 @@ class Redmine(object):
 
     @property
     def _cache_path(self):
-        return os.path.join(DATA_DIRECTORY, 'redmine_issues.pickle')
+        datadir = config.get('patch_report', 'data_directory')
+        return os.path.join(datadir, 'redmine_issues.pickle')
 
     @property
     def cached_issues(self):
@@ -222,18 +233,18 @@ class Patch(object):
 
 
 class PatchReport(object):
-    def __init__(self, path):
-        self.path = path
+    def __init__(self):
         self.patches = []
 
     @property
+    def path(self):
+        return config.get('patch_report', 'repo_path')
+
+    @property
     def redmine(self):
-        url = os.environ.get('REDMINE_URL')
-        username = os.environ.get('REDMINE_USERNAME')
-        password = os.environ.get('REDMINE_PASSWORD')
-        assert all([url, username, password]),\
-               'Must provide REDMINE_URL, REDMINE_USERNAME, and'\
-               ' REDMINE_PASSWORD environment variables'
+        url = config.get('redmine', 'url')
+        username = config.get('redmine', 'username')
+        password = config.get('redmine', 'password')
         return Redmine(url, username, password)
 
     def get_sorted_patches(self, sort_key, sort_dir):
@@ -242,6 +253,9 @@ class PatchReport(object):
         return sorted(self.patches, key=key, reverse=reverse)
 
     def refresh(self):
+        with temp_chdir(self.path):
+            os.system('git checkout master && git fetch origin && git merge origin/master')
+
         idx = 1
         with open(os.path.join(self.path, 'series')) as f:
             for line in f:
@@ -255,7 +269,8 @@ class PatchReport(object):
 
     @staticmethod
     def _get_save_path():
-        return os.path.join(DATA_DIRECTORY, 'repo_state.pickle')
+        datadir = config.get('patch_report', 'data_directory')
+        return os.path.join(datadir, 'repo_state.pickle')
 
     def save(self):
         with open(self._get_save_path(), 'w') as f:
