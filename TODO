@@ -1,2 +1,4 @@
+- Better configuration
+    - Use cfg file in /etc instead of envirionment variables
 - Add Gerrit title/status to modal
 - Add setup.py

@@ -3,7 +3,7 @@ Refresh patch_report state.
 
 Intended to be run from a cron-job.
 
-python patch_report/refresh.py <patch-repo-path> <state-file>
+python patch_report/refresh.py <patch-repo-path>
 """
 import contextlib
 import os
@@ -28,8 +28,8 @@ def refresh_git(path):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print >> sys.stderr, "usage: refresh.py <patch-repo-path> <state-file>"
+    if len(sys.argv) < 2:
+        print >> sys.stderr, "usage: refresh.py <patch-repo-path>"
         sys.exit(1)
 
     path = sys.argv[1]
@@ -38,16 +38,8 @@ if __name__ == '__main__':
                              " exist '%s'" % path
         sys.exit(1)
 
-    state_file = sys.argv[2]
-    if not os.path.exists(path):
-        print >> sys.stderr, "error: state-file doesn't exist"\
-                             " '%s'" % state_file
-        sys.exit(1)
-
     refresh_git(path)
 
     pr = patch_report.PatchReport(path)
     pr.refresh()
-
-    state = patch_report.PatchRepoState(state_file)
-    state.save(pr)
+    pr.save()

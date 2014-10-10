@@ -23,9 +23,6 @@ app.debug = os.environ.get('DEBUG') == '1'
 import patch_report
 
 
-STATE_FILE = os.environ.get('STATE_FILE', 'repo_state.pickle')
-
-
 @app.route('/')
 def index():
     return flask.redirect(flask.url_for('patches'))
@@ -33,12 +30,13 @@ def index():
 
 @app.route('/patches')
 def patches():
-    state = patch_report.PatchRepoState(STATE_FILE)
-    patch_set = state.load()
+    pr = patch_report.PatchReport.load()
+    last_updated_at = patch_report.PatchReport.get_last_updated_at()
+
     sort_key = flask.request.args.get('sort_key', 'idx')
     sort_dir = flask.request.args.get('sort_dir', 'desc')
-    patches = patch_set.get_sorted_patches(sort_key, sort_dir)
-    last_updated_at = state.get_last_updated_at()
+    patches = pr.get_sorted_patches(sort_key, sort_dir)
+
     return flask.render_template('patches.html',
                                  patches=patches,
                                  sort_key=sort_key,

@@ -7,6 +7,9 @@ import re
 import redmine
 
 
+DATA_DIRECTORY = os.environ.get('DATA_DIRECTORY', '/tmp')
+
+
 class GerritReview(object):
     BASE_URL = "https://review.openstack.org/#q,%s,n,z"
 
@@ -27,8 +30,6 @@ class RedmineAuthException(RedmineException):
 
 
 class Redmine(object):
-    RM_CACHE = 'redmine_issues.pickle'
-
     def __init__(self, url, username, password, verify_cert=False, debug=True):
         self.url = url
         self.username = username
@@ -62,10 +63,14 @@ class Redmine(object):
                 'status': status}
 
     @property
+    def _cache_path(self):
+        return os.path.join(DATA_DIRECTORY, 'redmine_issues.pickle')
+
+    @property
     def cached_issues(self):
         if not hasattr(self, '_cached_issues'):
-            if os.path.exists(self.RM_CACHE):
-                with open(self.RM_CACHE) as f:
+            if os.path.exists(self._cache_path):
+                with open(self._cache_path) as f:
                     self._cached_issues = pickle.load(f)
             else:
                 self._cached_issues = {}
@@ -74,7 +79,7 @@ class Redmine(object):
 
     def _add_cached_issue(self, issue):
         self.cached_issues[issue.issue_id] = issue
-        with open(self.RM_CACHE, 'w') as f:
+        with open(self._cache_path, 'w') as f:
             pickle.dump(self.cached_issues, f)
 
     def get_issue(self, issue_id):
@@ -216,26 +221,6 @@ class Patch(object):
         self.line_count = line_count
 
 
-class PatchRepoState(object):
-    def __init__(self, filename):
-        self.filename = filename
-
-    def load(self):
-        with open(self.filename) as f:
-            patch_report = pickle.load(f)
-        return patch_report
-
-    def save(self, patch_report):
-        with open(self.filename, 'w') as f:
-            pickle.dump(patch_report, f)
-
-    def get_last_updated_at(self):
-        if not os.path.exists(self.filename):
-            return None
-        epoch_secs = os.path.getmtime(self.filename)
-        return datetime.datetime.fromtimestamp(epoch_secs)
-
-
 class PatchReport(object):
     def __init__(self, path):
         self.path = path
@@ -267,3 +252,27 @@ class PatchReport(object):
                 patch.refresh()
                 self.patches.append(patch)
                 idx += 1
+
+    @staticmethod
+    def _get_save_path():
+        return os.path.join(DATA_DIRECTORY, 'repo_state.pickle')
+
+    def save(self):
+        with open(self._get_save_path(), 'w') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(cls):
+        with open(cls._get_save_path()) as f:
+            patch_report = pickle.load(f)
+        return patch_report
+
+    @classmethod
+    def get_last_updated_at(cls):
+        path = cls._get_save_path()
+
+        if not os.path.exists(path):
+            return None
+
+        epoch_secs = os.path.getmtime(path)
+        return datetime.datetime.fromtimestamp(epoch_secs)
