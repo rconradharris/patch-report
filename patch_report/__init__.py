@@ -1,20 +1,9 @@
-import contextlib
-import datetime
 import os
 import pickle
 
 from patch_report import config
 from patch_report.models import patch_series
-
-
-@contextlib.contextmanager
-def temp_chdir(dirname):
-    orig_path = os.getcwd()
-    os.chdir(dirname)
-    try:
-        yield
-    finally:
-        os.chdir(orig_path)
+from patch_report import utils
 
 
 def _get_save_path():
@@ -25,7 +14,7 @@ def _get_save_path():
 def refresh_patch_series():
     repo_path = config.get('patch_report', 'repo_path')
 
-    with temp_chdir(repo_path):
+    with utils.temp_chdir(repo_path):
         os.system('git checkout master && git fetch origin'
                   ' && git merge origin/master')
 
@@ -43,9 +32,4 @@ def get_patch_series():
 
 def get_last_updated_at():
     path = _get_save_path()
-
-    if not os.path.exists(path):
-        return None
-
-    epoch_secs = os.path.getmtime(path)
-    return datetime.datetime.fromtimestamp(epoch_secs)
+    return utils.get_file_modified_time(path)
