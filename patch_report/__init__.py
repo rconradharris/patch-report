@@ -4,7 +4,7 @@ import os
 import pickle
 
 from patch_report import config
-from patch_report.models import patch
+from patch_report.models import patch_series
 
 
 @contextlib.contextmanager
@@ -17,54 +17,35 @@ def temp_chdir(dirname):
         os.chdir(orig_path)
 
 
-class PatchReport(object):
-    def __init__(self):
-        self.patches = []
+def _get_save_path():
+    datadir = config.get('patch_report', 'data_directory')
+    return os.path.join(datadir, 'repo_state.pickle')
 
-    @property
-    def path(self):
-        return config.get('patch_report', 'repo_path')
 
-    def get_sorted_patches(self, sort_key, sort_dir):
-        key = lambda p: getattr(p, sort_key)
-        reverse = sort_dir == 'desc'
-        return sorted(self.patches, key=key, reverse=reverse)
+def refresh_patch_series():
+    repo_path = config.get('patch_report', 'repo_path')
 
-    def refresh(self):
-        with temp_chdir(self.path):
-            os.system('git checkout master && git fetch origin && git merge origin/master')
+    with temp_chdir(repo_path):
+        os.system('git checkout master && git fetch origin'
+                  ' && git merge origin/master')
 
-        idx = 1
-        with open(os.path.join(self.path, 'series')) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                p = patch.Patch(idx, line)
-                p.refresh()
-                self.patches.append(p)
-                idx += 1
+    ps = patch_series.PatchSeries()
+    ps.refresh()
 
-        with open(self._get_save_path(), 'w') as f:
-            pickle.dump(self, f)
+    with open(_get_save_path(), 'w') as f:
+        pickle.dump(ps, f)
 
-    @staticmethod
-    def _get_save_path():
-        datadir = config.get('patch_report', 'data_directory')
-        return os.path.join(datadir, 'repo_state.pickle')
 
-    @classmethod
-    def load(cls):
-        with open(cls._get_save_path()) as f:
-            patch_report = pickle.load(f)
-        return patch_report
+def get_patch_series():
+    with open(_get_save_path()) as f:
+        return pickle.load(f)
 
-    @classmethod
-    def get_last_updated_at(cls):
-        path = cls._get_save_path()
 
-        if not os.path.exists(path):
-            return None
+def get_last_updated_at():
+    path = _get_save_path()
 
-        epoch_secs = os.path.getmtime(path)
-        return datetime.datetime.fromtimestamp(epoch_secs)
+    if not os.path.exists(path):
+        return None
+
+    epoch_secs = os.path.getmtime(path)
+    return datetime.datetime.fromtimestamp(epoch_secs)

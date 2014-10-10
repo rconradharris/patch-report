@@ -9,5 +9,4 @@ import patch_report
 
 
 if __name__ == '__main__':
-    pr = patch_report.PatchReport()
-    pr.refresh()
+    patch_report.refresh_patch_series()

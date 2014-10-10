@@ -24,12 +24,13 @@ def index():
 
 @app.route('/patches')
 def patches():
-    pr = patch_report.PatchReport.load()
-    last_updated_at = patch_report.PatchReport.get_last_updated_at()
+    patch_series = patch_report.get_patch_series()
+
+    last_updated_at = patch_report.get_last_updated_at()
 
     sort_key = flask.request.args.get('sort_key', 'idx')
     sort_dir = flask.request.args.get('sort_dir', 'desc')
-    patches = pr.get_sorted_patches(sort_key, sort_dir)
+    patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
     return flask.render_template('patches.html',
                                  patches=patches,
