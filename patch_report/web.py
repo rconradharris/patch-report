@@ -38,7 +38,13 @@ def patches():
                                  sort_dir=sort_dir,
                                  last_updated_at=last_updated_at)
 
-if __name__ == '__main__':
+
+def _init_app(app):
     app.debug = config.get('web', 'debug')
-    app.run(host=config.get('web', 'host'),
-            port=config.get('web', 'port'))
+
+
+_init_app(app)
+
+
+if __name__ == '__main__':
+    app.run()

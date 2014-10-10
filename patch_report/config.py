@@ -35,17 +35,13 @@ _OPTIONS_SCHEMA = {
     "web": {
         "debug": {"type": "bool",
                   "default": False},
-        "host": {"type": "str",
-                 "default": None},
-        "port": {"type": "int",
-                 "default": None},
     },
 }
 
 
 _SEARCH_PATH = ['./patch_report.cfg',
-               '~/.patch_report.cfg',
-               '/etc/patch_report.cfg']
+                '~/.patch_report.cfg',
+                '/etc/patch_report.cfg']
 
 
 def _get_value(cfg, section, key, type_):

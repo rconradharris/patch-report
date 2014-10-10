@@ -1,0 +1,7 @@
+#!/bin/bash
+# usage: serve [gunicorn]
+if [[ $1 == gunicorn ]]; then
+    sudo gunicorn -b "0.0.0.0:80" -w 4 patch_report.web:app
+else
+    python patch_report/web.py
+fi
