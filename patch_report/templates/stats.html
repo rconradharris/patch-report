@@ -1,0 +1,28 @@
+{% extends '_layout.html' %}
+
+{% block title %}
+PatchReport - Stats
+{% endblock title %}
+
+{% block main_container %}
+<div class="row">
+    <div class="col-md-2">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th class="rightcol">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, count in category_counts %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td class="rightcol">{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+<div>
+{% endblock main_container %}

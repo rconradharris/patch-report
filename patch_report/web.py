@@ -39,6 +39,14 @@ def patches():
                                  last_updated_at=last_updated_at)
 
 
+@app.route('/stats')
+def stats():
+    patch_series = patch_report.get_patch_series()
+    category_counts = patch_series.get_category_counts()
+    return flask.render_template('stats.html',
+                                 category_counts=category_counts)
+
+
 def _init_app(app):
     app.debug = config.get('web', 'debug')
 

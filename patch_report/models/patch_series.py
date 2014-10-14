@@ -1,3 +1,4 @@
+import collections
 import os
 
 from patch_report import config
@@ -27,3 +28,21 @@ class PatchSeries(object):
         key = lambda p: getattr(p, sort_key)
         reverse = sort_dir == 'desc'
         return sorted(self.patches, key=key, reverse=reverse)
+
+    def get_category_counts(self):
+        """If a prefix is detected more than once in a patch filename, it's
+        considered a 'category'.
+        """
+        counter = collections.Counter()
+        for patch in self.patches:
+            parts = patch.filename.split('-')
+            if len(parts) > 1:
+                counter[parts[0]] += 1
+
+        category_counts = []
+        for category, count in counter.iteritems():
+            if count > 1:
+                category_counts.append((category, count))
+
+        category_counts.sort(key=lambda x: x[1], reverse=True)
+        return category_counts

@@ -1,3 +1,5 @@
+{% extends '_layout.html' %}
+
 {% macro sort_heading(key, name=None) %}
     {% set is_sort_key = key == sort_key %}
     <th class="{{ 'sort-key' if is_sort_key else '' }}">
@@ -116,96 +118,50 @@
     <a data-toggle="modal" data-target="#files-modal-{{ patch.idx }}" href="javascript:void(0)">{{ patch.file_count }}</a>
 {% endmacro %}
 
+{% block title %}
+PatchReport - Patches
+{% endblock title %}
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>PatchRepo</title>
-        <link href="static/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            #main { margin-top: 50px; margin-bottom: 50px; }
-            #sort-caret { float: right; }
-            .sort-key { background: #eee; }
-            .sort-link { display: block; width: 100%; height: 100%; }
-            ol.btn-list li { margin-bottom: 5px; }
-            .rightcol { text-align: right; }
-        </style>
+{% block main_container %}
+<table class="table table-striped">
+<thead>
+    <tr>
+        {{ sort_heading('idx', name='#') }}
+        {{ sort_heading('date') }}
+        {{ sort_heading('filename') }}
+        {{ sort_heading('author') }}
+        {{ sort_heading('line_count') }}
+        {{ sort_heading('file_count') }}
+        {{ sort_heading('rm_issue_count',
+                        name='Redmine Issues') }}
+        {{ sort_heading('gerrit_review_count',
+                        name='Upstream Reviews') }}
+    </tr>
+</thead>
+{% for patch in patches %}
+    <tr>
+        <td>{{ patch.idx }} </td>
+        <td>{{ patch.date.date() }} </td>
+        <td><a target="_blank" href="{{ patch.url }}">{{ patch.filename }}</a></td>
+        <td>{{ patch.author }} </td>
+        <td>{{ patch.line_count }}</td>
+        <td>{{ file_list_modal(patch) }}</td>
+        <td>
+            {% if patch.rm_issue_count > 0 %}
+                {{ rm_list_modal(patch) }}
+            {% endif %}
+        </td>
+        <td>
+            {% if patch.gerrit_review_count == 0 %}
+            {% elif patch.gerrit_review_count == 1 %}
+                {{ gr_link(patch.gerrit_reviews[0]) }}
+            {% else %}
+                {{ gr_list_modal(patch) }}
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+</table>
+Last Updated: {{ last_updated_at }} UTC
+{% endblock main_container %}
 
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-    </head>
-    <body>
-        <!-- Navbar -->
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="{{ url_for('index') }}">PatchRepo</a>
-            </div>
-            <div class="navbar-collapse collapse">
-              <ul class="nav navbar-nav navbar-right">
-                <li><a href="{{ url_for('patches') }}">Patches</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Container -->
-        <div id="main" class="container-fluid">
-            <table class="table table-striped">
-            <thead>
-                <tr>
-                    {{ sort_heading('idx', name='#') }}
-                    {{ sort_heading('date') }}
-                    {{ sort_heading('filename') }}
-                    {{ sort_heading('author') }}
-                    {{ sort_heading('line_count') }}
-                    {{ sort_heading('file_count') }}
-                    {{ sort_heading('rm_issue_count',
-                                    name='Redmine Issues') }}
-                    {{ sort_heading('gerrit_review_count',
-                                    name='Upstream Reviews') }}
-                </tr>
-            </thead>
-            {% for patch in patches %}
-                <tr>
-                    <td>{{ patch.idx }} </td>
-                    <td>{{ patch.date.date() }} </td>
-                    <td><a target="_blank" href="{{ patch.url }}">{{ patch.filename }}</a></td>
-                    <td>{{ patch.author }} </td>
-                    <td>{{ patch.line_count }}</td>
-                    <td>{{ file_list_modal(patch) }}</td>
-                    <td>
-                        {% if patch.rm_issue_count > 0 %}
-                            {{ rm_list_modal(patch) }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if patch.gerrit_review_count == 0 %}
-                        {% elif patch.gerrit_review_count == 1 %}
-                            {{ gr_link(patch.gerrit_reviews[0]) }}
-                        {% else %}
-                            {{ gr_list_modal(patch) }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </table>
-            Last Updated: {{ last_updated_at }} UTC
-        </div>
-        <script src="static/js/jquery.min.js"></script>
-        <script src="static/js/bootstrap.min.js"></script>
-    </body>
-</html>
