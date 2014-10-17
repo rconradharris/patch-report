@@ -33,16 +33,23 @@ class PatchSeries(object):
         """If a prefix is detected more than once in a patch filename, it's
         considered a 'category'.
         """
+        # Count categories
         counter = collections.Counter()
         for patch in self.patches:
             parts = patch.filename.split('-')
-            if len(parts) > 1:
-                counter[parts[0]] += 1
+            category = parts[0] if len(parts) > 1 else None
+            counter[category] += 1
 
-        category_counts = []
+        # Group None-valued categories
+        counter2 = collections.Counter()
         for category, count in counter.iteritems():
-            if count > 1:
-                category_counts.append((category, count))
+            if count < 2:
+                category = None
+            counter2[category] += count
 
-        category_counts.sort(key=lambda x: x[1], reverse=True)
+        # Return in a Jinja-friendly format (works well with filters)
+        category_counts = []
+        for category, count in counter2.iteritems():
+            category_counts.append({'category': category, 'count': count})
+
         return category_counts

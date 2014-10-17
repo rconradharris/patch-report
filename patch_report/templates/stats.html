@@ -12,16 +12,34 @@ PatchReport - Stats
                 <tr>
                     <th>Category</th>
                     <th class="rightcol">Count</th>
+                    <th class="rightcol">Percent</th>
                 </tr>
             </thead>
             <tbody>
-                {% for category, count in category_counts %}
+                {% set total = category_counts|sum(attribute='count') %}
+                {% for item in category_counts|sort(attribute='count', reverse=True) %}
                     <tr>
-                        <td>{{ category }}</td>
-                        <td class="rightcol">{{ count }}</td>
+                        <td>
+                            {% with category = item['category'] %}
+                                {% if category is none %}
+                                    <em>(No category)</em>
+                                {% else %}
+                                    {{ category }}
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td class="rightcol">{{ item['count'] }}</td>
+                        <td class="rightcol">{{ (item['count'] * 100 / total)|round(0) }} %</td>
                     </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th class="rightcol">{{ total }}</th>
+                    <th class="rightcol">100.0 %</th>
+                </tr>
+            </tfoot>
         </table>
     </div>
 <div>
