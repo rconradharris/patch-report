@@ -29,6 +29,17 @@ class PatchSeries(object):
         reverse = sort_dir == 'desc'
         return sorted(self.patches, key=key, reverse=reverse)
 
+    def get_author_counts(self):
+        counter = collections.Counter()
+        for patch in self.patches:
+            counter[patch.author] += 1
+
+        author_counts = []
+        for author, count in counter.iteritems():
+            author_counts.append({'author': author, 'count': count})
+
+        return author_counts
+
     def get_category_counts(self):
         """If a prefix is detected more than once in a patch filename, it's
         considered a 'category'.

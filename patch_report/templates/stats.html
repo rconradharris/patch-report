@@ -4,43 +4,51 @@
 PatchReport - Stats
 {% endblock title %}
 
+{% macro count_table(data, attribute) %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{{ attribute|capitalize }}</th>
+            <th class="rightcol">Count</th>
+            <th class="rightcol">Percent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set total = data|sum(attribute='count') %}
+        {% for item in data|sort(attribute='count', reverse=True) %}
+            <tr>
+                <td>
+                    {% with value = item[attribute] %}
+                        {% if value is none %}
+                            <em>(No {{ attribute }})</em>
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td class="rightcol">{{ item['count'] }}</td>
+                <td class="rightcol">{{ (item['count'] * 100 / total)|round(0) }} %</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <th class="rightcol">{{ total }}</th>
+            <th class="rightcol">100.0 %</th>
+        </tr>
+    </tfoot>
+</table>
+{% endmacro %}
+
+
 {% block main_container %}
 <div class="row">
-    <div class="col-md-2">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th class="rightcol">Count</th>
-                    <th class="rightcol">Percent</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set total = category_counts|sum(attribute='count') %}
-                {% for item in category_counts|sort(attribute='count', reverse=True) %}
-                    <tr>
-                        <td>
-                            {% with category = item['category'] %}
-                                {% if category is none %}
-                                    <em>(No category)</em>
-                                {% else %}
-                                    {{ category }}
-                                {% endif %}
-                            {% endwith %}
-                        </td>
-                        <td class="rightcol">{{ item['count'] }}</td>
-                        <td class="rightcol">{{ (item['count'] * 100 / total)|round(0) }} %</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>Total</th>
-                    <th class="rightcol">{{ total }}</th>
-                    <th class="rightcol">100.0 %</th>
-                </tr>
-            </tfoot>
-        </table>
+    <div class="col-md-3">
+        {{ count_table(category_counts, 'category') }}
+    </div>
+    <div class="col-md-3">
+        {{ count_table(author_counts, 'author') }}
     </div>
 <div>
 {% endblock main_container %}

@@ -43,8 +43,10 @@ def patches():
 def stats():
     patch_series = patch_report.get_patch_series()
     category_counts = patch_series.get_category_counts()
+    author_counts = patch_series.get_author_counts()
     return flask.render_template('stats.html',
-                                 category_counts=category_counts)
+                                 category_counts=category_counts,
+                                 author_counts=author_counts)
 
 
 def _init_app(app):
