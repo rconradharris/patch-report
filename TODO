@@ -1,3 +1,4 @@
+- Rename index to overview
 - Move templates and static out of project directory and up one level
 - Add Gerrit title/status to modal
 - Add setup.py
