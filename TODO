@@ -1,7 +1,7 @@
+- Make overview columns sortable
 - Do not write to state and redmine files, write to tmp file and move in place
   (avoid corruption)
 - Refresh redmine daily
-- Make overview columns sortable
 - Move templates and static out of project directory and up one level
 - Add Gerrit title/status to modal
 - Add setup.py

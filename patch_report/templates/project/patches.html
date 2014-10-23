@@ -142,7 +142,7 @@
     <tr>
         <td>{{ patch.idx }} </td>
         <td>{{ patch.date.date() }} </td>
-        <td><a target="_blank" href="{{ patch.url }}">{{ patch.filename }}</a></td>
+        <td><a target="_blank" href="{{ patch.url }}">{{ patch.filename|truncate(32, True) }}</a></td>
         <td>{{ patch.author }} </td>
         <td>{{ patch.line_count }}</td>
         <td>{{ file_list_modal(patch) }}</td>

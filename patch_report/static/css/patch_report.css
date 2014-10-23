@@ -1,4 +1,5 @@
 #logo { float: left; }
+th, td { white-space: nowrap; }
 .navbar-inverse { background-color: #000; }
 #main { margin-top: 50px; margin-bottom: 50px; padding-top: 10px; }
 .tab { margin-top: 10px; }
