@@ -10,7 +10,7 @@ from patch_report.models import redmine
 
 class Patch(object):
     RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
-    RE_RM_LINK = re.compile('https://redmine.ohthree.com/issues/(\d+)')
+    RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
 
     # FIXME: Until UTF-8 is supported...
     NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
