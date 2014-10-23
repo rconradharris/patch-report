@@ -1,12 +1,8 @@
 - Multi-project
-    - add refresh_all_projects() function which uses refresh_patch_series()
-
-    - bin/refesh should call refresh_all_projects()
-
     - Add new index page dashboard
         - Show number of patches for each project
 
-- Move templates and static out of project directory and up one level
 - Make RE_RM_LINK use redmine_url config
+- Move templates and static out of project directory and up one level
 - Add Gerrit title/status to modal
 - Add setup.py

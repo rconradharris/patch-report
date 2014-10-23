@@ -80,6 +80,8 @@ def _parse_section(cfg, section, section_schema, values):
 
 
 _CONFIG_VALUES = {}
+_PROJECTS = []
+
 
 def _load():
     cfg = ConfigParser.SafeConfigParser()
@@ -93,13 +95,13 @@ def _load():
         raise ConfigFileNotFound('Config not found in search path: %s' %
                                  _SEARCH_PATH)
 
-
-    cfg_sections = cfg.sections()
-
-    # Parse sections defined in config file
-    for section in cfg_sections:
+    for section in cfg.sections():
         if ':' in section:
-            prefix = section.split(':', 1)[0]
+            prefix, rest = section.split(':', 1)
+
+            if prefix == 'project':
+                _PROJECTS.append(rest)
+
             section_schema = _OPTIONS_SCHEMA[prefix + ':']
         else:
             section_schema = _OPTIONS_SCHEMA[section]
@@ -116,3 +118,10 @@ def get(section, key):
 
 def get_for_project(project, key):
     return get('project:%s' % project, key)
+
+
+def get_projects():
+    if not _PROJECTS:
+        _load()
+
+    return _PROJECTS

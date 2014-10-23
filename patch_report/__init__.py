@@ -11,7 +11,7 @@ def _get_project_state_file(project):
     return os.path.join(datadir, '%s.pickle' % project)
 
 
-def refresh_patch_series(project):
+def _refresh_project(project):
     repo_path = config.get_for_project(project, 'repo_path')
 
     with utils.temp_chdir(repo_path):
@@ -24,6 +24,12 @@ def refresh_patch_series(project):
     path = _get_project_state_file(project)
     with open(path, 'w') as f:
         pickle.dump(ps, f)
+
+
+def refresh_projects():
+    projects = config.get_projects()
+    for project in projects:
+        _refresh_project(project)
 
 
 def get_patch_series(project):
