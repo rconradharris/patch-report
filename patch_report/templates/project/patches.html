@@ -1,8 +1,8 @@
 {% extends 'project/_layout.html' %}
 
-{% macro sort_heading(key, name=None) %}
+{% macro sort_heading(key, name=None, align_right=False) %}
     {% set is_sort_key = key == sort_key %}
-    <th class="{{ 'sort-key' if is_sort_key else '' }}">
+    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
     {% if is_sort_key %}
         {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
     {% else %}
@@ -130,12 +130,14 @@
         {{ sort_heading('date') }}
         {{ sort_heading('filename') }}
         {{ sort_heading('author') }}
-        {{ sort_heading('line_count') }}
-        {{ sort_heading('file_count') }}
         {{ sort_heading('rm_issue_count',
-                        name='Redmine Issues') }}
+                        name='Redmine Issues',
+                        align_right=True) }}
         {{ sort_heading('upstream_review_count',
-                        name='Upstream Reviews') }}
+                        name='Upstream Reviews',
+                        align_right=True) }}
+        {{ sort_heading('file_count', align_right=True) }}
+        {{ sort_heading('line_count', align_right=True) }}
     </tr>
 </thead>
 {% for patch in patches %}
@@ -144,14 +146,12 @@
         <td>{{ patch.date.date() }} </td>
         <td><a target="_blank" href="{{ patch.url }}">{{ patch.filename|truncate(32, True) }}</a></td>
         <td>{{ patch.author }} </td>
-        <td>{{ patch.line_count }}</td>
-        <td>{{ file_list_modal(patch) }}</td>
-        <td>
+        <td class="rightcol">
             {% if patch.rm_issue_count > 0 %}
                 {{ rm_list_modal(patch) }}
             {% endif %}
         </td>
-        <td>
+        <td class="rightcol">
             {% if patch.upstream_review_count == 0 %}
             {% elif patch.upstream_review_count == 1 %}
                 {{ gr_link(patch.upstream_reviews[0]) }}
@@ -159,6 +159,8 @@
                 {{ gr_list_modal(patch) }}
             {% endif %}
         </td>
+        <td class="rightcol">{{ file_list_modal(patch) }}</td>
+        <td class="rightcol">{{ patch.line_count }}</td>
     </tr>
 {% else %}
     <tr>
