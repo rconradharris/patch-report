@@ -78,7 +78,7 @@
               </button>
 
               <span id="logo"><img src="/static/img/logo.jpg" width="40" height="50"></span>
-              <a class="navbar-brand" href="{{ url_for('index') }}">PatchRepo</a>
+              <a class="navbar-brand" href="{{ url_for('overview') }}">PatchRepo</a>
             </div>
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav navbar-right">
@@ -92,7 +92,7 @@
             <div class="row">
                 <div class="col-sm-3 col-md-2 sidebar">
                   <ul class="nav nav-sidebar">
-                    {{ macros.tab_item(sidebar_tab, 'Overview', url_for('index')) }}
+                    {{ macros.tab_item(sidebar_tab, 'Overview', url_for('overview')) }}
                   </ul>
                   <ul class="nav nav-sidebar">
                     {% for project in projects %}

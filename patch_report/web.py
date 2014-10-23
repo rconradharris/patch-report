@@ -19,7 +19,7 @@ from patch_report import config
 
 
 @app.route('/')
-def index():
+def overview():
     projects = config.get_projects()
 
     overview_counts_by_project = {}
@@ -28,7 +28,7 @@ def index():
         overview_counts = patch_series.get_overview_counts()
         overview_counts_by_project[project] = overview_counts
 
-    return render_template('index.html',
+    return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
                            projects=projects,
                            sidebar_tab='Overview',
