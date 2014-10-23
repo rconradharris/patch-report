@@ -18,4 +18,4 @@ def get_file_modified_time(path):
         return None
 
     epoch_secs = os.path.getmtime(path)
-    return datetime.datetime.fromtimestamp(epoch_secs)
+    return datetime.datetime.utcfromtimestamp(epoch_secs)
