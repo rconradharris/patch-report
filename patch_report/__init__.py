@@ -7,12 +7,12 @@ from patch_report import utils
 
 
 def _get_save_path():
-    datadir = config.get('patch_report', 'data_directory')
+    datadir = config.get('project:nova', 'data_directory')
     return os.path.join(datadir, 'repo_state.pickle')
 
 
 def refresh_patch_series():
-    repo_path = config.get('patch_report', 'repo_path')
+    repo_path = config.get('project:nova', 'repo_path')
 
     with utils.temp_chdir(repo_path):
         os.system('git checkout master && git fetch origin'

@@ -1,2 +1,18 @@
+- Multi-project
+    - Add <project_id> to URL (but not used)
+
+    - Make get_patch_series() and get_last_updated_at() take `patch_id`
+      argument
+
+    - refresh_patch_series() should take `patch_id` argument
+
+    - add refresh_all_projects() function which uses refresh_patch_series()
+
+    - bin/refesh should call refresh_all_projects()
+
+    - Add new index page dashboard
+        - Show number of patches for each project
+
+- Make RE_RM_LINK use redmine_url config
 - Add Gerrit title/status to modal
 - Add setup.py

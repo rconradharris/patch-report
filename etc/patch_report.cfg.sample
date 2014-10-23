@@ -1,6 +1,7 @@
-[patch_report]
-repo_path=foo
+[project:nova]
 data_directory=/tmp
+patch_url=https://github.com/user/project/blob/master
+repo_path=foo
 
 [redmine]
 url=https://redmine.example.com

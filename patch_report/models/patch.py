@@ -9,9 +9,6 @@ from patch_report.models import redmine
 
 
 class Patch(object):
-    GITHUB_URL = "https://github.rackspace.com/O3Eng/nova-rax-patches/blob"\
-                 "/master"
-
     RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
     RE_RM_LINK = re.compile('https://redmine.ohthree.com/issues/(\d+)')
 
@@ -45,7 +42,8 @@ class Patch(object):
 
     @property
     def url(self):
-        return os.path.join(self.GITHUB_URL, self.filename)
+        base_url = config.get('project:nova', 'patch_url')
+        return os.path.join(base_url, self.filename)
 
     @property
     def path(self):
