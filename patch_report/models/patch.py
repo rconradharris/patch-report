@@ -47,8 +47,8 @@ class Patch(object):
 
     @property
     def url(self):
-        base_url = config.get_for_project(self.project, 'patch_url')
-        return os.path.join(base_url, self.filename)
+        base_url = config.get_for_project(self.project, 'github_url')
+        return os.path.join(base_url, 'blob', 'master', self.filename)
 
     @property
     def path(self):

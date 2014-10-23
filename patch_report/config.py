@@ -23,7 +23,7 @@ _OPTIONS_SCHEMA = {
                            "default": '/tmp'},
     },
     "project:": {
-        "patch_url": {"type": "str",
+        "github_url": {"type": "str",
                       "default": _OPTION_REQUIRED},
         "repo_path": {"type": "str",
                       "default": _OPTION_REQUIRED},

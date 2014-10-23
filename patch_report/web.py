@@ -55,6 +55,7 @@ def project_patches(project):
     patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
     sidebar = _sidebar_for_project(project)
+    github_url = config.get_for_project(project, 'github_url')
 
     return render_template('project/patches.html',
                            patches=patches,
@@ -63,6 +64,7 @@ def project_patches(project):
                            sort_key=sort_key,
                            sort_dir=sort_dir,
                            last_updated_at=last_updated_at,
+                           github_url=github_url,
                            **sidebar
                            )
 

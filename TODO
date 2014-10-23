@@ -1,3 +1,6 @@
+- Provide link to patch-repo
+- Refactor common project stuff
+
 - Move templates and static out of project directory and up one level
 - Add Gerrit title/status to modal
 - Add setup.py
