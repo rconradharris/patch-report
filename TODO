@@ -1,6 +1,6 @@
 - Multi-project
-    - Add new index page dashboard
-        - Show number of patches for each project
+    - Fix layout header
+    - Fix title for patch report pages
 
 - Make RE_RM_LINK use redmine_url config
 - Move templates and static out of project directory and up one level

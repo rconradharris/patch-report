@@ -65,3 +65,14 @@ class PatchSeries(object):
             category_counts.append({'category': category, 'count': count})
 
         return category_counts
+
+    def get_overview_counts(self):
+        num_patches = len(self.patches)
+        num_files = sum(len(p.files) for p in self.patches)
+        num_lines = sum(p.line_count for p in self.patches)
+        return {
+            'num_files': num_files,
+            'num_lines': num_lines,
+            'num_patches': num_patches,
+        }
+

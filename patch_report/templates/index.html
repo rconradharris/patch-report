@@ -1,0 +1,56 @@
+{% extends '_layout.html' %}
+
+
+{% block title %}
+PatchReport Overview
+{% endblock title %}
+
+{% block main_container %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th class="rightcol">Patch Count</th>
+            <th class="rightcol">File Count</th>
+            <th class="rightcol">Line Count</th>
+        </tr>
+    </thead>
+    <tbody>
+
+{% for project in projects %}
+        <tr>
+            <td>
+                <a href="{{ url_for('project', project=project) }}">{{ project }}</a>
+            </td>
+            {% with counts = overview_counts_by_project[project] %}
+            <td class="rightcol">
+                {{ counts['num_patches'] }}
+            </td>
+            <td class="rightcol">
+                {{ counts['num_files'] }}
+            </td>
+            <td class="rightcol">
+                {{ counts['num_lines'] }}
+            </td>
+            {% endwith %}
+        </tr>
+{% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            {% with all_counts = overview_counts_by_project.values() %}
+            <th class="rightcol">
+                {{ all_counts|sum('num_patches') }}
+            </th>
+            <th class="rightcol">
+                {{ all_counts|sum('num_files') }}
+            </th>
+            <th class="rightcol">
+                {{ all_counts|sum('num_lines') }}
+            </th>
+            {% endwith %}
+        </tr>
+    </tfoot>
+</table>
+{% endblock main_container %}

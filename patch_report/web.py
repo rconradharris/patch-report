@@ -10,8 +10,9 @@ From webrowser navigate to:
 """
 import os
 
-import flask
-app = flask.Flask(__name__)
+from flask import Flask, redirect, render_template, request, url_for
+
+app = Flask(__name__)
 
 import patch_report
 from patch_report import config
@@ -19,8 +20,23 @@ from patch_report import config
 
 @app.route('/')
 def index():
-    project = 'nova'
-    return flask.redirect(flask.url_for('project_patches', project=project))
+    projects = config.get_projects()
+
+    overview_counts_by_project = {}
+    for project in projects:
+        patch_series = patch_report.get_patch_series(project)
+        overview_counts = patch_series.get_overview_counts()
+        overview_counts_by_project[project] = overview_counts
+
+    return render_template('index.html',
+                           overview_counts_by_project=overview_counts_by_project,
+                           projects=projects,
+                           )
+
+
+@app.route('/<project>')
+def project(project):
+    return redirect(url_for('project_patches', project=project))
 
 
 @app.route('/<project>/patches')
@@ -28,17 +44,17 @@ def project_patches(project):
     patch_series = patch_report.get_patch_series(project)
     last_updated_at = patch_report.get_last_updated_at(project)
 
-    sort_key = flask.request.args.get('sort_key', 'idx')
-    sort_dir = flask.request.args.get('sort_dir', 'desc')
+    sort_key = request.args.get('sort_key', 'idx')
+    sort_dir = request.args.get('sort_dir', 'desc')
     patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
-    return flask.render_template('project_patches.html',
-                                 patches=patches,
-                                 project=project,
-                                 sort_key=sort_key,
-                                 sort_dir=sort_dir,
-                                 last_updated_at=last_updated_at,
-                                 )
+    return render_template('project_patches.html',
+                           patches=patches,
+                           project=project,
+                           sort_key=sort_key,
+                           sort_dir=sort_dir,
+                           last_updated_at=last_updated_at,
+                           )
 
 
 @app.route('/<project>/stats')
@@ -49,12 +65,12 @@ def project_stats(project):
     category_counts = patch_series.get_category_counts()
     author_counts = patch_series.get_author_counts()
 
-    return flask.render_template('project_stats.html',
-                                 project=project,
-                                 category_counts=category_counts,
-                                 author_counts=author_counts,
-                                 last_updated_at=last_updated_at,
-                                 )
+    return render_template('project_stats.html',
+                           project=project,
+                           category_counts=category_counts,
+                           author_counts=author_counts,
+                           last_updated_at=last_updated_at,
+                           )
 
 
 def _init_app(app):
