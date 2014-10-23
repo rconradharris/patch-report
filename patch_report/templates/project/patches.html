@@ -160,6 +160,10 @@
             {% endif %}
         </td>
     </tr>
+{% else %}
+    <tr>
+        <td class="placeholder-row" colspan="8">No patches in repo</td>
+    </tr>
 {% endfor %}
 </table>
 Last Updated: {{ last_updated_at }} UTC
