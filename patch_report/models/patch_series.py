@@ -70,9 +70,12 @@ class PatchSeries(object):
         num_patches = len(self.patches)
         num_files = sum(len(p.files) for p in self.patches)
         num_lines = sum(p.line_count for p in self.patches)
+        num_upstream_reviews = sum(
+                p.upstream_review_count for p in self.patches)
         return {
             'num_files': num_files,
             'num_lines': num_lines,
             'num_patches': num_patches,
+            'num_upstream_reviews': num_upstream_reviews,
         }
 

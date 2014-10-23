@@ -14,6 +14,7 @@ PatchReport Overview
             <th class="rightcol">Patches</th>
             <th class="rightcol">Files Modified </th>
             <th class="rightcol">Lines Modified</th>
+            <th class="rightcol">Upstream Reviews</th>
         </tr>
     </thead>
     <tbody>
@@ -33,6 +34,9 @@ PatchReport Overview
             <td class="rightcol">
                 {{ counts['num_lines'] }}
             </td>
+            <td class="rightcol">
+                {{ counts['num_upstream_reviews'] }}
+            </td>
             {% endwith %}
         </tr>
 {% endfor %}
@@ -49,6 +53,9 @@ PatchReport Overview
             </th>
             <th class="rightcol">
                 {{ all_counts|sum('num_lines') }}
+            </th>
+            <th class="rightcol">
+                {{ all_counts|sum('num_upstream_reviews') }}
             </th>
             {% endwith %}
         </tr>

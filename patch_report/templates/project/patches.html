@@ -53,13 +53,13 @@
 {% macro gr_list_modal(patch) %}
     {% call modal('gr-modal-%s' % patch.idx, 'Upstream Reviews') %}
         <ol class="btn-list">
-            {% for gr in patch.gerrit_reviews %}
+            {% for gr in patch.upstream_reviews %}
                 <li>{{ gr_link(gr) }}</li>
             {% endfor %}
         </ol>
     {% endcall %}
     <a data-toggle="modal" data-target="#gr-modal-{{ patch.idx }}"
-       href="javascript:void(0)">{{ patch.gerrit_reviews|count }} reviews</a>
+       href="javascript:void(0)">{{ patch.upstream_reviews|count }} reviews</a>
 {% endmacro %}
 
 
@@ -134,7 +134,7 @@
         {{ sort_heading('file_count') }}
         {{ sort_heading('rm_issue_count',
                         name='Redmine Issues') }}
-        {{ sort_heading('gerrit_review_count',
+        {{ sort_heading('upstream_review_count',
                         name='Upstream Reviews') }}
     </tr>
 </thead>
@@ -152,9 +152,9 @@
             {% endif %}
         </td>
         <td>
-            {% if patch.gerrit_review_count == 0 %}
-            {% elif patch.gerrit_review_count == 1 %}
-                {{ gr_link(patch.gerrit_reviews[0]) }}
+            {% if patch.upstream_review_count == 0 %}
+            {% elif patch.upstream_review_count == 1 %}
+                {{ gr_link(patch.upstream_reviews[0]) }}
             {% else %}
                 {{ gr_list_modal(patch) }}
             {% endif %}

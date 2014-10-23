@@ -27,7 +27,7 @@ class Patch(object):
         self.line_count = None
         self.rm_issues = []
         self.files = []
-        self.gerrit_reviews = []
+        self.upstream_reviews = []
 
     @property
     def project(self):
@@ -38,8 +38,8 @@ class Patch(object):
         return len(self.rm_issues)
 
     @property
-    def gerrit_review_count(self):
-        return len(self.gerrit_reviews)
+    def upstream_review_count(self):
+        return len(self.upstream_reviews)
 
     @property
     def file_count(self):
@@ -105,7 +105,7 @@ class Patch(object):
 
         change_id = line.split(' ', 1)[1].strip()
         gr = gerrit.GerritReview(change_id)
-        self.gerrit_reviews.append(gr)
+        self.upstream_reviews.append(gr)
 
     def refresh(self):
         line_count = 0
