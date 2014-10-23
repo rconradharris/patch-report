@@ -9,6 +9,8 @@
         <title>{% block title %}PatchRepo{% endblock title %}</title>
         <link href="/static/css/bootstrap.min.css" rel="stylesheet">
         <style>
+            #logo { float: left; }
+            .navbar-inverse { background-color: #000; }
             #main { margin-top: 50px; margin-bottom: 50px; }
             .tab { margin-top: 10px; }
             #sort-caret { float: right; }
@@ -74,6 +76,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
+
+              <span id="logo"><img src="/static/img/logo.jpg" width="40" height="50"></span>
               <a class="navbar-brand" href="{{ url_for('index') }}">PatchRepo</a>
             </div>
             <div class="navbar-collapse collapse">
