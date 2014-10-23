@@ -1,6 +1,4 @@
 - Multi-project
-    - Remove 'patches' and 'stats' buttons from navbar
-
     - Add sidebar nav for switching between projects
         Overview
         Nova
