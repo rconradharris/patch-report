@@ -1,6 +1,4 @@
 - Multi-project
-    - Move patches and stats to project_patches and project_stats
-
     - Make get_patch_series() and get_last_updated_at() take `patch_id`
       argument
 
@@ -13,6 +11,7 @@
     - Add new index page dashboard
         - Show number of patches for each project
 
+- Move templates and static out of project directory and up one level
 - Make RE_RM_LINK use redmine_url config
 - Add Gerrit title/status to modal
 - Add setup.py

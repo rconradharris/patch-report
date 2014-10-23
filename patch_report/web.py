@@ -32,7 +32,7 @@ def project_patches(project):
     sort_dir = flask.request.args.get('sort_dir', 'desc')
     patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
-    return flask.render_template('patches.html',
+    return flask.render_template('project_patches.html',
                                  patches=patches,
                                  project=project,
                                  sort_key=sort_key,
@@ -47,7 +47,7 @@ def project_stats(project):
     last_updated_at = patch_report.get_last_updated_at()
     category_counts = patch_series.get_category_counts()
     author_counts = patch_series.get_author_counts()
-    return flask.render_template('stats.html',
+    return flask.render_template('project_stats.html',
                                  project=project,
                                  category_counts=category_counts,
                                  author_counts=author_counts,
