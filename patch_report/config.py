@@ -18,9 +18,11 @@ _OPTION_REQUIRED = object()
 
 
 _OPTIONS_SCHEMA = {
-    "project:": {
+    "patch_report": {
         "data_directory": {"type": "str",
                            "default": '/tmp'},
+    },
+    "project:": {
         "patch_url": {"type": "str",
                       "default": _OPTION_REQUIRED},
         "repo_path": {"type": "str",
@@ -91,7 +93,11 @@ def _load():
         raise ConfigFileNotFound('Config not found in search path: %s' %
                                  _SEARCH_PATH)
 
-    for section in cfg.sections():
+
+    cfg_sections = cfg.sections()
+
+    # Parse sections defined in config file
+    for section in cfg_sections:
         if ':' in section:
             prefix = section.split(':', 1)[0]
             section_schema = _OPTIONS_SCHEMA[prefix + ':']

@@ -6,30 +6,32 @@ from patch_report.models import patch_series
 from patch_report import utils
 
 
-def _get_save_path():
-    datadir = config.get('project:nova', 'data_directory')
-    return os.path.join(datadir, 'repo_state.pickle')
+def _get_project_state_file(project):
+    datadir = config.get('patch_report', 'data_directory')
+    return os.path.join(datadir, '%s.pickle' % project)
 
 
-def refresh_patch_series():
-    repo_path = config.get('project:nova', 'repo_path')
+def refresh_patch_series(project):
+    repo_path = config.get('project:%s' % project, 'repo_path')
 
     with utils.temp_chdir(repo_path):
         os.system('git checkout master && git fetch origin'
                   ' && git merge origin/master')
 
-    ps = patch_series.PatchSeries()
+    ps = patch_series.PatchSeries(project)
     ps.refresh()
 
-    with open(_get_save_path(), 'w') as f:
+    path = _get_project_state_file(project)
+    with open(path, 'w') as f:
         pickle.dump(ps, f)
 
 
-def get_patch_series():
-    with open(_get_save_path()) as f:
+def get_patch_series(project):
+    path = _get_project_state_file(project)
+    with open(path) as f:
         return pickle.load(f)
 
 
-def get_last_updated_at():
-    path = _get_save_path()
+def get_last_updated_at(project):
+    path = _get_project_state_file(project)
     return utils.get_file_modified_time(path)

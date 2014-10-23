@@ -15,7 +15,8 @@ class Patch(object):
     # FIXME: Until UTF-8 is supported...
     NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
 
-    def __init__(self, idx, filename):
+    def __init__(self, patch_series, idx, filename):
+        self.patch_series = patch_series
         self.idx = idx
         self.filename = filename
 
@@ -27,6 +28,10 @@ class Patch(object):
         self.rm_issues = []
         self.files = []
         self.gerrit_reviews = []
+
+    @property
+    def project(self):
+        return self.patch_series.project
 
     @property
     def rm_issue_count(self):
@@ -42,12 +47,12 @@ class Patch(object):
 
     @property
     def url(self):
-        base_url = config.get('project:nova', 'patch_url')
+        base_url = config.get('project:%s' % self.project, 'patch_url')
         return os.path.join(base_url, self.filename)
 
     @property
     def path(self):
-        repo_path = config.get('patch_report', 'repo_path')
+        repo_path = config.get('project:%s' % self.project, 'repo_path')
         return os.path.join(repo_path, self.filename)
 
     def _parse_author(self, line):

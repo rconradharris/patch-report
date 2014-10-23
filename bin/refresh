@@ -4,5 +4,8 @@ Refresh patch_report state.
 
 Intended to be run from a cron-job.
 """
+import sys
 import patch_report
-patch_report.refresh_patch_series()
+
+project = sys.argv[1]
+patch_report.refresh_patch_series(project)

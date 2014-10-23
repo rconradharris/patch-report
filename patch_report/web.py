@@ -25,8 +25,8 @@ def index():
 
 @app.route('/<project>/patches')
 def project_patches(project):
-    patch_series = patch_report.get_patch_series()
-    last_updated_at = patch_report.get_last_updated_at()
+    patch_series = patch_report.get_patch_series(project)
+    last_updated_at = patch_report.get_last_updated_at(project)
 
     sort_key = flask.request.args.get('sort_key', 'idx')
     sort_dir = flask.request.args.get('sort_dir', 'desc')
@@ -43,10 +43,12 @@ def project_patches(project):
 
 @app.route('/<project>/stats')
 def project_stats(project):
-    patch_series = patch_report.get_patch_series()
-    last_updated_at = patch_report.get_last_updated_at()
+    patch_series = patch_report.get_patch_series(project)
+    last_updated_at = patch_report.get_last_updated_at(project)
+
     category_counts = patch_series.get_category_counts()
     author_counts = patch_series.get_author_counts()
+
     return flask.render_template('project_stats.html',
                                  project=project,
                                  category_counts=category_counts,

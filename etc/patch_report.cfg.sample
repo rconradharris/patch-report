@@ -1,3 +1,5 @@
+[patch_report]
+
 [project:nova]
 data_directory=/tmp
 patch_url=https://github.com/user/project/blob/master

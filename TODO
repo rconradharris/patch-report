@@ -1,4 +1,9 @@
 - Multi-project
+    - Make data_directory a global setting, not part of project
+
+
+    - Add config.get_for_project()
+
     - Make get_patch_series() and get_last_updated_at() take `patch_id`
       argument
 

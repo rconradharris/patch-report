@@ -6,11 +6,12 @@ from patch_report.models import patch
 
 
 class PatchSeries(object):
-    def __init__(self):
+    def __init__(self, project):
+        self.project = project
         self.patches = []
 
     def refresh(self):
-        repo_path = config.get('patch_report', 'repo_path')
+        repo_path = config.get('project:%s' % self.project, 'repo_path')
         series_path = os.path.join(repo_path, 'series')
 
         idx = 1
@@ -19,7 +20,7 @@ class PatchSeries(object):
                 line = line.strip()
                 if not line:
                     continue
-                p = patch.Patch(idx, line)
+                p = patch.Patch(self, idx, line)
                 p.refresh()
                 self.patches.append(p)
                 idx += 1
