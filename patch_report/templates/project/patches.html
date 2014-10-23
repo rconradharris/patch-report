@@ -1,5 +1,4 @@
-{% extends '_layout.html' %}
-{% import 'project/macros.html' as project_macros %}
+{% extends 'project/_layout.html' %}
 
 {% macro sort_heading(key, name=None) %}
     {% set is_sort_key = key == sort_key %}
@@ -123,9 +122,7 @@
 PatchReport - Patches
 {% endblock title %}
 
-{% block main_container %}
-{{ project_macros.tabs('Patches', project) }}
-
+{% block tab_container %}
 <table class="table table-striped">
 <thead>
     <tr>
@@ -166,4 +163,4 @@ PatchReport - Patches
 {% endfor %}
 </table>
 Last Updated: {{ last_updated_at }} UTC
-{% endblock main_container %}
+{% endblock tab_container %}

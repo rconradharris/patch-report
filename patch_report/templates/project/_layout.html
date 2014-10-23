@@ -1,0 +1,11 @@
+{% extends '_layout.html' %}
+{% import 'macros.html' as macros %}
+
+{% block main_container %}
+    <ul class="nav nav-tabs" role="tablist">
+        {% for tab in ('Patches', 'Stats') %}
+            {{ macros.tab_item(project_tab, tab, url_for('project_%s' % tab.lower(), project=project)) }}
+        {% endfor %}
+    </ul>
+    {% block tab_container %} {% endblock tab_container %}
+{% endblock main_container %}

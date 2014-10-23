@@ -1,4 +1,4 @@
-{% extends '_layout.html' %}
+{% extends 'project/_layout.html' %}
 {% import 'project/macros.html' as project_macros %}
 
 {% block title %}
@@ -43,8 +43,7 @@ PatchReport - Stats
 {% endmacro %}
 
 
-{% block main_container %}
-{{ project_macros.tabs('Stats', project) }}
+{% block tab_container %}
 <div class="row">
     <div class="col-md-3">
         {{ count_table(category_counts, 'category') }}
@@ -58,4 +57,4 @@ PatchReport - Stats
         Last Updated: {{ last_updated_at }} UTC
     </div>
 </div>
-{% endblock main_container %}
+{% endblock tab_container %}

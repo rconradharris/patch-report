@@ -59,6 +59,7 @@ def project_patches(project):
     return render_template('project/patches.html',
                            patches=patches,
                            project=project,
+                           project_tab='Patches',
                            sort_key=sort_key,
                            sort_dir=sort_dir,
                            last_updated_at=last_updated_at,
@@ -81,6 +82,7 @@ def project_stats(project):
                            category_counts=category_counts,
                            author_counts=author_counts,
                            last_updated_at=last_updated_at,
+                           project_tab='Stats',
                            **sidebar
                            )
 
