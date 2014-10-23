@@ -1,9 +1,5 @@
 - Multi-project
-    - Add sidebar nav for switching between projects
-        Overview
-        Nova
-        Glance
-
+    - Fix tabs in patch pages to use tab_item
     - Fix title for patch report pages
 
 - Make RE_RM_LINK use redmine_url config

@@ -31,12 +31,18 @@ def index():
     return render_template('index.html',
                            overview_counts_by_project=overview_counts_by_project,
                            projects=projects,
+                           sidebar_tab='Overview',
                            )
 
 
 @app.route('/<project>')
 def project(project):
     return redirect(url_for('project_patches', project=project))
+
+
+def _sidebar_for_project(project):
+    projects = config.get_projects()
+    return dict(sidebar_tab=project, projects=projects)
 
 
 @app.route('/<project>/patches')
@@ -48,12 +54,15 @@ def project_patches(project):
     sort_dir = request.args.get('sort_dir', 'desc')
     patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
+    sidebar = _sidebar_for_project(project)
+
     return render_template('project/patches.html',
                            patches=patches,
                            project=project,
                            sort_key=sort_key,
                            sort_dir=sort_dir,
                            last_updated_at=last_updated_at,
+                           **sidebar
                            )
 
 
@@ -65,11 +74,14 @@ def project_stats(project):
     category_counts = patch_series.get_category_counts()
     author_counts = patch_series.get_author_counts()
 
+    sidebar = _sidebar_for_project(project)
+
     return render_template('project/stats.html',
                            project=project,
                            category_counts=category_counts,
                            author_counts=author_counts,
                            last_updated_at=last_updated_at,
+                           **sidebar
                            )
 
 
