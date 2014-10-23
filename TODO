@@ -1,6 +1,4 @@
 - Multi-project
-    - Add <project_id> to URL (but not used)
-
     - Make get_patch_series() and get_last_updated_at() take `patch_id`
       argument
 

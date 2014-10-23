@@ -11,7 +11,7 @@
     {% if name is none %}
         {% set name = key.replace('_', ' ').title() %}
     {% endif %}
-    <a href="{{ url_for('patches', sort_key=key, sort_dir=sort_dir) }}"
+    <a href="{{ url_for('project_patches', project=project, sort_key=key, sort_dir=sort_dir) }}"
        class="sort-link">{{ name }}
     {% if is_sort_key %}
         <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>

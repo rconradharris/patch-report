@@ -19,11 +19,12 @@ from patch_report import config
 
 @app.route('/')
 def index():
-    return flask.redirect(flask.url_for('patches'))
+    project = 'nova'
+    return flask.redirect(flask.url_for('project_patches', project=project))
 
 
-@app.route('/patches')
-def patches():
+@app.route('/<project>/patches')
+def project_patches(project):
     patch_series = patch_report.get_patch_series()
 
     last_updated_at = patch_report.get_last_updated_at()
@@ -34,17 +35,19 @@ def patches():
 
     return flask.render_template('patches.html',
                                  patches=patches,
+                                 project=project,
                                  sort_key=sort_key,
                                  sort_dir=sort_dir,
                                  last_updated_at=last_updated_at)
 
 
-@app.route('/stats')
-def stats():
+@app.route('/<project>/stats')
+def project_stats(project):
     patch_series = patch_report.get_patch_series()
     category_counts = patch_series.get_category_counts()
     author_counts = patch_series.get_author_counts()
     return flask.render_template('stats.html',
+                                 project=project,
                                  category_counts=category_counts,
                                  author_counts=author_counts)
 
