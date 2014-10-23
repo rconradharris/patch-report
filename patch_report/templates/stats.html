@@ -50,5 +50,10 @@ PatchReport - Stats
     <div class="col-md-3">
         {{ count_table(author_counts, 'author') }}
     </div>
-<div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        Last Updated: {{ last_updated_at }} UTC
+    </div>
+</div>
 {% endblock main_container %}

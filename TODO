@@ -1,4 +1,6 @@
 - Multi-project
+    - Move patches and stats to project_patches and project_stats
+
     - Make get_patch_series() and get_last_updated_at() take `patch_id`
       argument
 
