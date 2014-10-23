@@ -21,13 +21,13 @@
 {% endmacro %}
 
 
-{% macro modal(id, title) %}
+{% macro modal(id, title, truncate_length=50) %}
     <div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="myModalLabel">{{ title }}</h4>
+            <h4 class="modal-title" id="myModalLabel">{{ title|truncate(truncate_length, True) }}</h4>
           </div>
           <div class="modal-body">
             {{ caller()|safe }}
@@ -62,10 +62,22 @@
        href="javascript:void(0)">{{ patch.upstream_reviews|count }} reviews</a>
 {% endmacro %}
 
+{% macro issues_modal_link(patch) %}
+    <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}"
+        href="javascript:void(0)">
+        {% with issue_count = patch.rm_issues|count %}
+            {% if issue_count == 1 %}
+                <span class="label label-danger">{{ patch.rm_issues[0].issue_id }}</span>
+            {% else %}
+                {{ issue_count }} {{ pluralize(issue_count, 'issue', 'issues') }}
+            {% endif %}
+        {% endwith %}
+    </a>
+{% endmacro %}
 
-{% macro rm_list_modal(patch) %}
+{% macro issues_modal(patch, max_subject_length=50) %}
     {% call modal('rm-modal-%s' % patch.idx,
-                  'Redmine Issues for %s' % patch.filename) %}
+                  'Issues for %s' % patch.filename) %}
 
         <table class="table table-striped">
             <thead>
@@ -82,8 +94,13 @@
                         <span class="label label-danger">{{ rm_issue.issue_id }}</span>
                     </td>
                     <td>
-                        <a target="_blank"
-                            href="{{ rm_issue.url }}">{{ rm_issue.subject or '<Issue Not Found>'}}</a>
+                        {% if rm_issue.subject %}
+                            {% set subject = rm_issue.subject|truncate(max_subject_length,
+                            True) %}
+                        {% else %}
+                            {% set subject = '<Issue Not Found>' %}
+                        {% endif %}
+                        <a target="_blank" href="{{ rm_issue.url }}">{{ subject }}</a>
                     </td>
                     <td class="rightcol">
                         <span class="label label-default">{{ rm_issue.status }}</span>
@@ -94,20 +111,13 @@
             </tbody>
         </table>
     {% endcall %}
-    <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}"
-        href="javascript:void(0)">
-        {% with issue_count = patch.rm_issues|count %}
-            {% if issue_count == 1 %}
-                <span class="label label-danger">{{ patch.rm_issues[0].issue_id }}</span>
-            {% else %}
-                {{ issue_count }} {{ pluralize(issue_count, 'issue', 'issues') }}
-            {% endif %}
-        {% endwith %}
-    </a>
 {% endmacro %}
 
+{% macro files_modal_link(patch) %}
+    <a data-toggle="modal" data-target="#files-modal-{{ patch.idx }}" href="javascript:void(0)">{{ patch.file_count }}</a>
+{% endmacro %}
 
-{% macro file_list_modal(patch) %}
+{% macro files_modal(patch) %}
     {% call modal('files-modal-%s' % patch.idx, 'Files Modified') %}
         <ol>
             {% for filename in patch.files %}
@@ -115,7 +125,6 @@
             {% endfor %}
         </ol>
     {% endcall %}
-    <a data-toggle="modal" data-target="#files-modal-{{ patch.idx }}" href="javascript:void(0)">{{ patch.file_count }}</a>
 {% endmacro %}
 
 {% block title %}
@@ -123,6 +132,14 @@
 {% endblock title %}
 
 {% block tab_container %}
+{% for patch in patches %}
+    {% if patch.rm_issue_count > 0 %}
+        {{ issues_modal(patch) }}
+    {% endif %}
+    {{ files_modal(patch) }}
+{% endfor %}
+
+
 <table class="table table-striped">
 <thead>
     <tr>
@@ -131,7 +148,7 @@
         {{ sort_heading('filename') }}
         {{ sort_heading('author') }}
         {{ sort_heading('rm_issue_count',
-                        name='Redmine Issues',
+                        name='Attached Issues',
                         align_right=True) }}
         {{ sort_heading('upstream_review_count',
                         name='Upstream Reviews',
@@ -148,7 +165,7 @@
         <td>{{ patch.author }} </td>
         <td class="rightcol">
             {% if patch.rm_issue_count > 0 %}
-                {{ rm_list_modal(patch) }}
+                {{ issues_modal_link(patch) }}
             {% endif %}
         </td>
         <td class="rightcol">
@@ -159,7 +176,7 @@
                 {{ gr_list_modal(patch) }}
             {% endif %}
         </td>
-        <td class="rightcol">{{ file_list_modal(patch) }}</td>
+        <td class="rightcol">{{ files_modal_link(patch) }}</td>
         <td class="rightcol">{{ patch.line_count }}</td>
     </tr>
 {% else %}
