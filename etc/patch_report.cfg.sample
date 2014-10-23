@@ -1,4 +1,5 @@
 [patch_report]
+data_directory=/tmp
 
 [project:nova]
 data_directory=/tmp

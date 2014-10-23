@@ -47,12 +47,12 @@ class Patch(object):
 
     @property
     def url(self):
-        base_url = config.get('project:%s' % self.project, 'patch_url')
+        base_url = config.get_for_project(self.project, 'patch_url')
         return os.path.join(base_url, self.filename)
 
     @property
     def path(self):
-        repo_path = config.get('project:%s' % self.project, 'repo_path')
+        repo_path = config.get_for_project(self.project, 'repo_path')
         return os.path.join(repo_path, self.filename)
 
     def _parse_author(self, line):

@@ -112,3 +112,7 @@ def get(section, key):
         _load()
 
     return _CONFIG_VALUES[section][key]
+
+
+def get_for_project(project, key):
+    return get('project:%s' % project, key)

@@ -11,7 +11,7 @@ class PatchSeries(object):
         self.patches = []
 
     def refresh(self):
-        repo_path = config.get('project:%s' % self.project, 'repo_path')
+        repo_path = config.get_for_project(self.project, 'repo_path')
         series_path = os.path.join(repo_path, 'series')
 
         idx = 1

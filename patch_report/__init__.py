@@ -12,7 +12,7 @@ def _get_project_state_file(project):
 
 
 def refresh_patch_series(project):
-    repo_path = config.get('project:%s' % project, 'repo_path')
+    repo_path = config.get_for_project(project, 'repo_path')
 
     with utils.temp_chdir(repo_path):
         os.system('git checkout master && git fetch origin'
