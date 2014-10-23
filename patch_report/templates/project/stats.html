@@ -1,4 +1,5 @@
 {% extends '_layout.html' %}
+{% import 'project/macros.html' as project_macros %}
 
 {% block title %}
 PatchReport - Stats
@@ -43,6 +44,7 @@ PatchReport - Stats
 
 
 {% block main_container %}
+{{ project_macros.tabs('Stats', project) }}
 <div class="row">
     <div class="col-md-3">
         {{ count_table(category_counts, 'category') }}

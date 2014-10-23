@@ -1,0 +1,9 @@
+{% macro tabs(active, project) %}
+    <ul class="nav nav-tabs" role="tablist">
+        {% for tab in ('Patches', 'Stats') %}
+            <li class="{{ 'active' if active == tab else '' }}">
+                <a href="{{ url_for('project_%s' % tab.lower(), project=project) }}">{{ tab }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}

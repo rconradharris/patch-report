@@ -1,5 +1,11 @@
 - Multi-project
-    - Fix layout header
+    - Remove 'patches' and 'stats' buttons from navbar
+
+    - Add sidebar nav for switching between projects
+        Overview
+        Nova
+        Glance
+
     - Fix title for patch report pages
 
 - Make RE_RM_LINK use redmine_url config
