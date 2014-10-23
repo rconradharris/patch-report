@@ -1,7 +1,3 @@
-- Multi-project
-    - Fix tabs in patch pages to use tab_item
-    - Fix title for patch report pages
-
 - Make RE_RM_LINK use redmine_url config
 - Move templates and static out of project directory and up one level
 - Add Gerrit title/status to modal

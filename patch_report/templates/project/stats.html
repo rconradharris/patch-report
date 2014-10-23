@@ -1,8 +1,7 @@
 {% extends 'project/_layout.html' %}
-{% import 'project/macros.html' as project_macros %}
 
 {% block title %}
-PatchReport - Stats
+{{ project }} Stats
 {% endblock title %}
 
 {% macro count_table(data, attribute) %}
