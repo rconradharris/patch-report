@@ -19,7 +19,10 @@ def _refresh_project(project):
     cache.write_file(project, ps)
 
 
-def refresh_projects():
+def refresh_projects(clear=False):
+    if clear:
+        cache.clear()
+
     projects = config.get_projects()
     for project in projects:
         _refresh_project(project)

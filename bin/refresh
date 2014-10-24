@@ -8,12 +8,21 @@ usage: refresh [--clear-cache]
 
 Intended to be run from a cron-job.
 """
+import os
 import sys
 
 import patch_report
-from patch_report import cache
 
-if '--clear-cache' in sys.argv[1:]:
-    cache.clear()
+PIDFILE = '/tmp/refresh.pid'
 
-patch_report.refresh_projects()
+if os.path.exists(PIDFILE):
+    sys.exit(1)
+
+with open(PIDFILE, 'w') as f:
+    f.write(str(os.getpid()))
+
+try:
+    clear = '--clear-cache' in sys.argv[1:]
+    patch_report.refresh_projects(clear=clear)
+finally:
+    os.unlink(PIDFILE)
