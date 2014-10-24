@@ -1,4 +1,3 @@
-- Rename gerrit module to gerrit_review.py
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
 - Make overview columns sortable

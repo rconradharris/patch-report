@@ -3,8 +3,8 @@ from email.utils import parsedate_tz, mktime_tz
 import os
 
 from patch_report import config
-from patch_report.models import gerrit
-from patch_report.models import redmine
+from patch_report.models import gerrit_review
+from patch_report.models import redmine_issue
 
 
 class Patch(object):
@@ -77,7 +77,7 @@ class Patch(object):
         self.date = datetime.datetime.fromtimestamp(epoch_secs)
 
     def _parse_rm_issue(self, line):
-        rm_issue = redmine.get_from_line(line)
+        rm_issue = redmine_issue.get_from_line(line)
         # Avoid dup if there's a tag *and* a link
         if rm_issue and rm_issue not in self.rm_issues:
             self.rm_issues.append(rm_issue)
@@ -91,7 +91,7 @@ class Patch(object):
         self.files.append(b_part)
 
     def _parse_upstream_change_id(self, line):
-        gr = gerrit.get_from_line(line)
+        gr = gerrit_review.get_from_line(line)
         if gr:
             self.upstream_reviews.append(gr)
 
