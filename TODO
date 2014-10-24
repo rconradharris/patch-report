@@ -1,7 +1,3 @@
-- Add stale data alert to
-    - Overview
-    - Upstream
-    - Stats
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
 - Make overview columns sortable

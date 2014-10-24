@@ -9,11 +9,29 @@ import patch_report
 from patch_report import cache
 from patch_report import config
 
-STALE_DATA_SECS = 600
-
 
 def _render_empty_cache_page():
     return render_template('empty_cache.html')
+
+
+def _is_data_stale(projects, stale_secs=600):
+    last_updated_at = patch_report.get_last_updated_at(projects[0])
+    utcnow = datetime.datetime.utcnow()
+    updated_secs = (utcnow - last_updated_at).total_seconds()
+    return updated_secs > stale_secs
+
+
+def _common(sidebar_tab, projects=None):
+    if projects is None:
+        projects = config.get_projects()
+
+    stale_data = _is_data_stale(projects)
+
+    return dict(
+            projects=projects,
+            sidebar_tab=sidebar_tab,
+            stale_data=stale_data,
+            )
 
 
 @app.route('/')
@@ -32,8 +50,7 @@ def overview():
 
     return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
-                           projects=projects,
-                           sidebar_tab='Overview',
+                           **_common('Overview', projects=projects)
                            )
 
 
@@ -51,10 +68,10 @@ def upstream_reviews():
         upstream_reviews = patch_series.get_upstream_reviews()
         upstream_reviews_by_project[project] = upstream_reviews
 
+
     return render_template('upstream_reviews.html',
-                           projects=projects,
-                           sidebar_tab='Upstream Reviews',
                            upstream_reviews_by_project=upstream_reviews_by_project,
+                           **_common('Upstream Reviews', projects=projects)
                            )
 
 
@@ -65,18 +82,10 @@ def project(project):
 
 def _project_common(project):
     last_updated_at = patch_report.get_last_updated_at(project)
-    projects = config.get_projects()
-
-    utcnow = datetime.datetime.utcnow()
-    updated_secs = (utcnow - last_updated_at).total_seconds()
-    stale_data = updated_secs > STALE_DATA_SECS
-
     return dict(
             last_updated_at=last_updated_at,
             project=project,
-            projects=projects,
-            sidebar_tab=project,
-            stale_data=stale_data,
+            **_common(project)
             )
 
 
@@ -86,8 +95,6 @@ def project_patches(project):
         patch_series = patch_report.get_patch_series(project)
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
-
-    common = _project_common(project)
 
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
@@ -103,7 +110,7 @@ def project_patches(project):
                            project_tab='Patches',
                            sort_dir=sort_dir,
                            sort_key=sort_key,
-                           **common
+                           **_project_common(project)
                            )
 
 
@@ -114,8 +121,6 @@ def project_stats(project):
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    common = _project_common(project)
-
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
 
@@ -124,7 +129,7 @@ def project_stats(project):
                            category_counts=category_counts,
                            patch_series=patch_series,
                            project_tab='Stats',
-                           **common
+                           **_project_common(project)
                            )
 
 
