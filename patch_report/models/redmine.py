@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 import os
-import pickle
 
 import redmine
 
+from patch_report import cache
 from patch_report import config
 
 
@@ -64,25 +64,18 @@ class Redmine(object):
                 'status': status}
 
     @property
-    def _cache_path(self):
-        datadir = config.get('patch_report', 'data_directory')
-        return os.path.join(datadir, 'redmine_issues.pickle')
-
-    @property
     def cached_issues(self):
         if not hasattr(self, '_cached_issues'):
-            if os.path.exists(self._cache_path):
-                with open(self._cache_path) as f:
-                    self._cached_issues = pickle.load(f)
-            else:
+            try:
+                self._cached_issues = cache.read_file('redmine_issues')
+            except cache.CacheFileNotFound:
                 self._cached_issues = {}
 
         return self._cached_issues
 
     def _add_cached_issue(self, issue):
         self.cached_issues[issue.issue_id] = issue
-        with open(self._cache_path, 'w') as f:
-            pickle.dump(self.cached_issues, f)
+        cache.write_file('redmine_issues', self.cached_issues)
 
     def get_issue(self, issue_id):
         issue = self.cached_issues.get(issue_id)
@@ -94,7 +87,6 @@ class Redmine(object):
 
         self._add_cached_issue(issue)
         return issue
-
 
 
 _REDMINE = None

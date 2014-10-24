@@ -19,8 +19,8 @@ _OPTION_REQUIRED = object()
 
 _OPTIONS_SCHEMA = {
     "patch_report": {
-        "data_directory": {"type": "str",
-                           "default": '/tmp'},
+        "cache_directory": {"type": "str",
+                            "default": '/tmp'},
     },
     "project:": {
         "github_url": {"type": "str",

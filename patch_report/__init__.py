@@ -1,14 +1,9 @@
 import os
-import pickle
 
+from patch_report import cache
 from patch_report import config
 from patch_report.models import patch_series
 from patch_report import utils
-
-
-def _get_project_state_file(project):
-    datadir = config.get('patch_report', 'data_directory')
-    return os.path.join(datadir, '%s.pickle' % project)
 
 
 def _refresh_project(project):
@@ -21,9 +16,7 @@ def _refresh_project(project):
     ps = patch_series.PatchSeries(project)
     ps.refresh()
 
-    path = _get_project_state_file(project)
-    with open(path, 'w') as f:
-        pickle.dump(ps, f)
+    cache.write_file(project, ps)
 
 
 def refresh_projects():
@@ -33,11 +26,8 @@ def refresh_projects():
 
 
 def get_patch_series(project):
-    path = _get_project_state_file(project)
-    with open(path) as f:
-        return pickle.load(f)
+    return cache.read_file(project)
 
 
 def get_last_updated_at(project):
-    path = _get_project_state_file(project)
-    return utils.get_file_modified_time(path)
+    return cache.get_last_updated_at(project)
