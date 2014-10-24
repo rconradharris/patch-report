@@ -77,7 +77,7 @@ class Patch(object):
         self.date = datetime.datetime.fromtimestamp(epoch_secs)
 
     def _parse_rm_issue(self, line):
-        rm_issue = redmine_issue.get_from_line(line)
+        rm_issue = redmine_issue.get_from_line(self, line)
         # Avoid dup if there's a tag *and* a link
         if rm_issue and rm_issue not in self.rm_issues:
             self.rm_issues.append(rm_issue)
@@ -91,7 +91,7 @@ class Patch(object):
         self.files.append(b_part)
 
     def _parse_upstream_change_id(self, line):
-        gr = gerrit_review.get_from_line(line)
+        gr = gerrit_review.get_from_line(self, line)
         if gr:
             self.upstream_reviews.append(gr)
 

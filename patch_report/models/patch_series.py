@@ -79,3 +79,16 @@ class PatchSeries(object):
             'num_upstream_reviews': num_upstream_reviews,
         }
 
+    def get_upstream_reviews(self):
+        # You'd think a generator would be a good idea here. But then you'd
+        # think wrong.
+        #
+        # The problem is that when we can't use it in a template twice,
+        # because we will have exhausted the iterator on the first run.
+        # `iter` won't save the day because it's not available in Jinja
+        # templates (and I don't feel like passing it in)
+        reviews = []
+        for patch in self.patches:
+            for upstream_review in patch.upstream_reviews:
+                reviews.append(upstream_review)
+        return reviews

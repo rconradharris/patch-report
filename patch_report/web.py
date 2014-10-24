@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-"""
-Patch-Repo Web Overview Tool
-
-From command-line run:
-    python patch_report/web.py
-
-From webrowser navigate to:
-    http://localhost:5000
-"""
 import datetime
 import os
 
@@ -44,6 +34,27 @@ def overview():
                            overview_counts_by_project=overview_counts_by_project,
                            projects=projects,
                            sidebar_tab='Overview',
+                           )
+
+
+@app.route('/upstream-reviews')
+def upstream_reviews():
+    projects = config.get_projects()
+
+    upstream_reviews_by_project = {}
+    for project in projects:
+        try:
+            patch_series = patch_report.get_patch_series(project)
+        except cache.CacheFileNotFound:
+            return _render_empty_cache_page()
+
+        upstream_reviews = patch_series.get_upstream_reviews()
+        upstream_reviews_by_project[project] = upstream_reviews
+
+    return render_template('upstream_reviews.html',
+                           projects=projects,
+                           sidebar_tab='Upstream Reviews',
+                           upstream_reviews_by_project=upstream_reviews_by_project,
                            )
 
 

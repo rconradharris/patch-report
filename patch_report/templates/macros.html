@@ -1,5 +1,80 @@
+{% macro modal(id, title, truncate_length=50) %}
+    <div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">{{ title|truncate(truncate_length, True) }}</h4>
+          </div>
+          <div class="modal-body">
+            {{ caller()|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+{% endmacro %}
+
+{% macro pluralize(count, singular, plural=None) %}
+    {{ singular if count == 1 else plural if plural else singular + 's' }}
+{% endmacro %}
+
 {% macro tab_item(active_tab, label, url) %}
     <li class="{{ 'active' if active_tab == label else '' }}">
         <a href="{{ url }}">{{ label }}</a>
     </li>
+{% endmacro %}
+
+{% macro project_link(project) %}
+    <a href="{{ url_for('project', project=project) }}">{{ project }}</a>
+{% endmacro %}
+
+{% macro patch_link(patch, max_len=32) %}
+    <a target="_blank" href="{{ patch.url }}">{{ patch.filename|truncate(max_len, True) }}</a>
+{% endmacro %}
+
+
+{% macro upstream_reviews_modal_link(patch) %}
+    <a data-toggle="modal" data-target="#upstream-review-modal-{{ patch.idx }}" href="javascript:void(0)">
+        {% with review_count = patch.upstream_reviews|count %}
+            {% if review_count == 1 %}
+                <span class="label label-success">{{ patch.upstream_reviews[0].label }}</span>
+            {% else %}
+                {{ review_count }} {{ macros.pluralize(review_count, 'review') }}
+            {% endif %}
+        {% endwith %}
+    </a>
+{% endmacro %}
+
+{% macro upstream_reviews_modal(patch) %}
+    {% call modal('upstream-review-modal-%s' % patch.idx, 'Upstream Reviews') %}
+        <ol class="btn-list">
+            {% for upstream_review in patch.upstream_reviews %}
+            <li>
+                <a class="btn btn-success btn-xs"
+                   target="_blank"
+                   href="{{ upstream_review.url }}">{{ upstream_review.label }}</a>
+            </li>
+            {% endfor %}
+        </ol>
+    {% endcall %}
+{% endmacro %}
+
+{% macro sort_heading(key, name=None, align_right=False) %}
+    {% set is_sort_key = key == sort_key %}
+    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
+    {% if is_sort_key %}
+        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
+    {% else %}
+        {% set sort_dir = 'asc' %}
+    {% endif %}
+    {% if name is none %}
+        {% set name = key.replace('_', ' ').title() %}
+    {% endif %}
+    <a href="{{ url_for('project_patches', project=project, sort_key=key, sort_dir=sort_dir) }}"
+       class="sort-link">{{ name }}
+    {% if is_sort_key %}
+        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
+    {% endif %}
+    </th>
+</a>
 {% endmacro %}

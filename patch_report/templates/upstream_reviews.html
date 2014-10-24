@@ -1,0 +1,42 @@
+{% extends '_layout.html' %}
+{% import 'macros.html' as macros %}
+
+{% block title %}
+Upstream Reviews
+{% endblock title %}
+
+{% block main_container %}
+{% for project in projects %}
+    {% for upstream_review in upstream_reviews_by_project[project] %}
+        {{ macros.upstream_reviews_modal(upstream_review.patch) }}
+    {% endfor %}
+{% endfor %}
+
+<h1>Upstream Reviews</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Patch</th>
+            <th class="rightcol">Upstream Reviews</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for project in projects %}
+    {% for upstream_review in upstream_reviews_by_project[project] %}
+        {% with patch = upstream_review.patch %}
+        <tr>
+            <td>{{ macros.project_link(project) }}</td>
+            <td>{{ macros.patch_link(patch, max_len=64) }}</td>
+            <td class="rightcol">
+                {% if patch.upstream_review_count > 0 %}
+                    {{ macros.upstream_reviews_modal_link(patch) }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endwith %}
+    {% endfor %}
+{% endfor %}
+    </tbody>
+</table>
+{% endblock main_container %}

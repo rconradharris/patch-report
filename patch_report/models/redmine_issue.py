@@ -30,14 +30,7 @@ def _load():
     _REDMINE = Redmine(url, username, password)
 
 
-def get_issue(issue_id):
-    if _REDMINE is None:
-        _load()
-
-    return _REDMINE.get_issue(issue_id)
-
-
-def get_from_line(line):
+def get_from_line(patch, line):
     match = re.search(RE_RM_ISSUE, line)
     if not match:
         match = re.match(RE_RM_LINK, line)
@@ -45,11 +38,16 @@ def get_from_line(line):
         return
 
     issue_id = match.group(1)
-    return get_issue(issue_id)
+
+    if _REDMINE is None:
+        _load()
+
+    return _REDMINE.get_issue(patch, issue_id)
 
 
 class RedmineIssue(object):
-    def __init__(self, issue_id, subject=None, status=None):
+    def __init__(self, patch, issue_id, subject=None, status=None):
+        self.patch = patch
         self.issue_id = issue_id
         self.subject = subject
         self.status = status
@@ -110,13 +108,13 @@ class Redmine(object):
         self.cached_issues[issue.issue_id] = issue
         cache.write_file(CACHE_FILE, self.cached_issues)
 
-    def get_issue(self, issue_id):
+    def get_issue(self, patch, issue_id):
         issue = self.cached_issues.get(issue_id)
         if issue:
             return issue
 
         issue_kwargs = self._fetch_remote_issue(issue_id)
-        issue = RedmineIssue(issue_id, **issue_kwargs)
+        issue = RedmineIssue(patch, issue_id, **issue_kwargs)
 
         self._add_cached_issue(issue)
         return issue

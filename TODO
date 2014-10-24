@@ -1,5 +1,8 @@
-- Add 'Upstream Reviews' section in addition to overview
-    - Shows all upstream reviews across projects
+- Add stale data alert to
+    - Overview
+    - Upstream
+    - Stats
+- Add favicon.ico
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
 - Make overview columns sortable
