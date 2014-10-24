@@ -1,6 +1,3 @@
-- Add bin/clear-cache
-    - Use a 'patch_report' subdirectory under it
-
 Redmine Tweaks
     - separate add and commit from redmine _add_issues
     - bin/refresh repos

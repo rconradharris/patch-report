@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+"""
+Clear patch_report cache
+"""
+from patch_report import cache
+
+cache.clear()

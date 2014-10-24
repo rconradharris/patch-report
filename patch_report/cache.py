@@ -1,5 +1,6 @@
 import os
 import pickle
+import shutil
 import tempfile
 
 from patch_report import config
@@ -49,3 +50,8 @@ def write_file(name, data):
 def get_last_updated_at(name):
     filename = _make_filename(name)
     return utils.get_file_modified_time(filename)
+
+
+def clear():
+    cachedir = _make_cache_directory()
+    shutil.rmtree(cachedir)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Refresh patch_report state.
+Refresh patch_report cache.
 
 Intended to be run from a cron-job.
 """
