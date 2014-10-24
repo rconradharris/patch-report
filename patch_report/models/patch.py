@@ -1,7 +1,6 @@
 import datetime
 from email.utils import parsedate_tz, mktime_tz
 import os
-import re
 
 from patch_report import config
 from patch_report.models import gerrit
@@ -9,9 +8,6 @@ from patch_report.models import redmine
 
 
 class Patch(object):
-    RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
-    RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
-
     # FIXME: Until UTF-8 is supported...
     NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
 
@@ -81,15 +77,10 @@ class Patch(object):
         self.date = datetime.datetime.fromtimestamp(epoch_secs)
 
     def _parse_rm_issue(self, line):
-        match = re.search(self.RE_RM_ISSUE, line)
-        if not match:
-            match = re.match(self.RE_RM_LINK, line)
-        if match:
-            issue_id = match.group(1)
-            rm_issue = redmine.get_issue(issue_id)
-            # Avoid dup if there's a tag *and* a link
-            if rm_issue not in self.rm_issues:
-                self.rm_issues.append(rm_issue)
+        rm_issue = redmine.get_from_line(line)
+        # Avoid dup if there's a tag *and* a link
+        if rm_issue and rm_issue not in self.rm_issues:
+            self.rm_issues.append(rm_issue)
 
     def _parse_diff_file_line(self, line):
         if 'diff --git' not in line:
@@ -100,12 +91,9 @@ class Patch(object):
         self.files.append(b_part)
 
     def _parse_upstream_change_id(self, line):
-        if 'Upstream-Change-Id' not in line:
-            return
-
-        change_id = line.split(' ', 1)[1].strip()
-        gr = gerrit.GerritReview(change_id)
-        self.upstream_reviews.append(gr)
+        gr = gerrit.get_from_line(line)
+        if gr:
+            self.upstream_reviews.append(gr)
 
     def refresh(self):
         line_count = 0

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+import re
 
 import redmine
 
@@ -16,6 +17,36 @@ class RedmineAuthException(RedmineException):
 
 
 CACHE_FILE = 'redmine_issues'
+RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
+RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
+_REDMINE = None
+
+
+def _load():
+    global _REDMINE
+
+    url = config.get('redmine', 'url')
+    username = config.get('redmine', 'username')
+    password = config.get('redmine', 'password')
+    _REDMINE = Redmine(url, username, password)
+
+
+def get_issue(issue_id):
+    if _REDMINE is None:
+        _load()
+
+    return _REDMINE.get_issue(issue_id)
+
+
+def get_from_line(line):
+    match = re.search(RE_RM_ISSUE, line)
+    if not match:
+        match = re.match(RE_RM_LINK, line)
+    if not match:
+        return
+
+    issue_id = match.group(1)
+    return get_issue(issue_id)
 
 
 class RedmineIssue(object):
@@ -90,22 +121,3 @@ class Redmine(object):
 
         self._add_cached_issue(issue)
         return issue
-
-
-_REDMINE = None
-
-
-def _load():
-    global _REDMINE
-
-    url = config.get('redmine', 'url')
-    username = config.get('redmine', 'username')
-    password = config.get('redmine', 'password')
-    _REDMINE = Redmine(url, username, password)
-
-
-def get_issue(issue_id):
-    if _REDMINE is None:
-        _load()
-
-    return _REDMINE.get_issue(issue_id)

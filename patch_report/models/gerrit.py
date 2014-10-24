@@ -1,3 +1,11 @@
+def get_from_line(line):
+    if 'Upstream-Change-Id' not in line:
+        return
+
+    change_id = line.split(' ', 1)[1].strip()
+    return GerritReview(change_id)
+
+
 class GerritReview(object):
     BASE_URL = "https://review.openstack.org/#q,%s,n,z"
 
