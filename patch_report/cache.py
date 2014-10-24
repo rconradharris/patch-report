@@ -1,6 +1,5 @@
 import os
 import pickle
-import shutil
 import tempfile
 
 from patch_report import config
@@ -54,4 +53,4 @@ def get_last_updated_at(name):
 
 def clear():
     cachedir = _make_cache_directory()
-    shutil.rmtree(cachedir)
+    utils.rmtree_ignore_exists(cachedir)

@@ -1,3 +1,4 @@
+- Gracefully handle lack of data in cache, show alert
 - Add 'Upstream Reviews' section in addition to overview
     - Shows all upstream reviews across projects
 - separate add and commit from redmine _add_issues

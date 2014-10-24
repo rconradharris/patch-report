@@ -1,7 +1,8 @@
 import contextlib
-import errno
 import datetime
+import errno
 import os
+import shutil
 
 
 def makedirs_ignore_exists(*args, **kwargs):
@@ -10,6 +11,11 @@ def makedirs_ignore_exists(*args, **kwargs):
     except os.error as e:
         if e.errno != errno.EEXIST:
             raise
+
+
+def rmtree_ignore_exists(path, *args, **kwargs):
+    if os.path.exists(path):
+        shutil.rmtree(path)
 
 
 @contextlib.contextmanager
