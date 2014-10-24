@@ -47,6 +47,7 @@ The pickle files used to send data to the frontend also act as a data cache.
 regenerated on the next run of cron**
 
 ::
+
                                         +--------------+
     +-----+                             |              |
     |     |                             |  Patch Repo  |
