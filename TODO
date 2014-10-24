@@ -1,15 +1,12 @@
-- Use a 'patch_report' subdirectory under it
-- safe write for pickle files (use tmp file and move into place)
 - separate add and commit from redmine _add_issues
+
 - Add bin/clear-cache
+    - Use a 'patch_report' subdirectory under it
 
 Redmine Tweaks
     - bin/refresh repos
     - bin/refresh issues
     - bin/refresh reviews
-
-    - Do not write to state and redmine files, write to tmp file and move in place
-      (avoid corruption)
     - Refresh redmine daily
 
 - Add launchpad support?

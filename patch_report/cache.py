@@ -1,5 +1,6 @@
 import os
 import pickle
+import tempfile
 
 from patch_report import config
 from patch_report import utils
@@ -26,8 +27,14 @@ def read_file(name):
 
 def write_file(name, data):
     filename = _make_filename(name)
-    with open(filename, 'w') as f:
-        pickle.dump(data, f)
+    tmpfile = tempfile.NamedTemporaryFile(delete=False)
+    try:
+        with tmpfile:
+            pickle.dump(data, tmpfile)
+    except:
+        os.unlink(tmpfile.name)
+    else:
+        os.rename(tmpfile.name, filename)
 
 
 def get_last_updated_at(name):
