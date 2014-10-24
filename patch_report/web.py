@@ -16,9 +16,14 @@ from flask import Flask, redirect, render_template, request, url_for
 app = Flask(__name__)
 
 import patch_report
+from patch_report import cache
 from patch_report import config
 
 STALE_DATA_SECS = 600
+
+
+def _render_empty_cache_page():
+    return render_template('empty_cache.html')
 
 
 @app.route('/')
@@ -27,7 +32,11 @@ def overview():
 
     overview_counts_by_project = {}
     for project in projects:
-        patch_series = patch_report.get_patch_series(project)
+        try:
+            patch_series = patch_report.get_patch_series(project)
+        except cache.CacheFileNotFound:
+            return _render_empty_cache_page()
+
         overview_counts = patch_series.get_overview_counts()
         overview_counts_by_project[project] = overview_counts
 
@@ -44,7 +53,6 @@ def project(project):
 
 
 def _project_common(project):
-    patch_series = patch_report.get_patch_series(project)
     last_updated_at = patch_report.get_last_updated_at(project)
     projects = config.get_projects()
 
@@ -54,7 +62,6 @@ def _project_common(project):
 
     return dict(
             last_updated_at=last_updated_at,
-            patch_series=patch_series,
             project=project,
             projects=projects,
             sidebar_tab=project,
@@ -64,12 +71,16 @@ def _project_common(project):
 
 @app.route('/<project>/patches')
 def project_patches(project):
+    try:
+        patch_series = patch_report.get_patch_series(project)
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
+
     common = _project_common(project)
 
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
 
-    patch_series = common['patch_series']
     patches = patch_series.get_sorted_patches(sort_key, sort_dir)
 
     github_url = config.get_for_project(project, 'github_url')
@@ -77,6 +88,7 @@ def project_patches(project):
     return render_template('project/patches.html',
                            github_url=github_url,
                            patches=patches,
+                           patch_series=patch_series,
                            project_tab='Patches',
                            sort_dir=sort_dir,
                            sort_key=sort_key,
@@ -86,15 +98,20 @@ def project_patches(project):
 
 @app.route('/<project>/stats')
 def project_stats(project):
+    try:
+        patch_series = patch_report.get_patch_series(project)
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
+
     common = _project_common(project)
 
-    patch_series = common['patch_series']
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
 
     return render_template('project/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
+                           patch_series=patch_series,
                            project_tab='Stats',
                            **common
                            )
