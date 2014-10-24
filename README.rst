@@ -12,7 +12,6 @@ Features
 * Integrates with Redmine to track issue status
 * Quickly see which patches are proposed upstream
 
-
 Installation
 ============
 
@@ -64,3 +63,10 @@ regenerated on the next run of cron**
                       +------+          |               |
                                         +---------------+
 
+
+Cache Refresh
+=============
+
+The patch repos are refreshed every 5 minutes.
+
+The Redmine cache is refreshed once a day.
