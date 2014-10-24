@@ -1,6 +1,15 @@
 import contextlib
+import errno
 import datetime
 import os
+
+
+def makedirs_ignore_exists(*args, **kwargs):
+    try:
+        os.makedirs(*args, **kwargs)
+    except os.error as e:
+        if e.errno != errno.EEXIST:
+            raise
 
 
 @contextlib.contextmanager

@@ -10,8 +10,13 @@ class CacheFileNotFound(Exception):
     pass
 
 
-def _make_filename(name):
+def _make_cache_directory():
     cachedir = config.get('patch_report', 'cache_directory')
+    return os.path.join(cachedir, 'patch_report')
+
+
+def _make_filename(name):
+    cachedir = _make_cache_directory()
     return os.path.join(cachedir, '%s.pickle' % name)
 
 
@@ -26,7 +31,11 @@ def read_file(name):
 
 
 def write_file(name, data):
+    cachedir = _make_cache_directory()
+    utils.makedirs_ignore_exists(cachedir)
+
     filename = _make_filename(name)
+
     tmpfile = tempfile.NamedTemporaryFile(delete=False)
     try:
         with tmpfile:
