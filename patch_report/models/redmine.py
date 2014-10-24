@@ -15,6 +15,9 @@ class RedmineAuthException(RedmineException):
     pass
 
 
+CACHE_FILE = 'redmine_issues'
+
+
 class RedmineIssue(object):
     def __init__(self, issue_id, subject=None, status=None):
         self.issue_id = issue_id
@@ -67,7 +70,7 @@ class Redmine(object):
     def cached_issues(self):
         if not hasattr(self, '_cached_issues'):
             try:
-                self._cached_issues = cache.read_file('redmine_issues')
+                self._cached_issues = cache.read_file(CACHE_FILE)
             except cache.CacheFileNotFound:
                 self._cached_issues = {}
 
@@ -75,7 +78,7 @@ class Redmine(object):
 
     def _add_cached_issue(self, issue):
         self.cached_issues[issue.issue_id] = issue
-        cache.write_file('redmine_issues', self.cached_issues)
+        cache.write_file(CACHE_FILE, self.cached_issues)
 
     def get_issue(self, issue_id):
         issue = self.cached_issues.get(issue_id)

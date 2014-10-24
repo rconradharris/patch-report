@@ -1,9 +1,12 @@
-Redmine Tweaks
-    - separate add and commit from redmine _add_issues
-    - bin/refresh repos
-    - bin/refresh issues
-    - bin/refresh reviews
-    - Refresh redmine daily
+- Add lockfile to cache so that we don't try to refresh multiple times
+
+- separate add and commit from redmine _add_issues
+
+- get_issue_from_line to redmine
+    - Move regexes into redmine.py
+
+- get_upstream_review_from_line
+    - Move match code into gerrit_review.py
 
 - Add launchpad support?
 - Make overview columns sortable

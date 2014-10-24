@@ -2,8 +2,18 @@
 """
 Refresh patch_report cache.
 
+usage: refresh [--clear-cache]
+
+--clear-cache will clear the cache so that issues can be refreshed
+
 Intended to be run from a cron-job.
 """
+import sys
+
 import patch_report
+from patch_report import cache
+
+if '--clear-cache' in sys.argv[1:]:
+    cache.clear()
 
 patch_report.refresh_projects()
