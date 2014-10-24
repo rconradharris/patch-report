@@ -1,0 +1,1 @@
+*/5 * * * * PYTHONPATH=/path/to/patch-report /path/to/patch-report/bin/refresh
