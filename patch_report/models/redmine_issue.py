@@ -15,6 +15,10 @@ class RedmineAuthException(RedmineException):
     pass
 
 
+class RedmineUnknownException(RedmineException):
+    pass
+
+
 _RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
 _RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
 _REDMINE = None
@@ -68,6 +72,8 @@ class _Redmine(object):
         self.verify_cert = verify_cert
         self.debug = debug
         self.cache = cache.DictCache('redmine_issues')
+        self.ignore_errors = config.get('redmine', 'ignore_errors')
+        self.unrecoverable_error = False
         self.redmine = redmine.Redmine(url,
                                        requests={'verify': verify_cert},
                                        username=username,
@@ -78,17 +84,26 @@ class _Redmine(object):
         if self.debug:
             print 'Fetching Redmine Issue %s' % issue_id
 
-        try:
-            issue = self.redmine.issue.get(issue_id)
-        except redmine.exceptions.AuthError as auth_ex:
-            raise RedmineAuthException(
-                "Authentication error: %s" % auth_ex)
-        except redmine.exceptions.ResourceNotFoundError as res_ex:
-            subject = None
-            status = None
-        else:
-            subject = issue.subject
-            status = issue.status.name
+        status =  None
+        subject = None
+
+        if not self.unrecoverable_error:
+            try:
+                issue = self.redmine.issue.get(issue_id)
+            except redmine.exceptions.UnknownError as unknown_ex:
+                self.unrecoverable_error = True
+                if not self.ignore_errors:
+                    raise RedmineUnknownException(unknown_ex.message)
+            except redmine.exceptions.AuthError as auth_ex:
+                self.unrecoverable_error = True
+                if not self.ignore_errors:
+                    raise RedmineAuthException(
+                        "Authentication error: %s" % auth_ex)
+            except redmine.exceptions.ResourceNotFoundError as res_ex:
+                pass
+            else:
+                subject = issue.subject
+                status = issue.status.name
 
         return {'subject': subject,
                 'status': status}

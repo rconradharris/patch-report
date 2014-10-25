@@ -39,6 +39,8 @@ _OPTIONS_SCHEMA = {
                      "default": _OPTION_REQUIRED},
         "password": {"type": "str",
                      "default": None},
+        "ignore_errors": {"type": "bool",
+                          "default": False},
     },
     "web": {
         "debug": {"type": "bool",

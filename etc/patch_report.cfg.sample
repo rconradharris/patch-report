@@ -12,6 +12,7 @@ repo_path=foo
 url=https://redmine.example.com
 username=foo
 password=bar
+ignore_errors=False
 
 [web]
 debug=true
