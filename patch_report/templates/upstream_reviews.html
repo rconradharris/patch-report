@@ -19,6 +19,7 @@ Upstream Reviews
             <th>Project</th>
             <th>Patch</th>
             <th class="rightcol">Upstream Reviews</th>
+            <th class="rightcol">Merged?</th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,13 @@ Upstream Reviews
             <td class="rightcol">
                 {% if patch.upstream_review_count > 0 %}
                     {{ macros.upstream_reviews_modal_link(patch) }}
+                {% endif %}
+            </td>
+            <td class="rightcol">
+                {% if patch.all_upstream_reviews_merged %}
+                    <span class="label label-success">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        </span>
                 {% endif %}
             </td>
         </tr>

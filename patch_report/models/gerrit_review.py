@@ -34,6 +34,10 @@ class GerritChange(object):
         self.status = status
 
     @property
+    def is_merged(self):
+        return self.status == 'MERGED'
+
+    @property
     def label(self):
         return self.change_id[:5]
 

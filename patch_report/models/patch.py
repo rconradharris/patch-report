@@ -38,6 +38,10 @@ class Patch(object):
         return len(self.upstream_reviews)
 
     @property
+    def all_upstream_reviews_merged(self):
+        return all(r.is_merged for r in self.upstream_reviews)
+
+    @property
     def file_count(self):
         return len(self.files)
 
