@@ -1,6 +1,7 @@
+- Add check mark to Upstream Reviews page if all gerrit reviews have
+  merged.
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
 - Make overview columns sortable
 - Move templates and static out of project directory and up one level
-- Add Gerrit title/status to modal
 - Add setup.py

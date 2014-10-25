@@ -15,9 +15,8 @@ class RedmineAuthException(RedmineException):
     pass
 
 
-CACHE_FILE = 'redmine_issues'
-RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
-RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
+_RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
+_RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
 _REDMINE = None
 
 
@@ -27,13 +26,13 @@ def _load():
     url = config.get('redmine', 'url')
     username = config.get('redmine', 'username')
     password = config.get('redmine', 'password')
-    _REDMINE = Redmine(url, username, password)
+    _REDMINE = _Redmine(url, username, password)
 
 
 def get_from_line(patch, line):
-    match = re.search(RE_RM_ISSUE, line)
+    match = re.search(_RE_RM_ISSUE, line)
     if not match:
-        match = re.match(RE_RM_LINK, line)
+        match = re.match(_RE_RM_LINK, line)
     if not match:
         return
 
@@ -61,14 +60,14 @@ class RedmineIssue(object):
         return self.issue_id == other.issue_id
 
 
-class Redmine(object):
+class _Redmine(object):
     def __init__(self, url, username, password, verify_cert=False, debug=True):
         self.url = url
         self.username = username
         self.password = password
         self.verify_cert = verify_cert
         self.debug = debug
-
+        self.cache = cache.DictCache('redmine_issues')
         self.redmine = redmine.Redmine(url,
                                        requests={'verify': verify_cert},
                                        username=username,
@@ -94,27 +93,16 @@ class Redmine(object):
         return {'subject': subject,
                 'status': status}
 
-    @property
-    def cached_issues(self):
-        if not hasattr(self, '_cached_issues'):
-            try:
-                self._cached_issues = cache.read_file(CACHE_FILE)
-            except cache.CacheFileNotFound:
-                self._cached_issues = {}
-
-        return self._cached_issues
-
-    def _add_cached_issue(self, issue):
-        self.cached_issues[issue.issue_id] = issue
-        cache.write_file(CACHE_FILE, self.cached_issues)
-
     def get_issue(self, patch, issue_id):
-        issue = self.cached_issues.get(issue_id)
-        if issue:
+        try:
+            issue = self.cache[issue_id]
+        except KeyError:
+            pass
+        else:
             return issue
 
         issue_kwargs = self._fetch_remote_issue(issue_id)
         issue = RedmineIssue(patch, issue_id, **issue_kwargs)
 
-        self._add_cached_issue(issue)
+        self.cache[issue_id] = issue
         return issue

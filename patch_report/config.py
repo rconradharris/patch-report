@@ -18,6 +18,10 @@ _OPTION_REQUIRED = object()
 
 
 _OPTIONS_SCHEMA = {
+    "gerrit": {
+        "url": {"type": "str",
+                "default": _OPTION_REQUIRED},
+    },
     "patch_report": {
         "cache_directory": {"type": "str",
                             "default": '/tmp'},

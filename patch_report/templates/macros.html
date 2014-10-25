@@ -45,17 +45,39 @@
     </a>
 {% endmacro %}
 
-{% macro upstream_reviews_modal(patch) %}
+{% macro upstream_reviews_modal(patch, max_subject_length=50) %}
     {% call modal('upstream-review-modal-%s' % patch.idx, 'Upstream Reviews') %}
-        <ol class="btn-list">
-            {% for upstream_review in patch.upstream_reviews %}
-            <li>
-                <a class="btn btn-success btn-xs"
-                   target="_blank"
-                   href="{{ upstream_review.url }}">{{ upstream_review.label }}</a>
-            </li>
-            {% endfor %}
-        </ol>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Change Id</th>
+                    <th>Description</th>
+                    <th class="rightcol">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for upstream_review in patch.upstream_reviews %}
+                <tr>
+                    <td>
+                        <span class="label label-success">{{ upstream_review.label }}</span>
+                    </td>
+                    <td>
+                        {% if upstream_review.subject %}
+                            {% set subject = upstream_review.subject|truncate(max_subject_length,
+                            True) %}
+                        {% else %}
+                            {% set subject = '<Upstream Review Not Found>' %}
+                        {% endif %}
+                        <a target="_blank" href="{{ upstream_review.url }}">{{ subject }}</a>
+                    </td>
+                    <td class="rightcol">
+                        <span class="label label-default">{{ upstream_review.status }}</span>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endcall %}
 {% endmacro %}
 

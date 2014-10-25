@@ -1,3 +1,6 @@
+[gerrit]
+url = https://review.example.com
+
 [patch_report]
 cache_directory=/tmp
 

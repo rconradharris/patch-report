@@ -54,3 +54,28 @@ def get_last_updated_at(name):
 def clear():
     cachedir = _make_cache_directory()
     utils.rmtree_ignore_exists(cachedir)
+
+
+class DictCache(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self.data = None
+
+    def _load(self):
+        try:
+            self.data = read_file(self.filename)
+        except CacheFileNotFound:
+            self.data = {}
+
+    def __getitem__(self, key):
+        if self.data is None:
+            self._load()
+
+        return self.data[key]
+
+    def __setitem__(self, key, value):
+        if self.data is None:
+            self._load()
+
+        self.data[key] = value
+        write_file(self.filename, self.data)
