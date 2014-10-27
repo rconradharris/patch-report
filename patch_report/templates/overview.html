@@ -22,7 +22,7 @@ PatchReport Overview
 {% for project in projects %}
         <tr>
             <td>
-                <a href="{{ url_for('project', project=project) }}">{{ project }}</a>
+                <a href="{{ url_for('project_view', project_name=project) }}">{{ project }}</a>
             </td>
             {% with counts = overview_counts_by_project[project] %}
             <td class="rightcol">

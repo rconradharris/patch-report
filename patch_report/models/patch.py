@@ -47,13 +47,12 @@ class Patch(object):
 
     @property
     def url(self):
-        base_url = config.get_for_project(self.project, 'github_url')
-        return os.path.join(base_url, 'blob', 'master', self.filename)
+        return os.path.join(self.project.github_url, 'blob', 'master',
+                            self.filename)
 
     @property
     def path(self):
-        repo_path = config.get_for_project(self.project, 'repo_path')
-        return os.path.join(repo_path, self.filename)
+        return os.path.join(self.project.repo_path, self.filename)
 
     def _parse_author(self, line):
         if not line.startswith('From:'):
