@@ -49,11 +49,34 @@ def get_from_line(patch, line):
 
 
 class RedmineIssue(object):
-    def __init__(self, patch, issue_id, subject=None, status=None):
+    def __init__(self, patch, issue_id, subject=None, status=None,
+                 fetch_status='not_fetched'):
         self.patch = patch
         self.issue_id = issue_id
-        self.subject = subject
+        self._subject = subject
         self.status = status
+        self.fetch_status = fetch_status
+
+    @property
+    def subject(self):
+        s = self.fetch_status
+
+        if s == 'auth_error':
+            subject = '<Auth Error>'
+        elif s == 'forbidden':
+            subject = '<Forbidden>'
+        elif s == 'not_fetched':
+            subject = '<Not Fetched>'
+        elif s == 'not_found':
+            subject = '<Not Found>'
+        elif s == 'success':
+            subject = self._subject
+        elif s == 'unknown_error':
+            subject = '<Unknown Error>'
+        else:
+            raise Exception("Unknown fetch_status: '%s'" % s)
+
+        return subject
 
     @property
     def url(self):
@@ -73,7 +96,7 @@ class _Redmine(object):
         self.debug = debug
         self.cache = cache.DictCache('redmine_issues')
         self.ignore_errors = config.get('redmine', 'ignore_errors')
-        self.unrecoverable_error = False
+        self.last_unrecoverable_error = None
         self.redmine = redmine.Redmine(url,
                                        requests={'verify': verify_cert},
                                        username=username,
@@ -87,31 +110,37 @@ class _Redmine(object):
         status =  None
         subject = None
 
-        if not self.unrecoverable_error:
+        if self.last_unrecoverable_error:
+            fetch_status = self.last_unrecoverable_error
+        else:
             try:
                 issue = self.redmine.issue.get(issue_id)
             except redmine.exceptions.UnknownError as unknown_ex:
                 # FIXME: we can use ForbiddenError here if
                 # https://github.com/maxtepkeev/python-redmine/pull/60 merges
                 if '403' in unknown_ex.message:
-                    pass
+                    fetch_status = 'forbidden'
                 elif not self.ignore_errors:
                     raise RedmineUnknownException(unknown_ex.message)
                 else:
-                    self.unrecoverable_error = True
+                    self.last_unrecoverable_error = \
+                            fetch_status = 'unknown_error'
             except redmine.exceptions.AuthError as auth_ex:
-                self.unrecoverable_error = True
+                self.last_unrecoverable_error = \
+                        fetch_status = 'auth_error'
                 if not self.ignore_errors:
                     raise RedmineAuthException(
                         "Authentication error: %s" % auth_ex)
             except redmine.exceptions.ResourceNotFoundError as res_ex:
-                pass
+                fetch_status = 'not_found'
             else:
                 subject = issue.subject
                 status = issue.status.name
+                fetch_status = 'success'
 
         return {'subject': subject,
-                'status': status}
+                'status': status,
+                'fetch_status': fetch_status}
 
     def get_issue(self, patch, issue_id):
         try:

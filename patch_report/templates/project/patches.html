@@ -33,13 +33,7 @@
                         <span class="label label-danger">{{ rm_issue.issue_id }}</span>
                     </td>
                     <td>
-                        {% if rm_issue.subject %}
-                            {% set subject = rm_issue.subject|truncate(max_subject_length,
-                            True) %}
-                        {% else %}
-                            {% set subject = '<Issue Not Found>' %}
-                        {% endif %}
-                        <a target="_blank" href="{{ rm_issue.url }}">{{ subject }}</a>
+                        <a target="_blank" href="{{ rm_issue.url }}">{{ rm_issue.subject|truncate(max_subject_length, True) }}</a>
                     </td>
                     <td class="rightcol">
                         <span class="label label-default">{{ rm_issue.status }}</span>
