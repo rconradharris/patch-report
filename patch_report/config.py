@@ -14,6 +14,10 @@ class ConfigRequired(ConfigError):
     pass
 
 
+class ConfigSectionNotFound(ConfigError):
+    pass
+
+
 _OPTION_REQUIRED = object()
 
 
@@ -99,7 +103,17 @@ def _load():
         raise ConfigFileNotFound('Config not found in search path: %s' %
                                  _SEARCH_PATH)
 
-    for section in cfg.sections():
+    sections = cfg.sections()
+
+    # Ensure all sections are present
+    for section in _OPTIONS_SCHEMA.iterkeys():
+        if ':' in section:
+            continue
+
+        if section not in sections:
+            raise ConfigSectionNotFound(section)
+
+    for section in sections:
         if ':' in section:
             prefix, rest = section.split(':', 1)
 
