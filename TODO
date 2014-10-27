@@ -1,7 +1,12 @@
 - Refactor code to Project class
-    - Pass in project object to template
     - Move get_patch_series into project instance
     - Move last_updated_at into project instance
+
+    - Pass in project object to template
+        - Call it project_obj
+        - Rename to project once all orig `project` instances are replaced
+          with project_obj
+
     - Use `project.get_projects` everywhere
     - Use model.project everywhere
 

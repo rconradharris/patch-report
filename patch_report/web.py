@@ -8,6 +8,7 @@ app = Flask(__name__)
 import patch_report
 from patch_report import cache
 from patch_report import config
+from patch_report.models.project import get_project_from_cache
 
 
 def _render_empty_cache_page():
@@ -80,58 +81,51 @@ def project_view(project_name):
     return redirect(url_for('project_patches', project_name=project_name))
 
 
-def _project_common(project):
-    last_updated_at = patch_report.get_last_updated_at(project)
+def _project_common(project, project_tab):
+    last_updated_at = patch_report.get_last_updated_at(project.name)
     return dict(
+            github_url=project.github_url,
             last_updated_at=last_updated_at,
-            project=project,
-            **_common(project)
+            project=project.name,
+            project_tab=project_tab,
+            **_common(project.name)
             )
 
 
 @app.route('/<project_name>/patches')
 def project_patches(project_name):
-    project = project_name
     try:
-        patch_series = patch_report.get_patch_series(project)
+        project = get_project_from_cache(project_name)
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
-
-    patches = patch_series.get_sorted_patches(sort_key, sort_dir)
-
-    github_url = config.get_for_project(project, 'github_url')
+    patches = project.patch_series.get_sorted_patches(sort_key, sort_dir)
 
     return render_template('project/patches.html',
-                           github_url=github_url,
                            patches=patches,
-                           patch_series=patch_series,
-                           project_tab='Patches',
                            sort_dir=sort_dir,
                            sort_key=sort_key,
-                           **_project_common(project)
+                           **_project_common(project, 'Patches')
                            )
 
 
 @app.route('/<project_name>/stats')
 def project_stats(project_name):
-    project = project_name
     try:
-        patch_series = patch_report.get_patch_series(project)
+        project = get_project_from_cache(project_name)
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
+    patch_series = project.patch_series
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
 
     return render_template('project/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
-                           patch_series=patch_series,
-                           project_tab='Stats',
-                           **_project_common(project)
+                           **_project_common(project, 'Stats')
                            )
 
 
