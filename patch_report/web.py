@@ -42,11 +42,11 @@ def overview():
     overview_counts_by_project = {}
     for project in projects:
         try:
-            patch_series = patch_report.get_patch_series(project)
+            project_obj = get_project_from_cache(project)
         except cache.CacheFileNotFound:
             return _render_empty_cache_page()
 
-        overview_counts = patch_series.get_overview_counts()
+        overview_counts = project_obj.patch_series.get_overview_counts()
         overview_counts_by_project[project] = overview_counts
 
     return render_template('overview.html',
@@ -62,11 +62,11 @@ def upstream_reviews():
     upstream_reviews_by_project = {}
     for project in projects:
         try:
-            patch_series = patch_report.get_patch_series(project)
+            project_obj = get_project_from_cache(project)
         except cache.CacheFileNotFound:
             return _render_empty_cache_page()
 
-        upstream_reviews = patch_series.get_upstream_reviews()
+        upstream_reviews = project_obj.patch_series.get_upstream_reviews()
         upstream_reviews_by_project[project] = upstream_reviews
 
 

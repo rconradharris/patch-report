@@ -14,9 +14,5 @@ def refresh_projects(clear=False):
         proj.refresh()
 
 
-def get_patch_series(project_name):
-    return cache.read_file(project_name)
-
-
 def get_last_updated_at(project_name):
     return cache.get_last_updated_at(project_name)
