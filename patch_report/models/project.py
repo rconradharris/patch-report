@@ -27,7 +27,6 @@ def get_project_from_cache(name):
     return _get_project(name, patch_series)
 
 
-
 class Project(object):
     def __init__(self, name, repo_path, github_url, patch_series):
         self.name = name
@@ -43,3 +42,6 @@ class Project(object):
 
         self.patch_series.refresh()
         cache.write_file(self.name, self.patch_series)
+
+    def get_last_updated_at(self):
+        return cache.get_last_updated_at(self.name)

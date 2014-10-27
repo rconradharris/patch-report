@@ -1,12 +1,28 @@
 - Refactor code to Project class
-    - Move last_updated_at into project instance
+
+    - Use project_obj for
+        - Patches [DONE]
+        - Stats [DONE]
+        - Upstream Reviews
+        - Overview
+
+
+    - Add project_obj
+    - Use project_obj for:
+        - github_url
+        - project
+    - Rename project_obj to project
+
+
+
+    - Use `project.get_projects` everywhere
+        - Move last_updated_at into project instance
 
     - Pass in project object to template
         - Call it project_obj
         - Rename to project once all orig `project` instances are replaced
           with project_obj
 
-    - Use `project.get_projects` everywhere
     - Use model.project everywhere
 
 - Ability to init repos if they don't exist

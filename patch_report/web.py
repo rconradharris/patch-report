@@ -82,11 +82,9 @@ def project_view(project_name):
 
 
 def _project_common(project, project_tab):
-    last_updated_at = patch_report.get_last_updated_at(project.name)
     return dict(
-            github_url=project.github_url,
-            last_updated_at=last_updated_at,
-            project=project.name,
+            last_updated_at=project.get_last_updated_at(),
+            project_obj=project,
             project_tab=project_tab,
             **_common(project.name)
             )
