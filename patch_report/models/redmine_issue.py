@@ -103,7 +103,7 @@ class _Redmine(object):
                                        password=password,
                                        raise_attr_exception=debug)
 
-    def _fetch_remote_issue(self, issue_id):
+    def _fetch_remote_issue(self, patch, issue_id):
         if self.debug:
             print 'Fetching Redmine Issue %s' % issue_id
 
@@ -138,9 +138,8 @@ class _Redmine(object):
                 status = issue.status.name
                 fetch_status = 'success'
 
-        return {'subject': subject,
-                'status': status,
-                'fetch_status': fetch_status}
+        return RedmineIssue(patch, issue_id, subject=subject, status=status,
+                            fetch_status=fetch_status)
 
     def get_issue(self, patch, issue_id):
         try:
@@ -150,8 +149,6 @@ class _Redmine(object):
         else:
             return issue
 
-        issue_kwargs = self._fetch_remote_issue(issue_id)
-        issue = RedmineIssue(patch, issue_id, **issue_kwargs)
-
+        issue = self._fetch_remote_issue(patch, issue_id)
         self.cache[issue_id] = issue
         return issue

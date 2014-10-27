@@ -66,8 +66,10 @@ class _Gerrit(object):
         change_infos = json.loads(content)
         change_info = change_infos[0]
 
-        return {'subject': change_info['subject'],
-                'status': change_info['status']}
+        return GerritChange(patch,
+                            change_id,
+                            subject=change_info['subject'],
+                            status=change_info['status'])
 
     def get_change(self, patch, change_id):
         try:
@@ -77,8 +79,6 @@ class _Gerrit(object):
         else:
             return change
 
-        change_kwargs = self._fetch_remote_change(patch, change_id)
-        change = GerritChange(patch, change_id, **change_kwargs)
-
+        change = self._fetch_remote_change(patch, change_id)
         self.cache[change_id] = change
         return change
