@@ -8,9 +8,6 @@
 
 
     - Add project_obj
-    - Use project_obj for:
-        - github_url
-        - project
     - Rename project_obj to project
 
 
