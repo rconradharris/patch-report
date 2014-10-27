@@ -91,9 +91,14 @@ class _Redmine(object):
             try:
                 issue = self.redmine.issue.get(issue_id)
             except redmine.exceptions.UnknownError as unknown_ex:
-                self.unrecoverable_error = True
-                if not self.ignore_errors:
+                # FIXME: we can use ForbiddenError here if
+                # https://github.com/maxtepkeev/python-redmine/pull/60 merges
+                if '403' in unknown_ex.message:
+                    pass
+                elif not self.ignore_errors:
                     raise RedmineUnknownException(unknown_ex.message)
+                else:
+                    self.unrecoverable_error = True
             except redmine.exceptions.AuthError as auth_ex:
                 self.unrecoverable_error = True
                 if not self.ignore_errors:

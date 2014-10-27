@@ -1,5 +1,16 @@
+- Add fetch_status to RedmineIssue
+    - success
+    - not_found
+    - forbidden
+- Use Redmine Key instead of username/password
+- BUG: data not showing up in prod
+- Ability to init repos if they don't exist
+- Make overview columns sortable (default sort to number of patches)
+- Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
-- Make overview columns sortable
 - Move templates and static out of project directory and up one level
 - Add setup.py
+
+BLOCKED
+    https://github.com/maxtepkeev/python-redmine/pull/60
