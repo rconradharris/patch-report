@@ -1,5 +1,3 @@
-- Make _fetch_remote_issue return a RedmineIssue object
-- Use Redmine Key instead of username/password
 - Ability to init repos if they don't exist
 - Make overview columns sortable (default sort to number of patches)
 - Make rows with 0 patches appear grayed out

@@ -35,10 +35,8 @@ _OPTIONS_SCHEMA = {
     "redmine": {
         "url": {"type": "str",
                 "default": _OPTION_REQUIRED},
-        "username": {"type": "str",
-                     "default": _OPTION_REQUIRED},
-        "password": {"type": "str",
-                     "default": None},
+        "key": {"type": "str",
+                "default": _OPTION_REQUIRED},
         "ignore_errors": {"type": "bool",
                           "default": False},
     },

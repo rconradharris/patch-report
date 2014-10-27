@@ -10,8 +10,7 @@ repo_path=foo
 
 [redmine]
 url=https://redmine.example.com
-username=foo
-password=bar
+key=foobar
 ignore_errors=False
 
 [web]

@@ -28,9 +28,8 @@ def _load():
     global _REDMINE
 
     url = config.get('redmine', 'url')
-    username = config.get('redmine', 'username')
-    password = config.get('redmine', 'password')
-    _REDMINE = _Redmine(url, username, password)
+    key = config.get('redmine', 'key')
+    _REDMINE = _Redmine(url, key)
 
 
 def get_from_line(patch, line):
@@ -88,10 +87,9 @@ class RedmineIssue(object):
 
 
 class _Redmine(object):
-    def __init__(self, url, username, password, verify_cert=False, debug=True):
+    def __init__(self, url, key, verify_cert=False, debug=True):
         self.url = url
-        self.username = username
-        self.password = password
+        self.key = key
         self.verify_cert = verify_cert
         self.debug = debug
         self.cache = cache.DictCache('redmine_issues')
@@ -99,8 +97,7 @@ class _Redmine(object):
         self.last_unrecoverable_error = None
         self.redmine = redmine.Redmine(url,
                                        requests={'verify': verify_cert},
-                                       username=username,
-                                       password=password,
+                                       key=key,
                                        raise_attr_exception=debug)
 
     def _fetch_remote_issue(self, patch, issue_id):
