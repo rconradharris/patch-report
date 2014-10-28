@@ -51,7 +51,7 @@
                   </ul>
                   <ul class="nav nav-sidebar">
                     {% for repo in sidebar_repos %}
-                        {{ macros.tab_item(sidebar_tab, repo.name, url_for('repo_view', project_name=repo.name)) }}
+                        {{ macros.tab_item(sidebar_tab, repo.name, url_for('repo_view', repo_name=repo.name)) }}
                     {% endfor %}
                   </ul>
                 </div>

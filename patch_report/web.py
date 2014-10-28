@@ -126,9 +126,9 @@ def upstream_reviews():
                            )
 
 
-@app.route('/<project_name>')
-def repo_view(project_name):
-    return redirect(url_for('repo_patches', project_name=project_name))
+@app.route('/<repo_name>')
+def repo_view(repo_name):
+    return redirect(url_for('repo_patches', repo_name=repo_name))
 
 
 def _repo_common(repo, repo_tab):
@@ -141,14 +141,14 @@ def _repo_common(repo, repo_tab):
             )
 
 
-@app.route('/<project_name>/patches')
-def repo_patches(project_name):
+@app.route('/<repo_name>/patches')
+def repo_patches(repo_name):
     try:
         patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    repo = patch_report.get_repo(project_name)
+    repo = patch_report.get_repo(repo_name)
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
     patches = repo.patch_series.get_sorted_patches(sort_key, sort_dir)
@@ -161,14 +161,14 @@ def repo_patches(project_name):
                            )
 
 
-@app.route('/<project_name>/stats')
-def repo_stats(project_name):
+@app.route('/<repo_name>/stats')
+def repo_stats(repo_name):
     try:
         patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    repo = patch_report.get_repo(project_name)
+    repo = patch_report.get_repo(repo_name)
     patch_series = repo.patch_series
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()

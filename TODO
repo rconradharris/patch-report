@@ -18,7 +18,7 @@
         - project_patches [DONE]
         - project_stats [DONE]
 
-    - Change project_name url matcher to repo_name
+    - Change project_name url matcher to repo_name [DONE]
     - Change repo to just path
 
 PatchReport
