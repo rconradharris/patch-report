@@ -22,7 +22,7 @@ PatchReport Overview
 {% for project in projects %}
         <tr>
             <td>{{ macros.project_link(project) }}</td>
-            {% with counts = overview_counts_by_project[project.name] %}
+            {% with counts = overview_counts_by_project[project] %}
             <td class="rightcol">
                 {{ counts['num_patches'] }}
             </td>

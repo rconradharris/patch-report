@@ -8,7 +8,10 @@ app = Flask(__name__)
 import patch_report
 from patch_report import cache
 from patch_report import config
-from patch_report.models.project import get_project_from_cache, get_projects
+from patch_report.models.project import (
+    get_project_from_cache,
+    get_projects_from_cache,
+)
 
 
 def _render_empty_cache_page():
@@ -22,55 +25,48 @@ def _is_data_stale(projects, stale_secs=600):
     return updated_secs > stale_secs
 
 
-def _common(sidebar_tab):
-    projects = get_projects()
-    stale_data = _is_data_stale(projects)
-
+def _common(sidebar_tab, projects):
     return dict(
             projects=projects,
             sidebar_tab=sidebar_tab,
-            stale_data=stale_data,
+            stale_data=_is_data_stale(projects),
             )
 
 
 @app.route('/')
 def overview():
-    project_names = config.get_project_names()
+    try:
+        projects = get_projects_from_cache()
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
 
     overview_counts_by_project = {}
-    for project in project_names:
-        try:
-            project_obj = get_project_from_cache(project)
-        except cache.CacheFileNotFound:
-            return _render_empty_cache_page()
-
-        overview_counts = project_obj.patch_series.get_overview_counts()
+    for project in projects:
+        overview_counts = project.patch_series.get_overview_counts()
         overview_counts_by_project[project] = overview_counts
 
     return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
-                           **_common('Overview')
+                           **_common('Overview', projects)
                            )
 
 
 @app.route('/upstream-reviews')
 def upstream_reviews():
-    project_names = config.get_project_names()
+    try:
+        projects = get_projects_from_cache()
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
 
     upstream_reviews_by_project = {}
-    for project in project_names:
-        try:
-            project_obj = get_project_from_cache(project)
-        except cache.CacheFileNotFound:
-            return _render_empty_cache_page()
-
-        upstream_reviews = project_obj.patch_series.get_upstream_reviews()
+    for project in projects:
+        upstream_reviews = project.patch_series.get_upstream_reviews()
         upstream_reviews_by_project[project] = upstream_reviews
 
 
     return render_template('upstream_reviews.html',
                            upstream_reviews_by_project=upstream_reviews_by_project,
-                           **_common('Upstream Reviews')
+                           **_common('Upstream Reviews', projects)
                            )
 
 
@@ -80,12 +76,12 @@ def project_view(project_name):
 
 
 def _project_common(project, project_tab):
-    project_names = config.get_project_names()
+    projects = get_projects_from_cache()
     return dict(
             last_updated_at=project.get_last_updated_at(),
             project=project,
             project_tab=project_tab,
-            **_common(project.name)
+            **_common(project.name, projects)
             )
 
 

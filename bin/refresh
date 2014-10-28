@@ -11,7 +11,7 @@ Intended to be run from a cron-job.
 import os
 import sys
 
-import patch_report
+from patch_report.models import project
 
 PIDFILE = '/tmp/refresh.pid'
 
@@ -23,6 +23,6 @@ with open(PIDFILE, 'w') as f:
 
 try:
     clear = '--clear-cache' in sys.argv[1:]
-    patch_report.refresh_projects(clear=clear)
+    project.refresh_projects(clear=clear)
 finally:
     os.unlink(PIDFILE)

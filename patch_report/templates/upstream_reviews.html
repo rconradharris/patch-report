@@ -24,7 +24,7 @@ Upstream Reviews
     </thead>
     <tbody>
 {% for project in projects %}
-    {% for upstream_review in upstream_reviews_by_project[project.name] %}
+    {% for upstream_review in upstream_reviews_by_project[project] %}
         {% with patch = upstream_review.patch %}
         <tr>
             <td>{{ macros.project_link(project) }}</td>
