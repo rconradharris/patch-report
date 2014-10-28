@@ -70,8 +70,8 @@ def _common(sidebar_tab, repos):
     sidebar_repos.sort(key=lambda p: len(p.patch_series.patches),
                        reverse=True)
     return dict(
-            projects=repos,
-            sidebar_projects=sidebar_repos,
+            repos=repos,
+            sidebar_repos=sidebar_repos,
             sidebar_tab=sidebar_tab,
             stale_data=repos[0].is_data_stale(),
             )
@@ -98,10 +98,10 @@ def overview():
         reverse=sort_dir == 'desc')
 
     return render_template('overview.html',
-                           overview_counts_by_project=overview_counts_by_repo,
+                           overview_counts_by_repo=overview_counts_by_repo,
                            sort_key=sort_key,
                            sort_dir=sort_dir,
-                           sorted_projects=sorted_repos,
+                           sorted_repos=sorted_repos,
                            **_common('Overview', repos)
                            )
 
@@ -121,7 +121,7 @@ def upstream_reviews():
         upstream_reviews_by_repo[repo] = upstream_reviews
 
     return render_template('upstream_reviews.html',
-                           upstream_reviews_by_project=upstream_reviews_by_repo,
+                           upstream_reviews_by_repo=upstream_reviews_by_repo,
                            **_common('Upstream Reviews', repos)
                            )
 
@@ -131,13 +131,12 @@ def project_view(project_name):
     return redirect(url_for('project_patches', project_name=project_name))
 
 
-def _project_common(repo, project_tab):
+def _repo_common(repo, repo_tab):
     patch_report = get_from_cache()
     repos = patch_report.repos
-
     return dict(
-            project=repo,
-            project_tab=project_tab,
+            repo=repo,
+            repo_tab=repo_tab,
             **_common(repo.name, repos)
             )
 
@@ -158,7 +157,7 @@ def project_patches(project_name):
                            patches=patches,
                            sort_dir=sort_dir,
                            sort_key=sort_key,
-                           **_project_common(repo, 'Patches')
+                           **_repo_common(repo, 'Patches')
                            )
 
 
@@ -177,7 +176,7 @@ def project_stats(project_name):
     return render_template('project/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
-                           **_project_common(repo, 'Stats')
+                           **_repo_common(repo, 'Stats')
                            )
 
 

@@ -27,12 +27,12 @@ PatchReport Overview
 
 {% block main_container %}
 <h1>Overview</h1>
-<div class="last-updated">Last Updated: {{ projects[0].last_updated_at|time_ago_in_words }}</div>
+<div class="last-updated">Last Updated: {{ repos[0].last_updated_at|time_ago_in_words }}</div>
 
 <table class="table table-striped">
     <thead>
         <tr>
-            {{ sort_heading('project') }}
+            {{ sort_heading('repo') }}
             {{ sort_heading('num_patches', name='Patches', align_right=True) }}
             {{ sort_heading('num_upstream_reviews', name='Upstream Reviews', align_right=True) }}
             {{ sort_heading('num_files', name='Files Modified', align_right=True) }}
@@ -41,10 +41,10 @@ PatchReport Overview
     </thead>
     <tbody>
 
-{% for project in sorted_projects %}
+{% for repo in sorted_repos %}
         <tr>
-            <td>{{ macros.project_link(project) }}</td>
-            {% with counts = overview_counts_by_project[project] %}
+            <td>{{ macros.project_link(repo) }}</td>
+            {% with counts = overview_counts_by_repo[repo] %}
             <td class="rightcol">
                 {{ counts['num_patches'] }}
             </td>
@@ -64,7 +64,7 @@ PatchReport Overview
     <tfoot>
         <tr>
             <th>Total</th>
-            {% with all_counts = overview_counts_by_project.values() %}
+            {% with all_counts = overview_counts_by_repo.values() %}
             <th class="rightcol">
                 {{ all_counts|sum('num_patches') }}
             </th>

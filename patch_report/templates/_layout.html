@@ -50,8 +50,8 @@
                     {{ macros.tab_item(sidebar_tab, 'Upstream Reviews', url_for('upstream_reviews')) }}
                   </ul>
                   <ul class="nav nav-sidebar">
-                    {% for project in sidebar_projects %}
-                        {{ macros.tab_item(sidebar_tab, project.name, url_for('project_view', project_name=project.name)) }}
+                    {% for repo in sidebar_repos %}
+                        {{ macros.tab_item(sidebar_tab, repo.name, url_for('project_view', project_name=repo.name)) }}
                     {% endfor %}
                   </ul>
                 </div>
