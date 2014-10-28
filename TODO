@@ -1,15 +1,11 @@
 - Github integration:
     [github:O3eng]
-        match_string = '-rax-patches'
-        username = O3eng
         url=https://github.rackspace.com
         strip_match_string_for_name=True
 
     [github:O3eng-infra]
         match_string = '-rax-patches'
-        username = O3eng-infra
         url=https://github.rackspace.com
-        strip_match_string_for_name=True
 
 
     Scan for repos that match `match_string`, if match add to config

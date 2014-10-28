@@ -11,9 +11,9 @@ ol.btn-list li { margin-bottom: 5px; }
 .placeholder-row { text-align: center; color: #ccc; font-style: italic; }
 .last-updated { float: right; font-style: italic; }
 
-a.github-url { color: #ccc; font-size: 24px; }
-a.github-url:visited { text-decoration: none; color: #ccc; }
-a.github-url:hover { text-decoration: none; color: #777; }
+a.repo-url { color: #ccc; font-size: 24px; }
+a.repo-url:visited { text-decoration: none; color: #ccc; }
+a.repo-url:hover { text-decoration: none; color: #777; }
 
 /* Hide for mobile, show later */
 .sidebar {

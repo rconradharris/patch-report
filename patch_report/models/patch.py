@@ -48,8 +48,7 @@ class Patch(object):
 
     @property
     def url(self):
-        return os.path.join(self.repo.github_url, 'blob', 'master',
-                            self.filename)
+        return os.path.join(self.repo.url, 'blob', 'master', self.filename)
 
     @property
     def path(self):

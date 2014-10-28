@@ -33,8 +33,8 @@ _OPTIONS_SCHEMA = {
                            "default": _OPTION_REQUIRED},
     },
     "repo:": {
-        "github_url": {"type": "str",
-                       "default": _OPTION_REQUIRED},
+        "url": {"type": "str",
+                "default": _OPTION_REQUIRED},
     },
     "redmine": {
         "url": {"type": "str",

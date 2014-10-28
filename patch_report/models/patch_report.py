@@ -34,7 +34,8 @@ class PatchReport(object):
 
     def refresh(self):
         for name in config.get_repo_names():
-            repo = Repo(self, name)
+            url = config.get('repo:%s' % self.name, 'url')
+            repo = Repo(self, name, url)
             repo.patch_series = PatchSeries(repo)
             repo.refresh()
             self._repos[name] = repo

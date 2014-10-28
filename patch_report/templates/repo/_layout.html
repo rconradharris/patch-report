@@ -2,7 +2,7 @@
 {% import 'macros.html' as macros %}
 
 {% block main_container %}
-<h1>{{ repo.name }} <a class="github-url" href="{{ repo.github_url }}" target="_blank">{{ repo.github_url }}</a></h1>
+<h1>{{ repo.name }} <a class="repo-url" href="{{ repo.url }}" target="_blank">{{ repo.url }}</a></h1>
 
 <div class="last-updated">Last Updated: {{ repos[0].last_updated_at|time_ago_in_words }}</div>
 <ul class="nav nav-tabs" role="tablist">

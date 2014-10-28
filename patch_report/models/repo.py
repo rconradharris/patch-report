@@ -10,22 +10,19 @@ from patch_report.models import patch_series
 
 
 class Repo(object):
-    def __init__(self, patch_report, name):
+    def __init__(self, patch_report, name, url):
         self.patch_report = patch_report
         self.name = name
-
-    @property
-    def github_url(self):
-        return config.get('repo:%s' % self.name, 'github_url')
+        self.url = url
 
     @property
     def path(self):
         repo_directory = self.patch_report.repo_directory
-        repo_name = os.path.basename(self.github_url)
+        repo_name = os.path.basename(self.url)
         return os.path.join(repo_directory, repo_name)
 
     def _get_github_ssh_url(self):
-        parsed = urlparse.urlparse(self.github_url)
+        parsed = urlparse.urlparse(self.url)
         path_parts = parsed.path.split('/')
         # Ignore first slash at [0]
         org = path_parts[1]
