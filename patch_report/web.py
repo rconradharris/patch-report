@@ -64,16 +64,19 @@ def _render_empty_cache_page():
     return render_template('empty_cache.html')
 
 
-def _common(sidebar_tab, repos):
+def _common(sidebar_tab, patch_report):
+    repos = patch_report.repos
+
     # Sort sidebar so that repos with most patches are at top
     sidebar_repos = repos[:]
     sidebar_repos.sort(key=lambda p: len(p.patch_series.patches),
                        reverse=True)
     return dict(
+            last_updated_at=patch_report.last_updated_at,
             repos=repos,
             sidebar_repos=sidebar_repos,
             sidebar_tab=sidebar_tab,
-            stale_data=repos[0].is_data_stale(),
+            stale_data=patch_report.is_data_stale(),
             )
 
 
@@ -102,7 +105,7 @@ def overview():
                            sort_key=sort_key,
                            sort_dir=sort_dir,
                            sorted_repos=sorted_repos,
-                           **_common('Overview', repos)
+                           **_common('Overview', patch_report)
                            )
 
 
@@ -122,7 +125,7 @@ def upstream_reviews():
 
     return render_template('upstream_reviews.html',
                            upstream_reviews_by_repo=upstream_reviews_by_repo,
-                           **_common('Upstream Reviews', repos)
+                           **_common('Upstream Reviews', patch_report)
                            )
 
 
@@ -131,13 +134,11 @@ def repo_view(repo_name):
     return redirect(url_for('repo_patches', repo_name=repo_name))
 
 
-def _repo_common(repo, repo_tab):
-    patch_report = get_from_cache()
-    repos = patch_report.repos
+def _repo_common(repo, repo_tab, patch_report):
     return dict(
             repo=repo,
             repo_tab=repo_tab,
-            **_common(repo.name, repos)
+            **_common(repo.name, patch_report)
             )
 
 
@@ -157,7 +158,7 @@ def repo_patches(repo_name):
                            patches=patches,
                            sort_dir=sort_dir,
                            sort_key=sort_key,
-                           **_repo_common(repo, 'Patches')
+                           **_repo_common(repo, 'Patches', patch_report)
                            )
 
 
@@ -176,7 +177,7 @@ def repo_stats(repo_name):
     return render_template('repo/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
-                           **_repo_common(repo, 'Stats')
+                           **_repo_common(repo, 'Stats', patch_report)
                            )
 
 

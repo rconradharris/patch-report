@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import datetime
 import urlparse
 
 from patch_report import config
@@ -53,3 +54,12 @@ class PatchReport(object):
             repo.patch_series = PatchSeries(repo)
             repo.refresh()
             self._repos[name] = repo
+
+    @property
+    def last_updated_at(self):
+        return cache.get_last_updated_at('patch_report')
+
+    def is_data_stale(self, stale_secs=600):
+        utcnow = datetime.datetime.utcnow()
+        updated_secs = (utcnow - self.last_updated_at).total_seconds()
+        return updated_secs > stale_secs

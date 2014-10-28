@@ -1,8 +1,6 @@
 from __future__ import absolute_import
-import datetime
 import os
 
-from patch_report import cache
 from patch_report import utils
 
 
@@ -39,12 +37,3 @@ class Repo(object):
                 os.system('git clone %s' % self.ssh_url)
 
         self.patch_series.refresh()
-
-    @property
-    def last_updated_at(self):
-        return cache.get_last_updated_at('patch_report')
-
-    def is_data_stale(self, stale_secs=600):
-        utcnow = datetime.datetime.utcnow()
-        updated_secs = (utcnow - self.last_updated_at).total_seconds()
-        return updated_secs > stale_secs

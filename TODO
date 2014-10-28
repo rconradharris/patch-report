@@ -1,7 +1,4 @@
-- Fix last_updated_at:
-    - Move last_updated_at to PatchReport class
-    - Move is_data_stale to PatchReport class
-    - Pass last_updated_at and is_data_stale to templates
+- Rename Repo to LocalRepo
 
 
 
