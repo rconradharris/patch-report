@@ -2,15 +2,16 @@
 patch-report
 ============
 
-Dashboard for RAX Patches
+Patch Management Dashboard
 
 Features
 ========
 
-* Provides stats at a glance
-* Handles multiple projects
+* Integrates with GitHub so it can dynamically discover new patch repos
 * Integrates with Redmine to track issue status
-* Quickly see which patches are proposed upstream
+* Integrates with Gerrit so you can track which patches have been proposed
+  upstream
+* Currently only supports the `Ply <https://github.com/rconradharris/ply>`_ patch repo format
 
 Installation
 ============
