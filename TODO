@@ -1,11 +1,7 @@
-- Add Gerrit to Architecture diagram
-- Add GitHub to architecture diagram
-
-
 scanner = GitHubScanner(self, username, api_url, token, match_string)
+    get_repos()
+    refresh()
     self._repos = []
-
-    - refresh()
 
 
 def refresh():

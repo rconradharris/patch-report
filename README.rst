@@ -69,4 +69,4 @@ Cache Refresh
 
 The patch repos are refreshed every 5 minutes.
 
-The Redmine cache is refreshed once a day.
+Redmine issues, Gerrit changes, and GitHub repos are refreshed once a day.

@@ -45,7 +45,7 @@ class PatchReport(object):
 
     def refresh(self):
         for name in config.get_repo_names():
-            url = config.get('repo:%s' % self.name, 'url')
+            url = config.get('repo:%s' % name, 'url')
             ssh_url = self._get_ssh_url(url)
             repo = Repo(self, name, url, ssh_url)
             repo.patch_series = PatchSeries(repo)
