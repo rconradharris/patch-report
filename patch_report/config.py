@@ -32,9 +32,9 @@ _OPTIONS_SCHEMA = {
         "repo_directory": {"type": "str",
                            "default": _OPTION_REQUIRED},
     },
-    "project:": {
+    "repo:": {
         "github_url": {"type": "str",
-                      "default": _OPTION_REQUIRED},
+                       "default": _OPTION_REQUIRED},
     },
     "redmine": {
         "url": {"type": "str",
@@ -88,7 +88,7 @@ def _parse_section(cfg, section, section_schema, values):
 
 
 _CONFIG_VALUES = {}
-_PROJECT_NAMES = []
+_REPO_NAMES = []
 
 
 def _load():
@@ -117,8 +117,8 @@ def _load():
         if ':' in section:
             prefix, rest = section.split(':', 1)
 
-            if prefix == 'project':
-                _PROJECT_NAMES.append(rest)
+            if prefix == 'repo':
+                _REPO_NAMES.append(rest)
 
             section_schema = _OPTIONS_SCHEMA[prefix + ':']
         else:
@@ -134,8 +134,8 @@ def get(section, key):
     return _CONFIG_VALUES[section][key]
 
 
-def get_project_names():
-    if not _PROJECT_NAMES:
+def get_repo_names():
+    if not _REPO_NAMES:
         _load()
 
-    return _PROJECT_NAMES
+    return _REPO_NAMES

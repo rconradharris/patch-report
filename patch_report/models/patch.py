@@ -27,8 +27,8 @@ class Patch(object):
         self.upstream_reviews = []
 
     @property
-    def project(self):
-        return self.patch_series.project
+    def repo(self):
+        return self.patch_series.repo
 
     @property
     def rm_issue_count(self):
@@ -48,12 +48,12 @@ class Patch(object):
 
     @property
     def url(self):
-        return os.path.join(self.project.github_url, 'blob', 'master',
+        return os.path.join(self.repo.github_url, 'blob', 'master',
                             self.filename)
 
     @property
     def path(self):
-        return os.path.join(self.project.repo_path, self.filename)
+        return os.path.join(self.repo.repo_path, self.filename)
 
     def _parse_author(self, line):
         if not line.startswith('From:'):

@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from patch_report import config
 from patch_report import cache
-from patch_report.models.project import Project
+from patch_report.models.repo import Repo
 from patch_report.models.patch_series import PatchSeries
 
 
@@ -23,21 +23,18 @@ def refresh(clear_cache=False):
 class PatchReport(object):
     def __init__(self, repo_directory):
         self.repo_directory = repo_directory
-        self._projects = {}
+        self._repos = {}
 
     @property
-    def projects(self):
-        return self._projects.values()
+    def repos(self):
+        return self._repos.values()
 
-    def get_project(self, project_name):
-        return self._projects[project_name]
+    def get_repo(self, name):
+        return self._repos[name]
 
     def refresh(self):
-        for project_name in config.get_project_names():
-            github_url = config.get('project:%s' % project_name, 'github_url')
-
-            project = Project(self, project_name, github_url)
-            project.patch_series = PatchSeries(project)
-            project.refresh()
-
-            self._projects[project_name] = project
+        for name in config.get_repo_names():
+            repo = Repo(self, name)
+            repo.patch_series = PatchSeries(repo)
+            repo.refresh()
+            self._repos[name] = repo

@@ -1,9 +1,36 @@
+- Rename project to Repo
+    - Change class name [DONE]
+    - Change module name [DONE]
+    - Change config prefix from 'project:' to 'repo:' [DONE]
+    - Change references in code [DONE]
+    - Change references in templates
+        - Sidebar repos
+        - Sorted repos
+        - Repo tab
+    - Change view functions to repo_
+    - Change project_name url matcher to repo_name
+    - Change template names
+    - Change repo to just path
+
+PatchReport
+    - Repo
+        - PatchSeries
+            - Patch
+
+
 - Github integration:
-    [github]
+    [github:O3eng]
         match_string = '-rax-patches'
-        watched_usernames = O3eng,O3eng-infra
+        username = O3eng
         url=https://github.rackspace.com
         strip_match_string_for_name=True
+
+    [github:O3eng-infra]
+        match_string = '-rax-patches'
+        username = O3eng-infra
+        url=https://github.rackspace.com
+        strip_match_string_for_name=True
+
 
     Scan for repos that match `match_string`, if match add to config
     - Move repo list out to 'repos.pickle' in '/tmp'
@@ -14,11 +41,35 @@
             - patch_series
         - github
 
-class GitHubRepo(object):
-    def __init__(self, name, url, ssh_url=None):
-        self.name = name
+
+def get_repos():
+    pass
+
+
+def get_repos_from_config():
+    pass
+
+
+def get_repos_from_github():
+    pass
+
+class Repo(object):
+    def __init__(self, url, ssh_url=None, name=None):
         self.url = url
         self.ssh_url = ssh_url
+        self._name = name
+   
+    @property
+    def name(self):
+        if self._name:
+            return self._name
+        
+        # Determine from url
+        return 'thing'
+
+
+class GitHub(object):
+    pass
 
 
 

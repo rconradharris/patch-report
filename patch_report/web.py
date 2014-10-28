@@ -64,16 +64,16 @@ def _render_empty_cache_page():
     return render_template('empty_cache.html')
 
 
-def _common(sidebar_tab, projects):
-    # Sort sidebar so that projects with most patches are at top
-    sidebar_projects = projects[:]
-    sidebar_projects.sort(key=lambda p: len(p.patch_series.patches),
-                          reverse=True)
+def _common(sidebar_tab, repos):
+    # Sort sidebar so that repos with most patches are at top
+    sidebar_repos = repos[:]
+    sidebar_repos.sort(key=lambda p: len(p.patch_series.patches),
+                       reverse=True)
     return dict(
-            projects=projects,
-            sidebar_projects=sidebar_projects,
+            projects=repos,
+            sidebar_projects=sidebar_repos,
             sidebar_tab=sidebar_tab,
-            stale_data=projects[0].is_data_stale(),
+            stale_data=repos[0].is_data_stale(),
             )
 
 
@@ -84,25 +84,25 @@ def overview():
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    projects = patch_report.projects
+    repos = patch_report.repos
 
-    overview_counts_by_project = {}
-    for project in projects:
-        overview_counts = project.patch_series.get_overview_counts()
-        overview_counts_by_project[project] = overview_counts
+    overview_counts_by_repo = {}
+    for repo in repos:
+        overview_counts = repo.patch_series.get_overview_counts()
+        overview_counts_by_repo[repo] = overview_counts
 
     sort_key = request.args.get('sort_key', 'num_patches')
     sort_dir = request.args.get('sort_dir', 'desc')
-    sorted_projects = sorted(projects,
-        key=lambda p: overview_counts_by_project[p][sort_key],
+    sorted_repos = sorted(repos,
+        key=lambda p: overview_counts_by_repo[p][sort_key],
         reverse=sort_dir == 'desc')
 
     return render_template('overview.html',
-                           overview_counts_by_project=overview_counts_by_project,
+                           overview_counts_by_project=overview_counts_by_repo,
                            sort_key=sort_key,
                            sort_dir=sort_dir,
-                           sorted_projects=sorted_projects,
-                           **_common('Overview', projects)
+                           sorted_projects=sorted_repos,
+                           **_common('Overview', repos)
                            )
 
 
@@ -113,17 +113,16 @@ def upstream_reviews():
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    projects = patch_report.projects
+    repos = patch_report.repos
 
-    upstream_reviews_by_project = {}
-    for project in projects:
-        upstream_reviews = project.patch_series.get_upstream_reviews()
-        upstream_reviews_by_project[project] = upstream_reviews
-
+    upstream_reviews_by_repo = {}
+    for repo in repos:
+        upstream_reviews = repo.patch_series.get_upstream_reviews()
+        upstream_reviews_by_repo[repo] = upstream_reviews
 
     return render_template('upstream_reviews.html',
-                           upstream_reviews_by_project=upstream_reviews_by_project,
-                           **_common('Upstream Reviews', projects)
+                           upstream_reviews_by_project=upstream_reviews_by_repo,
+                           **_common('Upstream Reviews', repos)
                            )
 
 
@@ -132,14 +131,14 @@ def project_view(project_name):
     return redirect(url_for('project_patches', project_name=project_name))
 
 
-def _project_common(project, project_tab):
+def _project_common(repo, project_tab):
     patch_report = get_from_cache()
-    projects = patch_report.projects
+    repos = patch_report.repos
 
     return dict(
-            project=project,
+            project=repo,
             project_tab=project_tab,
-            **_common(project.name, projects)
+            **_common(repo.name, repos)
             )
 
 
@@ -150,16 +149,16 @@ def project_patches(project_name):
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    project = patch_report.get_project(project_name)
+    repo = patch_report.get_repo(project_name)
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
-    patches = project.patch_series.get_sorted_patches(sort_key, sort_dir)
+    patches = repo.patch_series.get_sorted_patches(sort_key, sort_dir)
 
     return render_template('project/patches.html',
                            patches=patches,
                            sort_dir=sort_dir,
                            sort_key=sort_key,
-                           **_project_common(project, 'Patches')
+                           **_project_common(repo, 'Patches')
                            )
 
 
@@ -170,15 +169,15 @@ def project_stats(project_name):
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
-    project = patch_report.get_project(project_name)
-    patch_series = project.patch_series
+    repo = patch_report.get_repo(project_name)
+    patch_series = repo.patch_series
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
 
     return render_template('project/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
-                           **_project_common(project, 'Stats')
+                           **_project_common(repo, 'Stats')
                            )
 
 

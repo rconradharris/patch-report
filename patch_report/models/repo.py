@@ -3,17 +3,20 @@ import datetime
 import os
 import urlparse
 
-from patch_report import config
 from patch_report import cache
+from patch_report import config
 from patch_report import utils
 from patch_report.models import patch_series
 
 
-class Project(object):
-    def __init__(self, patch_report, name, github_url):
+class Repo(object):
+    def __init__(self, patch_report, name):
         self.patch_report = patch_report
         self.name = name
-        self.github_url = github_url
+
+    @property
+    def github_url(self):
+        return config.get('repo:%s' % self.name, 'github_url')
 
     @property
     def repo_path(self):

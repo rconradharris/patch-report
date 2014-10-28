@@ -7,12 +7,12 @@ from patch_report.models import patch
 
 
 class PatchSeries(object):
-    def __init__(self, project):
-        self.project = project
+    def __init__(self, repo):
+        self.repo = repo
         self.patches = []
 
     def refresh(self):
-        series_path = os.path.join(self.project.repo_path, 'series')
+        series_path = os.path.join(self.repo.repo_path, 'series')
 
         idx = 1
         with open(series_path) as f:
@@ -77,7 +77,7 @@ class PatchSeries(object):
             'num_lines': num_lines,
             'num_patches': num_patches,
             'num_upstream_reviews': num_upstream_reviews,
-            'project': self.project.name,
+            'project': self.repo.name,
         }
 
     def get_upstream_reviews(self):

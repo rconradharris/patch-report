@@ -5,8 +5,8 @@ url = https://review.example.com
 cache_directory=/tmp
 repo_directory=/foo/bar
 
-[project:nova]
-github_url=https://github.com/user/project
+[repo:nova]
+github_url=https://github.com/user/repo
 
 [redmine]
 url=https://redmine.example.com
