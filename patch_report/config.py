@@ -37,6 +37,8 @@ _OPTIONS_SCHEMA = {
     "patch_report": {
         "cache_directory": {"type": "str",
                             "default": '/tmp'},
+        "ignore_missing_series_file": {"type": "bool",
+                                       "default": False},
         "repo_directory": {"type": "str",
                            "default": _OPTION_REQUIRED},
     },

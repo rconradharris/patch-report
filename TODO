@@ -1,5 +1,7 @@
 - Add placeholder row to upstream-reviews if there are none
 - Add placeholder row to category counts and author counts
+- Add -q to refresh
+- Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues
 - Add launchpad support?

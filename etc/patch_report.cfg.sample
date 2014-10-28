@@ -2,6 +2,7 @@
 url = https://review.example.com
 
 [patch_report]
+ignore_missing_series_file=False
 cache_directory=/tmp
 repo_directory=/foo/bar
 

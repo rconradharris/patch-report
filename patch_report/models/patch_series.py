@@ -6,6 +6,10 @@ from patch_report import config
 from patch_report.models import patch
 
 
+class PatchSeriesFileNotFound(Exception):
+    pass
+
+
 class PatchSeries(object):
     def __init__(self, repo):
         self.repo = repo
@@ -13,6 +17,12 @@ class PatchSeries(object):
 
     def refresh(self):
         series_path = os.path.join(self.repo.path, 'series')
+
+        if not os.path.exists(series_path):
+            if self.repo.patch_report.ignore_missing_series_file:
+                return
+            else:
+                raise PatchSeriesFileNotFound(series_path)
 
         idx = 1
         with open(series_path) as f:
