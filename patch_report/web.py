@@ -127,8 +127,8 @@ def upstream_reviews():
 
 
 @app.route('/<project_name>')
-def project_view(project_name):
-    return redirect(url_for('project_patches', project_name=project_name))
+def repo_view(project_name):
+    return redirect(url_for('repo_patches', project_name=project_name))
 
 
 def _repo_common(repo, repo_tab):
@@ -142,7 +142,7 @@ def _repo_common(repo, repo_tab):
 
 
 @app.route('/<project_name>/patches')
-def project_patches(project_name):
+def repo_patches(project_name):
     try:
         patch_report = get_from_cache()
     except cache.CacheFileNotFound:
@@ -162,7 +162,7 @@ def project_patches(project_name):
 
 
 @app.route('/<project_name>/stats')
-def project_stats(project_name):
+def repo_stats(project_name):
     try:
         patch_report = get_from_cache()
     except cache.CacheFileNotFound:

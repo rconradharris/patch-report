@@ -13,7 +13,11 @@
 
     - macros.project_link [DONE]
     - Change template names [DONE]
-    - Change view functions to repo_
+    - Change view functions to repo_ [DONE]
+        - project_view [DONE]
+        - project_patches [DONE]
+        - project_stats [DONE]
+
     - Change project_name url matcher to repo_name
     - Change repo to just path
 

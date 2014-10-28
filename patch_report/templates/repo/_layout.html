@@ -7,7 +7,7 @@
 <div class="last-updated">Last Updated: {{ repos[0].last_updated_at|time_ago_in_words }}</div>
 <ul class="nav nav-tabs" role="tablist">
     {% for tab in ('Patches', 'Stats') %}
-        {{ macros.tab_item(repo_tab, tab, url_for('project_%s' % tab.lower(), project_name=repo.name)) }}
+        {{ macros.tab_item(repo_tab, tab, url_for('repo_%s' % tab.lower(), project_name=repo.name)) }}
     {% endfor %}
 </ul>
 <div class="tab">
