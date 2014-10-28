@@ -27,7 +27,7 @@ PatchReport Overview
 
 {% block main_container %}
 <h1>Overview</h1>
-<div class="last-updated">Last Updated: {{ projects[0].last_updated_at }} UTC</div>
+<div class="last-updated">Last Updated: {{ projects[0].last_updated_at|time_ago_in_words }}</div>
 
 <table class="table table-striped">
     <thead>

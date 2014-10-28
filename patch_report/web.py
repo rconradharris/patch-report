@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -11,6 +12,42 @@ from patch_report.models.project import (
     get_project_from_cache,
     get_projects_from_cache,
 )
+
+
+@app.template_filter('time_ago_in_words')
+def time_ago_in_words(from_time):
+    if not from_time:
+        return 'never'
+
+    utcnow = datetime.datetime.utcnow()
+    timedelta = utcnow - from_time
+    secs = timedelta.seconds
+    days = timedelta.days
+
+    if days >= 730:
+        return '%s years ago' % (days / 365)
+    elif days >= 360:
+        return 'last year'
+    elif days >= 31:
+        return "%s months ago" % (days / 30)
+    elif days >= 14:
+        return "%s weeks ago" % (days / 7)
+    elif days >= 7:
+        return "last week"
+    elif days > 1:
+        return "%s days ago" % days
+    elif days == 1:
+        return "yesterday"
+    elif secs >= 7200:
+        return "%s hours ago" % (secs / 3600)
+    elif secs >= 3600:
+        return "an hour ago"
+    elif secs >= 120:
+        return "%s minutes ago" % (secs / 60)
+    elif secs >= 60:
+        return 'a minute ago'
+    else:
+        return 'just now'
 
 
 def _render_empty_cache_page():
