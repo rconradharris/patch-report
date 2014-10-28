@@ -1,3 +1,6 @@
+# Make last_updated_at into a property
+
+
 - Refactor code to Project class
     - Use model.project everywhere
 

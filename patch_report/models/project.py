@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from patch_report import config
@@ -6,24 +7,10 @@ from patch_report import utils
 from patch_report.models import patch_series
 
 
-def get_projects():
-    return [get_project(n) for n in config.get_project_names()]
-
-
-def get_projects_from_cache():
-    return [get_project_from_cache(n) for n in config.get_project_names()]
-
-
 def _get_project(name):
     repo_path = config.get_for_project(name, 'repo_path')
     github_url = config.get_for_project(name, 'github_url')
     return Project(name, repo_path, github_url)
-
-
-def get_project(name):
-    project = _get_project(name)
-    project.patch_series = patch_series.PatchSeries(project)
-    return project
 
 
 def get_project_from_cache(name):
@@ -32,11 +19,17 @@ def get_project_from_cache(name):
     return project
 
 
+def get_projects_from_cache():
+    return [get_project_from_cache(n) for n in config.get_project_names()]
+
+
 def refresh_projects(clear=False):
     if clear:
         cache.clear()
 
-    for project in get_projects():
+    for project_name in config.get_project_names():
+        project = _get_project(project_name)
+        project.patch_series = patch_series.PatchSeries(project)
         project.refresh()
 
 
@@ -57,3 +50,8 @@ class Project(object):
 
     def get_last_updated_at(self):
         return cache.get_last_updated_at(self.name)
+
+    def is_data_stale(self, stale_secs=600):
+        utcnow = datetime.datetime.utcnow()
+        updated_secs = (utcnow - self.get_last_updated_at()).total_seconds()
+        return updated_secs > stale_secs

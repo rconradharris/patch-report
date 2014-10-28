@@ -1,4 +1,3 @@
-import datetime
 import os
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -18,18 +17,11 @@ def _render_empty_cache_page():
     return render_template('empty_cache.html')
 
 
-def _is_data_stale(projects, stale_secs=600):
-    last_updated_at = projects[0].get_last_updated_at()
-    utcnow = datetime.datetime.utcnow()
-    updated_secs = (utcnow - last_updated_at).total_seconds()
-    return updated_secs > stale_secs
-
-
 def _common(sidebar_tab, projects):
     return dict(
             projects=projects,
             sidebar_tab=sidebar_tab,
-            stale_data=_is_data_stale(projects),
+            stale_data=projects[0].is_data_stale(),
             )
 
 
