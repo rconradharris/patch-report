@@ -11,7 +11,11 @@ Intended to be run from a cron-job.
 import os
 import sys
 
+
+from patch_report import cache
+from patch_report.models import github_scanner
 from patch_report.models import patch_report
+
 
 PIDFILE = '/tmp/refresh.pid'
 
@@ -23,6 +27,11 @@ with open(PIDFILE, 'w') as f:
 
 try:
     clear_cache = '--clear-cache' in sys.argv[1:]
-    patch_report.refresh(clear_cache=clear_cache)
+
+    if clear_cache:
+        cache.clear()
+        github_scanner.refresh()
+
+    patch_report.refresh()
 finally:
     os.unlink(PIDFILE)

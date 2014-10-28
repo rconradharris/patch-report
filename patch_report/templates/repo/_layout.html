@@ -2,7 +2,7 @@
 {% import 'macros.html' as macros %}
 
 {% block main_container %}
-<h1>{{ repo.name }} <a class="repo-url" href="{{ repo.url }}" target="_blank">{{ repo.url }}</a></h1>
+<h1>{{ repo.name }} <a class="repo-url" href="{{ repo.html_url }}" target="_blank">{{ repo.html_url }}</a></h1>
 <ul class="nav nav-tabs" role="tablist">
     {% for tab in ('Patches', 'Stats') %}
         {{ macros.tab_item(repo_tab, tab, url_for('repo_%s' % tab.lower(), repo_name=repo.name)) }}

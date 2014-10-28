@@ -5,8 +5,10 @@ url = https://review.example.com
 cache_directory=/tmp
 repo_directory=/foo/bar
 
-[repo:nova]
-url=https://github.com/user/repo
+[github:username]
+api_url = https://github.example.com/api/v3
+token = foo
+match_string = -patches
 
 [redmine]
 url=https://redmine.example.com

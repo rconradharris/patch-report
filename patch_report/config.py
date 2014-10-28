@@ -26,15 +26,19 @@ _OPTIONS_SCHEMA = {
         "url": {"type": "str",
                 "default": _OPTION_REQUIRED},
     },
+    "github:": {
+        "api_url": {"type": "str",
+                    "default": _OPTION_REQUIRED},
+        "token": {"type": "str",
+                  "default": _OPTION_REQUIRED},
+        "match_string": {"type": "str",
+                         "default": _OPTION_REQUIRED},
+    },
     "patch_report": {
         "cache_directory": {"type": "str",
                             "default": '/tmp'},
         "repo_directory": {"type": "str",
                            "default": _OPTION_REQUIRED},
-    },
-    "repo:": {
-        "url": {"type": "str",
-                "default": _OPTION_REQUIRED},
     },
     "redmine": {
         "url": {"type": "str",
@@ -87,10 +91,6 @@ def _parse_section(cfg, section, section_schema, values):
         values[section][key] = value
 
 
-_CONFIG_VALUES = {}
-_REPO_NAMES = []
-
-
 def _load():
     cfg = ConfigParser.SafeConfigParser()
 
@@ -115,16 +115,19 @@ def _load():
 
     for section in sections:
         if ':' in section:
-            prefix, rest = section.split(':', 1)
+            prefix, discriminator = section.split(':', 1)
 
-            if prefix == 'repo':
-                _REPO_NAMES.append(rest)
+            if prefix == 'github':
+                _GITHUB_USERNAMES.append(discriminator)
 
             section_schema = _OPTIONS_SCHEMA[prefix + ':']
         else:
             section_schema = _OPTIONS_SCHEMA[section]
 
         _parse_section(cfg, section, section_schema, _CONFIG_VALUES)
+
+
+_CONFIG_VALUES = {}
 
 
 def get(section, key):
@@ -134,8 +137,16 @@ def get(section, key):
     return _CONFIG_VALUES[section][key]
 
 
-def get_repo_names():
-    if not _REPO_NAMES:
+def get_from_multi_section(prefix, discriminator, key):
+    section = '%s:%s' % (prefix, discriminator)
+    return get(section, key)
+
+
+_GITHUB_USERNAMES = []
+
+
+def get_github_usernames():
+    if not _GITHUB_USERNAMES:
         _load()
 
-    return _REPO_NAMES
+    return _GITHUB_USERNAMES

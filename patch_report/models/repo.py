@@ -22,6 +22,10 @@ class Repo(object):
         return self.remote_repo.ssh_url
 
     @property
+    def html_url(self):
+        return self.remote_repo.html_url
+
+    @property
     def path(self):
         repo_directory = self.patch_report.repo_directory
         repo_name = os.path.basename(self.url)
