@@ -3,8 +3,9 @@ import urlparse
 
 from patch_report import config
 from patch_report import cache
-from patch_report.models.repo import Repo
 from patch_report.models.patch_series import PatchSeries
+from patch_report.models.repo import Repo
+from patch_report.models.remote_repo import RemoteRepo
 
 
 def get_from_cache():
@@ -47,7 +48,8 @@ class PatchReport(object):
         for name in config.get_repo_names():
             url = config.get('repo:%s' % name, 'url')
             ssh_url = self._get_ssh_url(url)
-            repo = Repo(self, name, url, ssh_url)
+            remote_repo = RemoteRepo(name, url, ssh_url)
+            repo = Repo(self, remote_repo)
             repo.patch_series = PatchSeries(repo)
             repo.refresh()
             self._repos[name] = repo

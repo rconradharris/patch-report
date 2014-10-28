@@ -1,7 +1,23 @@
+- Fix last_updated_at:
+    - Move last_updated_at to PatchReport class
+    - Move is_data_stale to PatchReport class
+    - Pass last_updated_at and is_data_stale to templates
+
+
+
 scanner = GitHubScanner(self, username, api_url, token, match_string)
     get_repos()
     refresh()
     self._repos = []
+
+RemoteRepo(object):
+    pass
+
+
+LocalRepo(patch_report, remote_repo):
+    - has path
+    pass
+
 
 
 def refresh():

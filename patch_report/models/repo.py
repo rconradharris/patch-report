@@ -7,11 +7,21 @@ from patch_report import utils
 
 
 class Repo(object):
-    def __init__(self, patch_report, name, url, ssh_url):
+    def __init__(self, patch_report, remote_repo):
         self.patch_report = patch_report
-        self.name = name
-        self.url = url
-        self.ssh_url = ssh_url
+        self.remote_repo = remote_repo
+
+    @property
+    def name(self):
+        return self.remote_repo.name
+
+    @property
+    def url(self):
+        return self.remote_repo.url
+
+    @property
+    def ssh_url(self):
+        return self.remote_repo.ssh_url
 
     @property
     def path(self):
@@ -32,7 +42,7 @@ class Repo(object):
 
     @property
     def last_updated_at(self):
-        return cache.get_last_updated_at(self.name)
+        return cache.get_last_updated_at('patch_report')
 
     def is_data_stale(self, stale_secs=600):
         utcnow = datetime.datetime.utcnow()
