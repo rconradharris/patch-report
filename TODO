@@ -1,12 +1,34 @@
+- Add Gerrit to Architecture diagram
+- Add GitHub to architecture diagram
+
+
+scanner = GitHubScanner(self, username, api_url, token, match_string)
+    self._repos = []
+
+    - refresh()
+
+
+def refresh():
+    for username in config.get_github_usernames():
+        api_url = config.get("github:%s" % username, 'api_url')
+        token = config.get("github:%s" % username, 'token')
+        match_string = config.get("github:%s" % username, 'match_string')
+        scanner = GitHubScanner(username, api_url, token, match_string)
+
+        for repo in scanner.repos():
+            self._repos.append(repo)
+
+
 - Github integration:
     [github:O3eng]
-        url=https://github.rackspace.com
-        strip_match_string_for_name=True
+        api_url = https://github.rackspace.com/api/v3
+        token = foo
+        match_string = -rax-patches
 
     [github:O3eng-infra]
-        match_string = '-rax-patches'
-        url=https://github.rackspace.com
-
+        api_url = https://github.rackspace.com/api/v3
+        token = foo
+        match_string = -rax-patches
 
     Scan for repos that match `match_string`, if match add to config
     - Move repo list out to 'repos.pickle' in '/tmp'
@@ -17,53 +39,6 @@
             - patch_series
         - github
 
-
-def get_repos():
-    pass
-
-
-def get_repos_from_config():
-    pass
-
-
-def get_repos_from_github():
-    pass
-
-class Repo(object):
-    def __init__(self, url, ssh_url=None, name=None):
-        self.url = url
-        self.ssh_url = ssh_url
-        self._name = name
-   
-    @property
-    def name(self):
-        if self._name:
-            return self._name
-        
-        # Determine from url
-        return 'thing'
-
-
-class GitHub(object):
-    pass
-
-
-
-class GitRepo(object):
-    def __init__(self, path):
-        self.path = path
-
-    def clone(self, url):
-        pass
-
-    def checkout(self, branch):
-        pass
-
-    def fetch(self, remote):
-        pass
-
-    def merge(self, branch):
-        pass
 
 - Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues
