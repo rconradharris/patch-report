@@ -8,7 +8,7 @@ app = Flask(__name__)
 import patch_report
 from patch_report import cache
 from patch_report import config
-from patch_report.models.project import get_project_from_cache
+from patch_report.models.project import get_project_from_cache, get_projects
 
 
 def _render_empty_cache_page():
@@ -16,13 +16,14 @@ def _render_empty_cache_page():
 
 
 def _is_data_stale(projects, stale_secs=600):
-    last_updated_at = patch_report.get_last_updated_at(projects[0])
+    last_updated_at = projects[0].get_last_updated_at()
     utcnow = datetime.datetime.utcnow()
     updated_secs = (utcnow - last_updated_at).total_seconds()
     return updated_secs > stale_secs
 
 
-def _common(sidebar_tab, projects):
+def _common(sidebar_tab):
+    projects = get_projects()
     stale_data = _is_data_stale(projects)
 
     return dict(
@@ -34,10 +35,10 @@ def _common(sidebar_tab, projects):
 
 @app.route('/')
 def overview():
-    projects = config.get_project_names()
+    project_names = config.get_project_names()
 
     overview_counts_by_project = {}
-    for project in projects:
+    for project in project_names:
         try:
             project_obj = get_project_from_cache(project)
         except cache.CacheFileNotFound:
@@ -48,16 +49,16 @@ def overview():
 
     return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
-                           **_common('Overview', projects)
+                           **_common('Overview')
                            )
 
 
 @app.route('/upstream-reviews')
 def upstream_reviews():
-    projects = config.get_project_names()
+    project_names = config.get_project_names()
 
     upstream_reviews_by_project = {}
-    for project in projects:
+    for project in project_names:
         try:
             project_obj = get_project_from_cache(project)
         except cache.CacheFileNotFound:
@@ -69,7 +70,7 @@ def upstream_reviews():
 
     return render_template('upstream_reviews.html',
                            upstream_reviews_by_project=upstream_reviews_by_project,
-                           **_common('Upstream Reviews', projects)
+                           **_common('Upstream Reviews')
                            )
 
 
@@ -79,12 +80,12 @@ def project_view(project_name):
 
 
 def _project_common(project, project_tab):
-    projects = config.get_project_names()
+    project_names = config.get_project_names()
     return dict(
             last_updated_at=project.get_last_updated_at(),
             project=project,
             project_tab=project_tab,
-            **_common(project.name, projects)
+            **_common(project.name)
             )
 
 

@@ -7,31 +7,31 @@ from patch_report.models import patch_series
 
 
 def get_projects():
-    pass
+    return [get_project(n) for n in config.get_project_names()]
 
 
-def _get_project(name, patch_series):
+def _get_project(name):
     repo_path = config.get_for_project(name, 'repo_path')
     github_url = config.get_for_project(name, 'github_url')
-    return Project(name, repo_path, github_url, patch_series)
+    return Project(name, repo_path, github_url)
 
 
 def get_project(name):
-    patch_series = patch_series.PatchSeries(self)
-    return _get_project(name, patch_series)
-
+    project = _get_project(name)
+    project.patch_series = patch_series.PatchSeries(project)
+    return project
 
 def get_project_from_cache(name):
-    patch_series = cache.read_file(name)
-    return _get_project(name, patch_series)
+    project = _get_project(name)
+    project.patch_series = cache.read_file(name)
+    return project
 
 
 class Project(object):
-    def __init__(self, name, repo_path, github_url, patch_series):
+    def __init__(self, name, repo_path, github_url):
         self.name = name
         self.repo_path = repo_path
         self.github_url = github_url
-        self.patch_series = patch_series
 
     def refresh(self):
         if os.path.exists(self.repo_path):

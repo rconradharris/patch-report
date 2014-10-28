@@ -7,7 +7,7 @@ Upstream Reviews
 
 {% block main_container %}
 {% for project in projects %}
-    {% for upstream_review in upstream_reviews_by_project[project] %}
+    {% for upstream_review in upstream_reviews_by_project[project.name] %}
         {{ macros.upstream_reviews_modal(upstream_review.patch) }}
     {% endfor %}
 {% endfor %}
@@ -24,7 +24,7 @@ Upstream Reviews
     </thead>
     <tbody>
 {% for project in projects %}
-    {% for upstream_review in upstream_reviews_by_project[project] %}
+    {% for upstream_review in upstream_reviews_by_project[project.name] %}
         {% with patch = upstream_review.patch %}
         <tr>
             <td>{{ macros.project_link(project) }}</td>
