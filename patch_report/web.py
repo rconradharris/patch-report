@@ -22,10 +22,7 @@ def _is_data_stale(projects, stale_secs=600):
     return updated_secs > stale_secs
 
 
-def _common(sidebar_tab, projects=None):
-    if projects is None:
-        projects = config.get_projects()
-
+def _common(sidebar_tab, projects):
     stale_data = _is_data_stale(projects)
 
     return dict(
@@ -37,7 +34,7 @@ def _common(sidebar_tab, projects=None):
 
 @app.route('/')
 def overview():
-    projects = config.get_projects()
+    projects = config.get_project_names()
 
     overview_counts_by_project = {}
     for project in projects:
@@ -51,13 +48,13 @@ def overview():
 
     return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
-                           **_common('Overview', projects=projects)
+                           **_common('Overview', projects)
                            )
 
 
 @app.route('/upstream-reviews')
 def upstream_reviews():
-    projects = config.get_projects()
+    projects = config.get_project_names()
 
     upstream_reviews_by_project = {}
     for project in projects:
@@ -72,7 +69,7 @@ def upstream_reviews():
 
     return render_template('upstream_reviews.html',
                            upstream_reviews_by_project=upstream_reviews_by_project,
-                           **_common('Upstream Reviews', projects=projects)
+                           **_common('Upstream Reviews', projects)
                            )
 
 
@@ -82,11 +79,12 @@ def project_view(project_name):
 
 
 def _project_common(project, project_tab):
+    projects = config.get_project_names()
     return dict(
             last_updated_at=project.get_last_updated_at(),
             project=project,
             project_tab=project_tab,
-            **_common(project.name)
+            **_common(project.name, projects)
             )
 
 

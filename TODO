@@ -6,12 +6,6 @@
         - Upstream Reviews
         - Overview
 
-
-    - Add project_obj
-    - Rename project_obj to project
-
-
-
     - Use `project.get_projects` everywhere
         - Move last_updated_at into project instance
 

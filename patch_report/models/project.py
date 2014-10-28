@@ -10,7 +10,6 @@ def get_projects():
     pass
 
 
-
 def _get_project(name, patch_series):
     repo_path = config.get_for_project(name, 'repo_path')
     github_url = config.get_for_project(name, 'github_url')

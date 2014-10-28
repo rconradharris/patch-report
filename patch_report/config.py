@@ -88,7 +88,7 @@ def _parse_section(cfg, section, section_schema, values):
 
 
 _CONFIG_VALUES = {}
-_PROJECTS = []
+_PROJECT_NAMES = []
 
 
 def _load():
@@ -118,7 +118,7 @@ def _load():
             prefix, rest = section.split(':', 1)
 
             if prefix == 'project':
-                _PROJECTS.append(rest)
+                _PROJECT_NAMES.append(rest)
 
             section_schema = _OPTIONS_SCHEMA[prefix + ':']
         else:
@@ -138,8 +138,8 @@ def get_for_project(project, key):
     return get('project:%s' % project, key)
 
 
-def get_projects():
-    if not _PROJECTS:
+def get_project_names():
+    if not _PROJECT_NAMES:
         _load()
 
-    return _PROJECTS
+    return _PROJECT_NAMES

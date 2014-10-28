@@ -8,8 +8,8 @@ def refresh_projects(clear=False):
     if clear:
         cache.clear()
 
-    projects = config.get_projects()
-    for project_name in projects:
+    project_names = config.get_project_names()
+    for project_name in project_names:
         proj = project.get_project(project_name)
         proj.refresh()
 
