@@ -14,9 +14,6 @@
     </div>
 {% endmacro %}
 
-{% macro pluralize(count, singular, plural=None) %}
-    {{ singular if count == 1 else plural if plural else singular + 's' }}
-{% endmacro %}
 
 {% macro tab_item(active_tab, label, url) %}
     <li class="{{ 'active' if active_tab == label else '' }}">
@@ -39,7 +36,7 @@
             {% if review_count == 1 %}
                 <span class="label label-success">{{ patch.upstream_reviews[0].label }}</span>
             {% else %}
-                {{ review_count }} {{ macros.pluralize(review_count, 'review') }}
+                {{ review_count }} {{ 'review'|pluralize(review_count) }}
             {% endif %}
         {% endwith %}
     </a>

@@ -28,7 +28,7 @@
             {% if issue_count == 1 %}
                 <span class="label label-danger">{{ patch.rm_issues[0].issue_id }}</span>
             {% else %}
-                {{ issue_count }} {{ macros.pluralize(issue_count, 'issue') }}
+                {{ issue_count }} {{ 'issue'|pluralize(issue_count) }}
             {% endif %}
         {% endwith %}
     </a>

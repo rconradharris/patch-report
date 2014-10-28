@@ -14,6 +14,17 @@ from patch_report.models.project import (
 )
 
 
+@app.template_filter('pluralize')
+def pluralize(singular, count, plural=None):
+    if count == 1:
+        return singular
+
+    if not plural:
+        plural = singular + 's'
+
+    return plural
+
+
 @app.template_filter('time_ago_in_words')
 def time_ago_in_words(from_time):
     if not from_time:
