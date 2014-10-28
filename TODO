@@ -1,8 +1,53 @@
+- Add PatchReport object
+    - repo_directory should be object of it
+    - refresh() should refresh all known projects
+
+- Github integration:
+    [github]
+        match_string = '-rax-patches'
+        watched_usernames = O3eng,O3eng-infra
+        url=https://github.rackspace.com
+        strip_match_string_for_name=True
+
+    Scan for repos that match `match_string`, if match add to config
+    - Move repo list out to 'repos.pickle' in '/tmp'
+
+
+    - Project
+        - repo
+            - patch_series
+        - github
+
+class GitHubRepo(object):
+    def __init__(self, name, url, ssh_url=None):
+        self.name = name
+        self.url = url
+        self.ssh_url = ssh_url
+
+
+
+class GitRepo(object):
+    def __init__(self, path):
+        self.path = path
+
+    def clone(self, url):
+        pass
+
+    def checkout(self, branch):
+        pass
+
+    def fetch(self, remote):
+        pass
+
+    def merge(self, branch):
+        pass
+
 - Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues
 - Add launchpad support?
-- Move templates and static out of project directory and up one level
 - Add setup.py
+- Move templates and static out of project directory and up one level
+
 
 BLOCKED
     https://github.com/maxtepkeev/python-redmine/pull/60

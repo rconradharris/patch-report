@@ -12,16 +12,8 @@ def _get_project_config(project_name, key):
     return config.get('project:%s' % project_name, key)
 
 
-def _get_project(project_name):
-    repo_directory = config.get('patch_report', 'repo_directory')
-    github_url = _get_project_config(project_name, 'github_url')
-    return Project(project_name, repo_directory, github_url)
-
-
 def get_project_from_cache(project_name):
-    project = _get_project(project_name)
-    project.patch_series = cache.read_file(project_name)
-    return project
+    return cache.read_file(project_name)
 
 
 def get_projects_from_cache():
@@ -33,9 +25,14 @@ def refresh_projects(clear=False):
         cache.clear()
 
     for project_name in config.get_project_names():
-        project = _get_project(project_name)
+        repo_directory = config.get('patch_report', 'repo_directory')
+        github_url = _get_project_config(project_name, 'github_url')
+
+        project = Project(project_name, repo_directory, github_url)
+
         project.patch_series = patch_series.PatchSeries(project)
         project.refresh()
+        cache.write_file(project.name, project)
 
 
 class Project(object):
@@ -69,7 +66,6 @@ class Project(object):
                 os.system('git clone %s' % ssh_url)
 
         self.patch_series.refresh()
-        cache.write_file(self.name, self.patch_series)
 
     @property
     def last_updated_at(self):
