@@ -18,8 +18,13 @@ def _render_empty_cache_page():
 
 
 def _common(sidebar_tab, projects):
+    # Sort sidebar so that projects with most patches are at top
+    sidebar_projects = projects[:]
+    sidebar_projects.sort(key=lambda p: len(p.patch_series.patches),
+                          reverse=True)
     return dict(
             projects=projects,
+            sidebar_projects=sidebar_projects,
             sidebar_tab=sidebar_tab,
             stale_data=projects[0].is_data_stale(),
             )
