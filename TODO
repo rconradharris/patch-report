@@ -1,7 +1,3 @@
-- Add PatchReport object
-    - repo_directory should be object of it
-    - refresh() should refresh all known projects
-
 - Github integration:
     [github]
         match_string = '-rax-patches'

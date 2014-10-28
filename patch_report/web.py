@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 import os
 
@@ -8,10 +9,8 @@ app = Flask(__name__)
 import patch_report
 from patch_report import cache
 from patch_report import config
-from patch_report.models.project import (
-    get_project_from_cache,
-    get_projects_from_cache,
-)
+
+from patch_report.models.patch_report import get_from_cache
 
 
 @app.template_filter('pluralize')
@@ -81,9 +80,11 @@ def _common(sidebar_tab, projects):
 @app.route('/')
 def overview():
     try:
-        projects = get_projects_from_cache()
+        patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
+
+    projects = patch_report.projects
 
     overview_counts_by_project = {}
     for project in projects:
@@ -108,9 +109,11 @@ def overview():
 @app.route('/upstream-reviews')
 def upstream_reviews():
     try:
-        projects = get_projects_from_cache()
+        patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
+
+    projects = patch_report.projects
 
     upstream_reviews_by_project = {}
     for project in projects:
@@ -130,7 +133,9 @@ def project_view(project_name):
 
 
 def _project_common(project, project_tab):
-    projects = get_projects_from_cache()
+    patch_report = get_from_cache()
+    projects = patch_report.projects
+
     return dict(
             project=project,
             project_tab=project_tab,
@@ -141,10 +146,11 @@ def _project_common(project, project_tab):
 @app.route('/<project_name>/patches')
 def project_patches(project_name):
     try:
-        project = get_project_from_cache(project_name)
+        patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
+    project = patch_report.get_project(project_name)
     sort_key = request.args.get('sort_key', 'idx')
     sort_dir = request.args.get('sort_dir', 'desc')
     patches = project.patch_series.get_sorted_patches(sort_key, sort_dir)
@@ -160,10 +166,11 @@ def project_patches(project_name):
 @app.route('/<project_name>/stats')
 def project_stats(project_name):
     try:
-        project = get_project_from_cache(project_name)
+        patch_report = get_from_cache()
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
+    project = patch_report.get_project(project_name)
     patch_series = project.patch_series
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
