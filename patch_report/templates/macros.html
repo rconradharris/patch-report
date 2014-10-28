@@ -80,23 +80,3 @@
         </table>
     {% endcall %}
 {% endmacro %}
-
-{% macro sort_heading(key, name=None, align_right=False) %}
-    {% set is_sort_key = key == sort_key %}
-    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
-    {% if is_sort_key %}
-        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
-    {% else %}
-        {% set sort_dir = 'asc' %}
-    {% endif %}
-    {% if name is none %}
-        {% set name = key.replace('_', ' ').title() %}
-    {% endif %}
-    <a href="{{ url_for('project_patches', project_name=project_name, sort_key=key, sort_dir=sort_dir) }}"
-       class="sort-link">{{ name }}
-    {% if is_sort_key %}
-        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
-    {% endif %}
-    </th>
-</a>
-{% endmacro %}

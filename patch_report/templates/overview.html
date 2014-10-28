@@ -1,5 +1,25 @@
 {% extends '_layout.html' %}
 
+{% macro sort_heading(key, name=None, align_right=False) %}
+    {% set is_sort_key = key == sort_key %}
+    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
+    {% if is_sort_key %}
+        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
+    {% else %}
+        {% set sort_dir = 'asc' %}
+    {% endif %}
+    {% if name is none %}
+        {% set name = key.replace('_', ' ').title() %}
+    {% endif %}
+    <a href="{{ url_for('overview', sort_key=key, sort_dir=sort_dir) }}"
+       class="sort-link">{{ name }}
+    {% if is_sort_key %}
+        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
+    {% endif %}
+    </th>
+</a>
+{% endmacro %}
+
 
 {% block title %}
 PatchReport Overview
@@ -12,16 +32,16 @@ PatchReport Overview
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Project</th>
-            <th class="rightcol">Patches</th>
-            <th class="rightcol">Upstream Reviews</th>
-            <th class="rightcol">Files Modified</th>
-            <th class="rightcol">Lines Modified</th>
+            {{ sort_heading('project') }}
+            {{ sort_heading('num_patches', name='Patches', align_right=True) }}
+            {{ sort_heading('num_upstream_reviews', name='Upstream Reviews', align_right=True) }}
+            {{ sort_heading('num_files', name='Files Modified', align_right=True) }}
+            {{ sort_heading('num_lines', name='Lines Modified', align_right=True) }}
         </tr>
     </thead>
     <tbody>
 
-{% for project in projects %}
+{% for project in sorted_projects %}
         <tr>
             <td>{{ macros.project_link(project) }}</td>
             {% with counts = overview_counts_by_project[project] %}

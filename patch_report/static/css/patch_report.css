@@ -3,7 +3,7 @@ th, td { white-space: nowrap; }
 .navbar-inverse { background-color: #000; }
 #main { margin-top: 50px; margin-bottom: 50px; padding-top: 10px; }
 .tab { margin-top: 10px; }
-#sort-caret { float: right; }
+#sort-caret { float: right; padding-left: 10px; }
 .sort-key { background: #eee; }
 .sort-link { display: block; width: 100%; height: 100%; }
 ol.btn-list li { margin-bottom: 5px; }

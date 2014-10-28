@@ -1,6 +1,26 @@
 {% extends 'project/_layout.html' %}
 {% import 'macros.html' as macros %}
 
+{% macro sort_heading(key, name=None, align_right=False) %}
+    {% set is_sort_key = key == sort_key %}
+    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
+    {% if is_sort_key %}
+        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
+    {% else %}
+        {% set sort_dir = 'asc' %}
+    {% endif %}
+    {% if name is none %}
+        {% set name = key.replace('_', ' ').title() %}
+    {% endif %}
+    <a href="{{ url_for('project_patches', project_name=project.name, sort_key=key, sort_dir=sort_dir) }}"
+       class="sort-link">{{ name }}
+    {% if is_sort_key %}
+        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
+    {% endif %}
+    </th>
+</a>
+{% endmacro %}
+
 {% macro issues_modal_link(patch) %}
     <a data-toggle="modal" data-target="#rm-modal-{{ patch.idx }}"
         href="javascript:void(0)">
@@ -76,18 +96,18 @@
 <table class="table table-striped">
 <thead>
     <tr>
-        {{ macros.sort_heading('idx', name='#') }}
-        {{ macros.sort_heading('date') }}
-        {{ macros.sort_heading('filename') }}
-        {{ macros.sort_heading('author') }}
-        {{ macros.sort_heading('rm_issue_count',
-                               name='Attached Issues',
-                               align_right=True) }}
-        {{ macros.sort_heading('upstream_review_count',
-                               name='Upstream Reviews',
-                               align_right=True) }}
-        {{ macros.sort_heading('file_count', align_right=True) }}
-        {{ macros.sort_heading('line_count', align_right=True) }}
+        {{ sort_heading('idx', name='#') }}
+        {{ sort_heading('date') }}
+        {{ sort_heading('filename') }}
+        {{ sort_heading('author') }}
+        {{ sort_heading('rm_issue_count',
+                        name='Attached Issues',
+                        align_right=True) }}
+        {{ sort_heading('upstream_review_count',
+                        name='Upstream Reviews',
+                        align_right=True) }}
+        {{ sort_heading('file_count', align_right=True) }}
+        {{ sort_heading('line_count', align_right=True) }}
     </tr>
 </thead>
 {% for patch in patches %}

@@ -37,8 +37,17 @@ def overview():
         overview_counts = project.patch_series.get_overview_counts()
         overview_counts_by_project[project] = overview_counts
 
+    sort_key = request.args.get('sort_key', 'num_patches')
+    sort_dir = request.args.get('sort_dir', 'desc')
+    sorted_projects = sorted(projects,
+        key=lambda p: overview_counts_by_project[p][sort_key],
+        reverse=sort_dir == 'desc')
+
     return render_template('overview.html',
                            overview_counts_by_project=overview_counts_by_project,
+                           sort_key=sort_key,
+                           sort_dir=sort_dir,
+                           sorted_projects=sorted_projects,
                            **_common('Overview', projects)
                            )
 

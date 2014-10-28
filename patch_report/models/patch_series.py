@@ -76,6 +76,7 @@ class PatchSeries(object):
             'num_lines': num_lines,
             'num_patches': num_patches,
             'num_upstream_reviews': num_upstream_reviews,
+            'project': self.project.name,
         }
 
     def get_upstream_reviews(self):
