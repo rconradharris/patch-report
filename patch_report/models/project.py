@@ -1,5 +1,6 @@
 import datetime
 import os
+import urlparse
 
 from patch_report import config
 from patch_report import cache
@@ -39,11 +40,24 @@ class Project(object):
         self.repo_path = repo_path
         self.github_url = github_url
 
+    def _get_github_ssh_url(self):
+        parsed = urlparse.urlparse(self.github_url)
+        path_parts = parsed.path.split('/')
+        # Ignore first slash at [0]
+        org = path_parts[1]
+        repo = path_parts[2]
+        return "git@%(netloc)s:%(org)s/%(repo)s.git" % dict(
+                netloc=parsed.netloc, org=org, repo=repo)
+
     def refresh(self):
         if os.path.exists(self.repo_path):
             with utils.temp_chdir(self.repo_path):
                 os.system('git checkout master && git fetch origin'
                           ' && git merge origin/master')
+        else:
+            ssh_url = self._get_github_ssh_url()
+            with utils.temp_chdir(os.path.dirname(self.repo_path)):
+                os.system('git clone %s' % ssh_url)
 
         self.patch_series.refresh()
         cache.write_file(self.name, self.patch_series)
