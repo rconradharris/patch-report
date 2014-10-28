@@ -70,7 +70,6 @@ def project_view(project_name):
 def _project_common(project, project_tab):
     projects = get_projects_from_cache()
     return dict(
-            last_updated_at=project.get_last_updated_at(),
             project=project,
             project_tab=project_tab,
             **_common(project.name, projects)

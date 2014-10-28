@@ -48,10 +48,11 @@ class Project(object):
         self.patch_series.refresh()
         cache.write_file(self.name, self.patch_series)
 
-    def get_last_updated_at(self):
+    @property
+    def last_updated_at(self):
         return cache.get_last_updated_at(self.name)
 
     def is_data_stale(self, stale_secs=600):
         utcnow = datetime.datetime.utcnow()
-        updated_secs = (utcnow - self.get_last_updated_at()).total_seconds()
+        updated_secs = (utcnow - self.last_updated_at).total_seconds()
         return updated_secs > stale_secs
