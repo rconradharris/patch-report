@@ -29,11 +29,11 @@ _OPTIONS_SCHEMA = {
     "patch_report": {
         "cache_directory": {"type": "str",
                             "default": '/tmp'},
+        "repo_directory": {"type": "str",
+                           "default": _OPTION_REQUIRED},
     },
     "project:": {
         "github_url": {"type": "str",
-                      "default": _OPTION_REQUIRED},
-        "repo_path": {"type": "str",
                       "default": _OPTION_REQUIRED},
     },
     "redmine": {
@@ -132,10 +132,6 @@ def get(section, key):
         _load()
 
     return _CONFIG_VALUES[section][key]
-
-
-def get_for_project(project, key):
-    return get('project:%s' % project, key)
 
 
 def get_project_names():

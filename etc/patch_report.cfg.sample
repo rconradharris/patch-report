@@ -3,10 +3,10 @@ url = https://review.example.com
 
 [patch_report]
 cache_directory=/tmp
+repo_directory=/foo/bar
 
 [project:nova]
-patch_url=https://github.com/user/project/blob/master
-repo_path=foo
+github_url=https://github.com/user/project
 
 [redmine]
 url=https://redmine.example.com

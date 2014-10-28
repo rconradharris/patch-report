@@ -1,6 +1,3 @@
-- Remove repo_path per project (use github_url to deduce project-name)
-- Add repo_path to `patch_report` section
-
 - Make overview columns sortable (default sort to number of patches)
     - Make sort-headings generic, extract out url_for(project_patches)
 - Make rows with 0 patches appear grayed out

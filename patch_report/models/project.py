@@ -8,15 +8,19 @@ from patch_report import utils
 from patch_report.models import patch_series
 
 
-def _get_project(name):
-    repo_path = config.get_for_project(name, 'repo_path')
-    github_url = config.get_for_project(name, 'github_url')
-    return Project(name, repo_path, github_url)
+def _get_project_config(project_name, key):
+    return config.get('project:%s' % project_name, key)
 
 
-def get_project_from_cache(name):
-    project = _get_project(name)
-    project.patch_series = cache.read_file(name)
+def _get_project(project_name):
+    repo_directory = config.get('patch_report', 'repo_directory')
+    github_url = _get_project_config(project_name, 'github_url')
+    return Project(project_name, repo_directory, github_url)
+
+
+def get_project_from_cache(project_name):
+    project = _get_project(project_name)
+    project.patch_series = cache.read_file(project_name)
     return project
 
 
@@ -35,10 +39,15 @@ def refresh_projects(clear=False):
 
 
 class Project(object):
-    def __init__(self, name, repo_path, github_url):
+    def __init__(self, name, repo_directory, github_url):
         self.name = name
-        self.repo_path = repo_path
+        self.repo_directory = repo_directory
         self.github_url = github_url
+
+    @property
+    def repo_path(self):
+        repo_name = os.path.basename(self.github_url)
+        return os.path.join(self.repo_directory, repo_name)
 
     def _get_github_ssh_url(self):
         parsed = urlparse.urlparse(self.github_url)
