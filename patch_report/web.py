@@ -153,7 +153,7 @@ def project_patches(project_name):
     sort_dir = request.args.get('sort_dir', 'desc')
     patches = repo.patch_series.get_sorted_patches(sort_key, sort_dir)
 
-    return render_template('project/patches.html',
+    return render_template('repo/patches.html',
                            patches=patches,
                            sort_dir=sort_dir,
                            sort_key=sort_key,
@@ -173,7 +173,7 @@ def project_stats(project_name):
     author_counts = patch_series.get_author_counts()
     category_counts = patch_series.get_category_counts()
 
-    return render_template('project/stats.html',
+    return render_template('repo/stats.html',
                            author_counts=author_counts,
                            category_counts=category_counts,
                            **_repo_common(repo, 'Stats')
