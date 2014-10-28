@@ -19,7 +19,7 @@ class Repo(object):
         return config.get('repo:%s' % self.name, 'github_url')
 
     @property
-    def repo_path(self):
+    def path(self):
         repo_directory = self.patch_report.repo_directory
         repo_name = os.path.basename(self.github_url)
         return os.path.join(repo_directory, repo_name)
@@ -34,13 +34,13 @@ class Repo(object):
                 netloc=parsed.netloc, org=org, repo=repo)
 
     def refresh(self):
-        if os.path.exists(self.repo_path):
-            with utils.temp_chdir(self.repo_path):
+        if os.path.exists(self.path):
+            with utils.temp_chdir(self.path):
                 os.system('git checkout master && git fetch origin'
                           ' && git merge origin/master')
         else:
             ssh_url = self._get_github_ssh_url()
-            with utils.temp_chdir(os.path.dirname(self.repo_path)):
+            with utils.temp_chdir(os.path.dirname(self.path)):
                 os.system('git clone %s' % ssh_url)
 
         self.patch_series.refresh()

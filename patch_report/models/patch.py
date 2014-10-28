@@ -53,7 +53,7 @@ class Patch(object):
 
     @property
     def path(self):
-        return os.path.join(self.repo.repo_path, self.filename)
+        return os.path.join(self.repo.path, self.filename)
 
     def _parse_author(self, line):
         if not line.startswith('From:'):

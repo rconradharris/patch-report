@@ -12,7 +12,7 @@ class PatchSeries(object):
         self.patches = []
 
     def refresh(self):
-        series_path = os.path.join(self.repo.repo_path, 'series')
+        series_path = os.path.join(self.repo.path, 'series')
 
         idx = 1
         with open(series_path) as f:
