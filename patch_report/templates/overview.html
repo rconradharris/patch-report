@@ -43,7 +43,7 @@ PatchReport Overview
 
 {% for repo in sorted_repos %}
         <tr>
-            <td>{{ macros.project_link(repo) }}</td>
+            <td>{{ macros.repo_link(repo) }}</td>
             {% with counts = overview_counts_by_repo[repo] %}
             <td class="rightcol">
                 {{ counts['num_patches'] }}

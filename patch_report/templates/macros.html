@@ -21,8 +21,8 @@
     </li>
 {% endmacro %}
 
-{% macro project_link(project) %}
-    <a href="{{ url_for('project_view', project_name=project.name) }}">{{ project.name }}</a>
+{% macro repo_link(repo) %}
+    <a href="{{ url_for('project_view', project_name=repo.name) }}">{{ repo.name }}</a>
 {% endmacro %}
 
 {% macro patch_link(patch, max_len=32) %}

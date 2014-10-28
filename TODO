@@ -11,10 +11,10 @@
         - Stats [DONE]
         - Repo tab [DONE]
 
-    - macros.project_link
+    - macros.project_link [DONE]
+    - Change template names
     - Change view functions to repo_
     - Change project_name url matcher to repo_name
-    - Change template names
     - Change repo to just path
 
 PatchReport

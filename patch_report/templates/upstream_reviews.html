@@ -28,7 +28,7 @@ Upstream Reviews
     {% for upstream_review in upstream_reviews_by_repo[repo] %}
         {% with patch = upstream_review.patch %}
         <tr>
-            <td>{{ macros.project_link(repo) }}</td>
+            <td>{{ macros.repo_link(repo) }}</td>
             <td>{{ macros.patch_link(patch, max_len=64) }}</td>
             <td class="rightcol">
                 {% if patch.upstream_review_count > 0 %}
