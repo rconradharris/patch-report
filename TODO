@@ -4,10 +4,27 @@
 - Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues
-- Add launchpad support?
 - Add setup.py
 - Move templates and static out of project directory and up one level
+
+- Abstract Issues
+    Issue
+        RedmineIssue
+        GithubIssue
+        LaunchpadIssue
+        BitbucketIssue
+
+- Abstract UpstreamReviews
+    UpstreamReview
+        GerritReview
+        GithubPullRequest
+        BitBucketPullRequest
+        EmailReview
 
 
 BLOCKED
     https://github.com/maxtepkeev/python-redmine/pull/60
+        - When 1.0.2 is released, change requirement to >= 1.0.2
+
+    ignore_missing_series_file is needed because ncclient is missing series
+    file [fix that]
