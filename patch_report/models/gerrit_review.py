@@ -5,6 +5,7 @@ import requests
 
 from patch_report import cache
 from patch_report import config
+from patch_report.logging import log
 
 
 _GERRIT = None
@@ -49,14 +50,12 @@ class GerritChange(object):
 
 
 class _Gerrit(object):
-    def __init__(self, url, debug=True):
+    def __init__(self, url):
         self.url = url
-        self.debug = debug
         self.cache = cache.DictCache('gerrit_reviews')
 
     def _fetch_remote_change(self, patch, change_id):
-        if self.debug:
-            print 'Fetching Gerrit Change %s' % change_id
+        log('Fetching Gerrit Change %s' % change_id)
 
         url = '%s/changes/?q=change:%s&n=1' % (self.url, change_id)
         resp = requests.get(url)

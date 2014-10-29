@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 """
-Refresh patch_report cache.
+Refresh patch_report cache
 
-usage: refresh [--clear-cache]
+usage: refresh [--clear-cache] [--verbose]
 
---clear-cache will clear the cache so that issues can be refreshed
+--clear-cache   Will clear the cache so that issues and upstream reviews can
+                be refreshed as well as GitHub scanned for new patch repos
+
+--verbose       Output logging information to stderr
 
 Intended to be run from a cron-job.
 """
@@ -13,6 +16,7 @@ import sys
 
 
 from patch_report import cache
+from patch_report import logging
 from patch_report.models import github_scanner
 from patch_report.models import patch_report
 
@@ -26,7 +30,11 @@ with open(PIDFILE, 'w') as f:
     f.write(str(os.getpid()))
 
 try:
-    clear_cache = '--clear-cache' in sys.argv[1:]
+    args = sys.argv[1:]
+
+    clear_cache = '--clear-cache' in args
+    verbose = '--verbose' in args
+    logging.set_verbose(verbose)
 
     if clear_cache:
         cache.clear()

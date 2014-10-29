@@ -6,6 +6,7 @@ import redmine
 
 from patch_report import cache
 from patch_report import config
+from patch_report.logging import log
 
 
 class RedmineException(Exception):
@@ -88,22 +89,20 @@ class RedmineIssue(object):
 
 
 class _Redmine(object):
-    def __init__(self, url, key, verify_cert=False, debug=True):
+    def __init__(self, url, key, verify_cert=False):
         self.url = url
         self.key = key
         self.verify_cert = verify_cert
-        self.debug = debug
         self.cache = cache.DictCache('redmine_issues')
         self.ignore_errors = config.get('redmine', 'ignore_errors')
         self.last_unrecoverable_error = None
         self.redmine = redmine.Redmine(url,
                                        requests={'verify': verify_cert},
                                        key=key,
-                                       raise_attr_exception=debug)
+                                       raise_attr_exception=True)
 
     def _fetch_remote_issue(self, patch, issue_id):
-        if self.debug:
-            print 'Fetching Redmine Issue %s' % issue_id
+        log('Fetching Redmine Issue %s' % issue_id)
 
         status =  None
         subject = None
