@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from github import Github
 
-from patch_report.logging import log
+from patch_report.simplelog import log
 from patch_report.models.remote_repo import RemoteRepo
 
 

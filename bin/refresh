@@ -16,7 +16,7 @@ import sys
 
 
 from patch_report import cache
-from patch_report import logging
+from patch_report import simplelog
 from patch_report.models import github_scanner
 from patch_report.models import patch_report
 
@@ -34,7 +34,7 @@ try:
 
     clear_cache = '--clear-cache' in args
     verbose = '--verbose' in args
-    logging.set_verbose(verbose)
+    simplelog.set_verbose(verbose)
 
     if clear_cache:
         cache.clear()

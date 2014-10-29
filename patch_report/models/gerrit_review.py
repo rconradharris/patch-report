@@ -5,7 +5,7 @@ import requests
 
 from patch_report import cache
 from patch_report import config
-from patch_report.logging import log
+from patch_report.simplelog import log
 
 
 _GERRIT = None

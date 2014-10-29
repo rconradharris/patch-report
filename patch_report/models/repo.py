@@ -6,7 +6,7 @@ try:
 except ImportError:
     DEVNULL = open(os.devnull, 'wb')
 
-from patch_report import logging
+from patch_report import simplelog
 from patch_report import utils
 
 
@@ -38,7 +38,7 @@ class Repo(object):
         return os.path.join(repo_directory, repo_name)
 
     def _git_cmd(self, cmd, *args):
-        if logging.is_verbose():
+        if simplelog.is_verbose():
             stdout = stderr = None
         else:
             stdout = stderr = DEVNULL
