@@ -31,7 +31,8 @@ def _load():
 
     url = config.get('redmine', 'url')
     key = config.get('redmine', 'key')
-    _REDMINE = _Redmine(url, key)
+    verify_cert = config.get('redmine', 'verify_cert')
+    _REDMINE = _Redmine(url, key, verify_cert)
 
 
 def get_from_line(patch, line):
@@ -89,7 +90,7 @@ class RedmineIssue(object):
 
 
 class _Redmine(object):
-    def __init__(self, url, key, verify_cert=False):
+    def __init__(self, url, key, verify_cert):
         self.url = url
         self.key = key
         self.verify_cert = verify_cert

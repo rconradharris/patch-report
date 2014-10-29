@@ -1,4 +1,3 @@
-- Add verify_cert config to redmine, default to True
 - Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out
 - separate add and commit from redmine _add_issues

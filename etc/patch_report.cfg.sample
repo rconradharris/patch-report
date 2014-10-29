@@ -15,6 +15,7 @@ match_string = -patches
 url=https://redmine.example.com
 key=foobar
 ignore_errors=False
+verify_cert = True
 
 [web]
 debug=true

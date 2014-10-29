@@ -49,6 +49,8 @@ _OPTIONS_SCHEMA = {
                 "default": _OPTION_REQUIRED},
         "ignore_errors": {"type": "bool",
                           "default": False},
+        "verify_cert": {"type": "bool",
+                        "default": True},
     },
     "web": {
         "debug": {"type": "bool",
