@@ -1,4 +1,3 @@
-- Add placeholder row to upstream-reviews if there are none
 - Add placeholder row to category counts and author counts
 - Add -q to refresh
 - Collect up exceptions in exceptions.py
@@ -20,6 +19,11 @@
         GithubPullRequest
         BitBucketPullRequest
         EmailReview
+
+BECOME THEIR OWN PROJECT?
+
+- PickleCache?
+- Port Rails helpers to Jinja2 filters (Jinja2Helpers)
 
 
 BLOCKED
