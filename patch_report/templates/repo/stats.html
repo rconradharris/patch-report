@@ -4,7 +4,7 @@
 {{ repo.name }} Stats
 {% endblock title %}
 
-{% macro count_table(data, attribute) %}
+{% macro count_table(data, attribute, plural) %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -29,6 +29,10 @@
                 <td class="rightcol">{{ item['count'] }}</td>
                 <td class="rightcol">{{ (item['count'] * 100 / total)|round(0) }} %</td>
             </tr>
+        {% else %}
+            <tr>
+                <td class="placeholder-row" colspan="3">No {{ plural }}</td>
+            </tr>
         {% endfor %}
     </tbody>
     <tfoot>
@@ -45,10 +49,10 @@
 {% block tab_container %}
 <div class="row">
     <div class="col-md-3">
-        {{ count_table(category_counts, 'category') }}
+        {{ count_table(category_counts, 'category', 'categories') }}
     </div>
     <div class="col-md-3">
-        {{ count_table(author_counts, 'author') }}
+        {{ count_table(author_counts, 'author', 'authors') }}
     </div>
 </div>
 {% endblock tab_container %}
