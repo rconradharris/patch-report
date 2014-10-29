@@ -1,5 +1,3 @@
-- Add refresh
-
 - Use entry points for serve and refresh and clear-cache
 - Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out
