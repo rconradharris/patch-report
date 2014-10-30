@@ -1,8 +1,10 @@
 from __future__ import absolute_import
 import datetime
 import os
+import uuid
 
 from flask import Flask, redirect, render_template, request, url_for
+from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 
@@ -183,6 +185,8 @@ def repo_stats(repo_name):
 
 def _init_app(app):
     app.debug = config.get('web', 'debug')
+    app.config['SECRET_KEY'] = uuid.uuid4()
+    toolbar = DebugToolbarExtension(app)
 
 
 _init_app(app)

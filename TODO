@@ -1,3 +1,4 @@
+- Render HTML in backend
 - Add category and author filters
     - Stats page should link to filtered views
 - Use entry points for serve and refresh and clear-cache

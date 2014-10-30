@@ -1,5 +1,8 @@
 import os
-import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import tempfile
 
 from patch_report import config
