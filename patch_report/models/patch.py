@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 import datetime
-from email.utils import parsedate_tz, mktime_tz
+import email
 import os
 
 from patch_report import config
@@ -9,9 +9,6 @@ from patch_report.models import redmine_issue
 
 
 class Patch(object):
-    # FIXME: Until UTF-8 is supported...
-    NAME_OVERRIDES = {'=?UTF-8?q?Jason=20K=C3=B6lker?=': 'Jason Koelker'}
-
     def __init__(self, patch_series, idx, filename):
         self.patch_series = patch_series
         self.idx = idx
@@ -59,15 +56,23 @@ class Patch(object):
             return
 
         self.raw_author = line.replace('From: ', '')
-        self.author, self.author_email = self.raw_author.split('<', 1)
 
-        self.author = self.author.strip()
-        if self.author in self.NAME_OVERRIDES:
-            self.author = self.NAME_OVERRIDES[self.author]
-        self.author = self.author.replace('"', '')
+        author, author_email = self.raw_author.split('<', 1)
+        author = author.replace('"', '')
+        author = author.strip()
 
-        self.author_email = self.author_email.replace('>', '')
-        self.author_email = self.author_email.strip()
+        # RFC 2822 encoded author
+        text, encoding = email.Header.decode_header(self.author)[0]
+        if encoding:
+            author = unicode(text, encoding)
+        else:
+            author = unicode(text)
+
+        author_email = author_email.replace('>', '')
+        author_email = author_email.strip()
+
+        self.author = author
+        self.author_email = author_email
 
     def _parse_date(self, line):
         if not line.startswith('Date:'):
@@ -75,8 +80,8 @@ class Patch(object):
 
         # Parse RFC 2822 Date
         date_str = line.replace('Date: ', '')
-        date_tuple = parsedate_tz(date_str)
-        epoch_secs = mktime_tz(date_tuple)
+        date_tuple = email.utils.parsedate_tz(date_str)
+        epoch_secs = email.utils.mktime_tz(date_tuple)
         self.date = datetime.datetime.fromtimestamp(epoch_secs)
 
     def _parse_rm_issue(self, line):
