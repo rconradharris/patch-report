@@ -56,28 +56,29 @@ class Patch(object):
     def path(self):
         return os.path.join(self.repo.path, self.filename)
 
+    def _get_name_from_raw_author(self):
+        author = self.raw_author.split('<', 1)[0].replace('"', '').strip()
+
+        # RFC 2822 encoded author
+        text, encoding = email.Header.decode_header(author)[0]
+        if encoding:
+            author = unicode(text, encoding)
+        else:
+            author = unicode(text)
+
+        return author
+
+    def _get_email_from_raw_author(self):
+        return self.raw_author.split('<', 1)[1].replace('>', '').strip()
+
     def _parse_author(self, line):
         if not line.startswith('From:'):
             return
 
         self.raw_author = line.replace('From: ', '')
 
-        author, author_email = self.raw_author.split('<', 1)
-        author = author.replace('"', '')
-        author = author.strip()
-
-        # RFC 2822 encoded author
-        text, encoding = email.Header.decode_header(self.author)[0]
-        if encoding:
-            author = unicode(text, encoding)
-        else:
-            author = unicode(text)
-
-        author_email = author_email.replace('>', '')
-        author_email = author_email.strip()
-
-        self.author = author
-        self.author_email = author_email
+        self.author = self._get_name_from_raw_author()
+        self.author_email = self._get_email_from_raw_author()
 
     def _parse_date(self, line):
         if not line.startswith('Date:'):
