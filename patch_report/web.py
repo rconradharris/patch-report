@@ -120,13 +120,16 @@ def upstream_reviews():
 
     repos = patch_report.repos
 
+    upstream_review_count = 0
     upstream_reviews_by_repo = {}
     for repo in repos:
         upstream_reviews = repo.patch_series.get_upstream_reviews()
         upstream_reviews_by_repo[repo] = upstream_reviews
+        upstream_review_count += len(upstream_reviews)
 
     return render_template('upstream_reviews.html',
                            upstream_reviews_by_repo=upstream_reviews_by_repo,
+                           upstream_review_count=upstream_review_count,
                            **_common('Upstream Reviews', patch_report)
                            )
 

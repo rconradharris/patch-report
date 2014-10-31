@@ -23,10 +23,8 @@ Upstream Reviews
         </tr>
     </thead>
     <tbody>
-{% set rows = False %}
 {% for repo in repos %}
     {% for upstream_review in upstream_reviews_by_repo[repo] %}
-        {% set rows = True %}
         {% with patch = upstream_review.patch %}
         <tr>
             <td>{{ macros.repo_link(repo) }}</td>
@@ -47,7 +45,7 @@ Upstream Reviews
         {% endwith %}
     {% endfor %}
 {% endfor %}
-{% if not rows %}
+{% if not upstream_review_count %}
         <tr>
             <td class="placeholder-row" colspan="4">No upstream reviews</td>
         </tr>

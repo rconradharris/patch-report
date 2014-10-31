@@ -1,4 +1,3 @@
-- BUG: No upstream reviews showing even when there are reviews
 - Add author filters
 - Use entry points for serve and refresh and clear-cache
 - Collect up exceptions in exceptions.py
