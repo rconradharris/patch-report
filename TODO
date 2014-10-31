@@ -1,6 +1,5 @@
-- Render HTML in backend
-- Add category and author filters
-    - Stats page should link to filtered views
+- BUG: No upstream reviews showing even when there are reviews
+- Add author filters
 - Use entry points for serve and refresh and clear-cache
 - Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out

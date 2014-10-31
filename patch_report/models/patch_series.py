@@ -35,11 +35,6 @@ class PatchSeries(object):
                 self.patches.append(p)
                 idx += 1
 
-    def get_sorted_patches(self, sort_key, sort_dir):
-        key = lambda p: getattr(p, sort_key)
-        reverse = sort_dir == 'desc'
-        return sorted(self.patches, key=key, reverse=reverse)
-
     def get_author_counts(self):
         counter = collections.Counter()
         for patch in self.patches:
@@ -52,26 +47,14 @@ class PatchSeries(object):
         return author_counts
 
     def get_category_counts(self):
-        """If a prefix is detected more than once in a patch filename, it's
-        considered a 'category'.
-        """
         # Count categories
         counter = collections.Counter()
         for patch in self.patches:
-            parts = patch.filename.split('-')
-            category = parts[0] if len(parts) > 1 else None
-            counter[category] += 1
-
-        # Group None-valued categories
-        counter2 = collections.Counter()
-        for category, count in counter.iteritems():
-            if count < 2:
-                category = None
-            counter2[category] += count
+            counter[patch.category] += 1
 
         # Return in a Jinja-friendly format (works well with filters)
         category_counts = []
-        for category, count in counter2.iteritems():
+        for category, count in counter.iteritems():
             category_counts.append({'category': category, 'count': count})
 
         return category_counts

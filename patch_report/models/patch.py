@@ -24,6 +24,11 @@ class Patch(object):
         self.upstream_reviews = []
 
     @property
+    def category(self):
+        parts = self.filename.split('-')
+        return parts[0] if len(parts) > 1 else None
+
+    @property
     def repo(self):
         return self.patch_series.repo
 

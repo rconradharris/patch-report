@@ -4,7 +4,7 @@
 {{ repo.name }} Stats
 {% endblock title %}
 
-{% macro count_table(data, attribute, plural) %}
+{% macro count_table(data, attribute, plural, callback=None) %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -19,10 +19,14 @@
             <tr>
                 <td>
                     {% with value = item[attribute] %}
-                        {% if value is none %}
-                            <em>(No {{ attribute }})</em>
+                        {% if callback %}
+                            {{ callback(value) }}
                         {% else %}
-                            {{ value }}
+                            {% if value is none %}
+                                <em>(No {{ attribute }})</em>
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
                         {% endif %}
                     {% endwith %}
                 </td>
@@ -46,10 +50,14 @@
 {% endmacro %}
 
 
+{% macro make_category_link(category) %}
+    {{ macros.category_link(repo, category) }}
+{% endmacro %}
+
 {% block tab_container %}
 <div class="row">
     <div class="col-md-3">
-        {{ count_table(category_counts, 'category', 'categories') }}
+        {{ count_table(category_counts, 'category', 'categories', callback=make_category_link) }}
     </div>
     <div class="col-md-3">
         {{ count_table(author_counts, 'author', 'authors') }}

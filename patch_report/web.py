@@ -152,15 +152,35 @@ def repo_patches(repo_name):
         return _render_empty_cache_page()
 
     repo = patch_report.get_repo(repo_name)
-    sort_key = request.args.get('sort_key', 'idx')
-    sort_dir = request.args.get('sort_dir', 'desc')
-    patches = repo.patch_series.get_sorted_patches(sort_key, sort_dir)
+    patches = repo.patch_series.patches
+
+    kwargs = _repo_common(repo, 'Patches', patch_report)
+
+    # Category filter
+    category_filter = request.args.get('category_filter', None)
+    if category_filter:
+        patches = filter(lambda p: p.category == category_filter, patches)
+        kwargs['category_filter'] = category_filter
+
+    # Sort
+    sort_key = request.args.get('sort_key', None)
+    if sort_key:
+        kwargs['sort_key'] = sort_key
+    else:
+        sort_key = 'idx'
+
+    sort_dir = request.args.get('sort_dir', None)
+    if sort_dir:
+        kwargs['sort_dir'] = sort_dir
+    else:
+        sort_dir = 'desc'
+
+    patches.sort(key=lambda p: getattr(p, sort_key),
+                 reverse=sort_dir == 'desc')
 
     return render_template('repo/patches.html',
                            patches=patches,
-                           sort_dir=sort_dir,
-                           sort_key=sort_key,
-                           **_repo_common(repo, 'Patches', patch_report)
+                           **kwargs
                            )
 
 
