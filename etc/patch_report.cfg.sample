@@ -2,8 +2,9 @@
 url = https://review.example.com
 
 [patch_report]
-ignore_missing_series_file=False
 cache_directory=/tmp
+ignore_missing_series_file=False
+patch_activity_days=7
 repo_directory=/foo/bar
 
 [github:username]

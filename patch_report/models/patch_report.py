@@ -26,6 +26,10 @@ class PatchReport(object):
         self._repos = {}
 
     @property
+    def patch_activity_days(self):
+        return config.get('patch_report', 'patch_activity_days')
+
+    @property
     def ignore_missing_series_file(self):
         return config.get('patch_report', 'ignore_missing_series_file')
 

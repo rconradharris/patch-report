@@ -48,6 +48,7 @@
                 <div class="col-sm-3 col-md-2 sidebar">
                   <ul class="nav nav-sidebar">
                     {{ macros.tab_item(sidebar_tab, 'Overview', url_for('overview')) }}
+                    {{ macros.tab_item(sidebar_tab, 'Activity', url_for('activity')) }}
                     {{ macros.tab_item(sidebar_tab, 'Upstream Reviews', url_for('upstream_reviews')) }}
                   </ul>
                   <ul class="nav nav-sidebar">
@@ -64,7 +65,7 @@
                     </div>
                     {% endif %}
                     <div class="last-updated">
-                        Last Updated: {{ last_updated_at|time_ago_in_words }}
+                        Last Updated: {{ last_updated_at|time_ago_in_words|capitalize }}
                     </div>
                     {% block main_container %} {% endblock main_container %}
                 </div>

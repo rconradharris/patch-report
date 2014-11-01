@@ -1,0 +1,51 @@
+{% extends '_layout.html' %}
+{% import 'macros.html' as macros %}
+
+{% macro sort_heading(key, name=None, align_right=False) %}
+    {% set is_sort_key = key == sort_key %}
+    <th class="{{ 'sort-key' if is_sort_key else '' }} {{ 'rightcol' if align_right else '' }}">
+    {% if is_sort_key %}
+        {% set sort_dir = 'desc' if sort_dir == 'asc' else 'asc' %}
+    {% else %}
+        {% set sort_dir = 'asc' %}
+    {% endif %}
+    {% if name is none %}
+        {% set name = key.replace('_', ' ').title() %}
+    {% endif %}
+    <a href="{{ url_for('activity', sort_key=key, sort_dir=sort_dir) }}" class="sort-link">{{ name }}
+    {% if is_sort_key %}
+        <span id="sort-caret" class="glyphicon glyphicon-chevron-{{ 'up' if sort_dir == 'asc' else 'down' }}"</span>
+    {% endif %}
+    </th>
+</a>
+{% endmacro %}
+
+
+{% block title %}
+PatchReport Activity
+{% endblock title %}
+
+{% block main_container %}
+<h1>Activity (Last {{ patch_report.patch_activity_days }} Days)</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            {{ sort_heading('when') }}
+            {{ sort_heading('repo') }}
+            {{ sort_heading('what', name='Action') }}
+            {{ sort_heading('filename', name='Patch') }}
+        </tr>
+    </thead>
+    <tbody>
+        {% for activity in activities %}
+            <tr>
+                <td>{{ activity.when|time_ago_in_words|capitalize }}</td>
+                <td>{{ macros.repo_link(activity.repo) }}</td>
+                <td>{{ activity.what|title }}</td>
+                <td>{{ activity.filename }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock main_container %}

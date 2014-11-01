@@ -75,6 +75,7 @@ def _common(sidebar_tab, patch_report):
                        reverse=True)
     return dict(
             last_updated_at=patch_report.last_updated_at,
+            patch_report=patch_report,
             repos=repos,
             sidebar_repos=sidebar_repos,
             sidebar_tab=sidebar_tab,
@@ -109,6 +110,31 @@ def overview():
                            sorted_repos=sorted_repos,
                            **_common('Overview', patch_report)
                            )
+
+@app.route('/activity')
+def activity():
+    try:
+        patch_report = get_from_cache()
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
+
+    activities = []
+    for repo in patch_report.repos:
+        for activity in repo.activities:
+            activities.append(activity)
+
+    sort_key = request.args.get('sort_key', 'when')
+    sort_dir = request.args.get('sort_dir', 'desc')
+    activities.sort(key=lambda a: getattr(a, sort_key),
+                    reverse=sort_dir == 'desc')
+
+    return render_template('activity.html',
+                           activities=activities,
+                           sort_dir=sort_dir,
+                           sort_key=sort_key,
+                           **_common('Activity', patch_report)
+                           )
+
 
 
 @app.route('/upstream-reviews')

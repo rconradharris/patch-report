@@ -1,12 +1,4 @@
-- Add number of upstream reviews to sidebar
-
-Activity Section
-    - Detect a new patch or detect a removed patch
-    - Show activity from last 5 days
-    - Save patch_series as old_patch_series
-    - added = new - old
-    - removed = old - new
-
+- Make activity patch link clickable
 
 - Email for notifcations
     [email]
