@@ -1,3 +1,5 @@
+- Make patch have a commit-hash it's based on, by default master branch
+
 - Make activity patch link clickable
 
 - Email for notifcations

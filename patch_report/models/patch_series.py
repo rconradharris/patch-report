@@ -25,14 +25,16 @@ class PatchSeries(object):
                 raise PatchSeriesFileNotFound(series_path)
 
         idx = 1
+        repo = self.repo
+        patches = self.patches
         with open(series_path) as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
-                p = patch.Patch(self, idx, line)
+                p = patch.Patch(repo, line, idx=idx)
                 p.refresh()
-                self.patches.append(p)
+                patches.append(p)
                 idx += 1
 
     def get_author_counts(self):

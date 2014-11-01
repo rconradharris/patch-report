@@ -9,6 +9,7 @@ except ImportError:
 
 from patch_report import simplelog
 from patch_report import utils
+from patch_report.models.patch import Patch
 from patch_report.models.patch_activity import PatchActivity
 
 
@@ -75,10 +76,14 @@ class Repo(object):
 
             what = parts[0]
             if what in ('create', 'delete'):
-                activity = PatchActivity(self, when, what, parts[3])
+                filename = parts[3]
+                patch = Patch(self, filename)
+                activity = PatchActivity(self, when, what, patch)
                 activities.append(activity)
             elif what == 'rename':
-                activity = PatchActivity(self, when, what, parts[3],
+                filename = parts[3]
+                patch = Patch(self, filename)
+                activity = PatchActivity(self, when, what, patch,
                                          old_filename=parts[1]) 
                 activities.append(activity)
 

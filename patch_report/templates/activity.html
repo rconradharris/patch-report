@@ -43,7 +43,7 @@ PatchReport Activity
                 <td>{{ activity.when|time_ago_in_words|capitalize }}</td>
                 <td>{{ macros.repo_link(activity.repo) }}</td>
                 <td>{{ activity.what|title }}</td>
-                <td>{{ activity.filename }}</td>
+                <td>{{ macros.patch_link(activity.patch, max_len=64) }}</td>
             </tr>
         {% endfor %}
     </tbody>

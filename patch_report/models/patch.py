@@ -9,10 +9,10 @@ from patch_report.models import redmine_issue
 
 
 class Patch(object):
-    def __init__(self, patch_series, idx, filename):
-        self.patch_series = patch_series
-        self.idx = idx
+    def __init__(self, repo, filename, idx=None):
+        self.repo = repo
         self.filename = filename
+        self.idx = idx
 
         self.raw_author = None
         self.author = None
@@ -27,10 +27,6 @@ class Patch(object):
     def category(self):
         parts = self.filename.split('-')
         return parts[0] if len(parts) > 1 else None
-
-    @property
-    def repo(self):
-        return self.patch_series.repo
 
     @property
     def rm_issue_count(self):
