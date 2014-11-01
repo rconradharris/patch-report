@@ -53,7 +53,7 @@ class Repo(object):
         since = since.strftime("%Y-%m-%d")
         with utils.temp_chdir(self.path):
             stdout = self._git_cmd(pipe, 'log', '--summary', '-M',
-                                   '--pretty=%at', '--since', since)[0]
+                                   '--pretty=%ct', '--since', since)[0]
         if not stdout:
             return []
 
