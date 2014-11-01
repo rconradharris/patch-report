@@ -106,6 +106,6 @@ class Repo(object):
             self.activities.append(activity)
 
     def refresh(self):
-        #self._refresh_git()
-        #self.patch_series.refresh()
+        self._refresh_git()
+        self.patch_series.refresh()
         self._refresh_patch_activities()
