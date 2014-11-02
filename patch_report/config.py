@@ -22,6 +22,20 @@ _OPTION_REQUIRED = object()
 
 
 _OPTIONS_SCHEMA = {
+    "email": {
+        "hostname": {"type": "str",
+                     "default": _OPTION_REQUIRED},
+        "password": {"type": "str",
+                     "default": _OPTION_REQUIRED},
+        "port": {"type": "int",
+                 "default": 25},
+        "recipients": {"type": "str",
+                       "default": _OPTION_REQUIRED},
+        "sender": {"type": "str",
+                   "default": _OPTION_REQUIRED},
+        "username": {"type": "str",
+                     "default": _OPTION_REQUIRED},
+    },
     "gerrit": {
         "url": {"type": "str",
                 "default": _OPTION_REQUIRED},

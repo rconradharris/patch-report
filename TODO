@@ -1,4 +1,8 @@
 - Email for notifcations
+
+    - Run once a day
+    - bin/send-notification-emails
+
     [email]
         unsubscribe_contact=rick.harris@rackspace.com
         emails=foo@bar.com,qux@bar.com
@@ -21,6 +25,7 @@
         - Add dan as administrator
         - Add sew as administrator
 
+- Make config stanza's optional
 - Add author filters
 - Use entry points for serve and refresh and clear-cache
 - Collect up exceptions in exceptions.py

@@ -1,3 +1,11 @@
+[email]
+hostname=example.com
+password=bar
+port=25
+recipients=foo@example.com,bar@example.com
+sender=patchreport@example.com
+username=foo
+
 [gerrit]
 url = https://review.example.com
 

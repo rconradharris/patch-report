@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+"""
+Send notification emails
+
+usage: send-notification-emails [--verbose] [--dry-run]
+
+--verbose       Output logging information to stderr
+--dry-run       Don't actually send the email
+
+Intended to be run from a cron-job.
+"""
+import datetime
+import email.utils
+from email.mime.text import MIMEText
+import os
+import sys
+import smtplib
+
+
+from patch_report import config
+from patch_report import simplelog
+from patch_report.models.patch_report import get_from_cache
+
+PIDFILE = '/tmp/send-notification-emails.pid'
+SINCE_DAYS = 1
+
+
+class Message(object):
+    def __init__(self, sender, recipient, subject, body, date=None):
+        self.sender = sender
+        self.recipient = recipient
+        self.subject = subject
+        self.body = body
+        self.date = date
+        self.message_id = email.utils.make_msgid()
+
+    def as_mime(self):
+        msg = MIMEText(self.body)
+        msg['To'] = self.recipient
+        msg['From'] = self.sender
+        msg['Subject'] = self.subject
+        msg['Date'] = email.utils.formatdate(self.date, localtime=True)
+        # see RFC 5322 section 3.6.4.
+        msg['Message-ID'] = self.message_id
+        return msg
+
+    def as_string(self):
+        return self.as_mime().as_string()
+
+    def __repr__(self):
+        return "<Message to='%s' subject='%s'>" % (self.recipient, self.subject)
+
+
+def _get_messages(patch_report, since_days):
+    since = (datetime.datetime.utcnow() -
+             datetime.timedelta(days=since_days)).date()
+
+    sender = config.get('email', 'sender')
+    recipients = config.get('email', 'recipients').split(',')
+
+    for repo in patch_report.repos:
+        for activity in repo.get_patch_activities(since):
+            patch = activity.patch
+            if activity.what == 'create':
+                for recipient in recipients:
+                    subject = "[NEW PATCH] [%s]: %s" % (activity.repo.name,
+                                                        patch.filename)
+                    yield Message(sender, recipient, subject, patch.contents)
+
+
+def _send_emails(messages, verbose):
+    hostname = config.get('email', 'hostname')
+    port = config.get('email', 'port')
+    username = config.get('email', 'username')
+    password = config.get('email', 'password')
+
+    server = smtplib.SMTP_SSL(hostname, port)
+    try:
+        server.set_debuglevel(verbose)
+
+        # identify ourselves, prompting server for supported features
+        server.ehlo()
+
+        # If we can encrypt this session, do it
+        if server.has_extn('STARTTLS'):
+            server.starttls()
+            server.ehlo() # re-identify ourselves over TLS connection
+
+        server.login(username, password)
+        for message in messages:
+            server.sendmail(message.sender, [message.recipient], message.as_string())
+    finally:
+        server.quit()
+
+
+if os.path.exists(PIDFILE):
+    sys.exit(1)
+
+with open(PIDFILE, 'w') as f:
+    f.write(str(os.getpid()))
+
+try:
+    args = sys.argv[1:]
+    verbose = '--verbose' in args
+    dry_run = '--dry-run' in args
+    simplelog.set_verbose(verbose)
+
+    patch_report = get_from_cache()
+
+    messages = _get_messages(patch_report, SINCE_DAYS)
+    if dry_run:
+        for message in messages:
+            print message.as_string()
+    else:
+        _send_emails(messages, verbose)
+finally:
+    os.unlink(PIDFILE)

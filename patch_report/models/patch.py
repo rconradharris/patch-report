@@ -106,6 +106,11 @@ class Patch(object):
         if gr:
             self.upstream_reviews.append(gr)
 
+    @property
+    def contents(self):
+        with open(self.path) as f:
+            return f.read()
+
     def refresh(self):
         line_count = 0
         with open(self.path) as f:
