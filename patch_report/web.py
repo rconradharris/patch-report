@@ -15,6 +15,9 @@ from patch_report import config
 from patch_report.models.patch_report import get_from_cache
 
 
+WEB_CONFIG = config.get_section('web')
+
+
 @app.template_filter('pluralize')
 def pluralize(singular, count, plural=None):
     if count == 1:
@@ -233,7 +236,9 @@ def repo_stats(repo_name):
 
 
 def _init_app(app):
-    app.debug = config.get('web', 'debug')
+    if WEB_CONFIG:
+        app.debug = WEB_CONFIG['debug']
+
     app.config['SECRET_KEY'] = uuid.uuid4()
     toolbar = DebugToolbarExtension(app)
 
