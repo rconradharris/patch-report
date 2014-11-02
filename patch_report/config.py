@@ -22,7 +22,6 @@ _OPTION_REQUIRED = object()
 
 
 _REQUIRED_SECTIONS = [
-    'gerrit',
     'patch_report',
     'redmine',
     'web',
