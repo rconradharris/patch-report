@@ -9,10 +9,14 @@ from patch_report.simplelog import log
 
 
 _GERRIT = None
+GERRIT_CONFIG = config.get_section('gerrit')
 
 
 def get_from_line(patch, line):
     global _GERRIT
+
+    if not GERRIT_CONFIG:
+        return
 
     if 'Upstream-Change-Id' not in line:
         return
@@ -20,11 +24,7 @@ def get_from_line(patch, line):
     change_id = line.split(' ', 1)[1].strip()
 
     if _GERRIT is None:
-        gerrit_config = config.get_section('gerrit')
-        if not gerrit_config:
-            return
-
-        _GERRIT = _Gerrit(gerrit_config['url'])
+        _GERRIT = _Gerrit(GERRIT_CONFIG['url'])
 
     return _GERRIT.get_change(patch, change_id)
 

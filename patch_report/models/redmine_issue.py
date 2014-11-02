@@ -20,22 +20,21 @@ class RedmineAuthException(RedmineException):
 class RedmineUnknownException(RedmineException):
     pass
 
+REDMINE_CONFIG = config.get_section('redmine')
 
 _RE_RM_ISSUE = re.compile('RM\s*#*(\d+)', re.IGNORECASE)
-_RE_RM_LINK = re.compile('%s/issues/(\d+)' % config.get('redmine', 'url'))
+if REDMINE_CONFIG:
+    _RE_RM_LINK = re.compile('%s/issues/(\d+)' % REDMINE_CONFIG['url'])
+
 _REDMINE = None
 
 
-def _load():
+def get_from_line(patch, line):
     global _REDMINE
 
-    url = config.get('redmine', 'url')
-    key = config.get('redmine', 'key')
-    verify_cert = config.get('redmine', 'verify_cert')
-    _REDMINE = _Redmine(url, key, verify_cert)
+    if not REDMINE_CONFIG:
+        return
 
-
-def get_from_line(patch, line):
     match = re.search(_RE_RM_ISSUE, line)
     if not match:
         match = re.match(_RE_RM_LINK, line)
@@ -45,14 +44,17 @@ def get_from_line(patch, line):
     issue_id = match.group(1)
 
     if _REDMINE is None:
-        _load()
+        _REDMINE = _Redmine(REDMINE_CONFIG['url'],
+                            REDMINE_CONFIG['key'],
+                            REDMINE_CONFIG['verify_cert'])
 
     return _REDMINE.get_issue(patch, issue_id)
 
 
 class RedmineIssue(object):
-    def __init__(self, patch, issue_id, subject=None, status=None,
+    def __init__(self, redmine, patch, issue_id, subject=None, status=None,
                  fetch_status='not_fetched'):
+        self.redmine = redmine
         self.patch = patch
         self.issue_id = issue_id
         self._subject = subject
@@ -82,8 +84,7 @@ class RedmineIssue(object):
 
     @property
     def url(self):
-        base = config.get('redmine', 'url')
-        return os.path.join(base, 'issues', self.issue_id)
+        return os.path.join(self.redmine.url, 'issues', self.issue_id)
 
     def __eq__(self, other):
         return self.issue_id == other.issue_id
@@ -136,7 +137,11 @@ class _Redmine(object):
                 status = issue.status.name
                 fetch_status = 'success'
 
-        return RedmineIssue(patch, issue_id, subject=subject, status=status,
+        return RedmineIssue(self,
+                            patch,
+                            issue_id,
+                            subject=subject,
+                            status=status,
                             fetch_status=fetch_status)
 
     def get_issue(self, patch, issue_id):

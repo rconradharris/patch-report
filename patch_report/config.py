@@ -23,7 +23,6 @@ _OPTION_REQUIRED = object()
 
 _REQUIRED_SECTIONS = [
     'patch_report',
-    'redmine',
     'web',
 ]
 
