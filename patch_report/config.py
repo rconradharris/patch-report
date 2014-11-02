@@ -117,7 +117,7 @@ def _parse_section(cfg, section, section_schema, values):
 
 
 def _load():
-    cfg = ConfigParser.SafeConfigParser()
+    cfg = ConfigParser.ConfigParser()
 
     for path in _SEARCH_PATH:
         path = os.path.expanduser(path)

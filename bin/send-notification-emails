@@ -110,7 +110,7 @@ def main():
         messages = _get_messages(email_config, patch_report, SINCE_DAYS)
         if dry_run:
             for message in messages:
-                print message.as_string()
+                print message
         else:
             _send_emails(email_config, messages, verbose)
     finally:
