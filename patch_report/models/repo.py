@@ -7,6 +7,8 @@ try:
 except ImportError:
     DEVNULL = open(os.devnull, 'wb')
 
+PIPE = subprocess.PIPE
+
 from patch_report import simplelog
 from patch_report import utils
 from patch_report.models.patch import Patch
@@ -49,12 +51,17 @@ class Repo(object):
         assert p.returncode == 0
         return stdout, stderr
 
+    def _get_parent_commit_hash(self, commit_hash):
+        with utils.temp_chdir(self.path):
+            stdout = self._git_cmd(PIPE, 'show', commit_hash + '^',
+                                   '--pretty=%H')[0]
+            return stdout.split('\n')[0].strip()
+
     def get_patch_activities(self, since):
-        pipe = subprocess.PIPE
         since = since.strftime("%Y-%m-%d")
         with utils.temp_chdir(self.path):
-            stdout = self._git_cmd(pipe, 'log', '--summary', '-M',
-                                   '--pretty=%ct', '--since', since)[0]
+            stdout = self._git_cmd(PIPE, 'log', '--summary', '-M',
+                                   '--pretty=%H %ct', '--since', since)[0]
         if not stdout:
             return []
 
@@ -69,20 +76,27 @@ class Repo(object):
 
             if not parts:
                 continue
-            elif len(parts) == 1:
-                epoch_secs = int(parts[0])
+            elif len(parts) == 2:
+                commit_hash = parts[0]
+                epoch_secs = int(parts[1])
                 when = datetime.datetime.utcfromtimestamp(epoch_secs)
                 continue
 
             what = parts[0]
-            if what in ('create', 'delete'):
+            if what == 'create':
                 filename = parts[3]
-                patch = Patch(self, filename)
+                patch = Patch(self, filename, commit_hash=commit_hash)
+                activity = PatchActivity(self, when, what, patch)
+                activities.append(activity)
+            elif what == 'delete':
+                filename = parts[3]
+                parent_hash = self._get_parent_commit_hash(commit_hash)
+                patch = Patch(self, filename, commit_hash=parent_hash)
                 activity = PatchActivity(self, when, what, patch)
                 activities.append(activity)
             elif what == 'rename':
                 filename = parts[3]
-                patch = Patch(self, filename)
+                patch = Patch(self, filename, commit_hash=commit_hash)
                 activity = PatchActivity(self, when, what, patch,
                                          old_filename=parts[1]) 
                 activities.append(activity)

@@ -9,10 +9,11 @@ from patch_report.models import redmine_issue
 
 
 class Patch(object):
-    def __init__(self, repo, filename, idx=None):
+    def __init__(self, repo, filename, idx=None, commit_hash='master'):
         self.repo = repo
         self.filename = filename
         self.idx = idx
+        self.commit_hash = commit_hash
 
         self.raw_author = None
         self.author = None
@@ -46,7 +47,7 @@ class Patch(object):
 
     @property
     def url(self):
-        return os.path.join(self.repo.html_url, 'blob', 'master', self.filename)
+        return os.path.join(self.repo.html_url, 'blob', self.commit_hash, self.filename)
 
     @property
     def path(self):
