@@ -108,8 +108,7 @@ class Patch(object):
 
     @property
     def contents(self):
-        with open(self.path) as f:
-            return f.read()
+        return self.repo.git_show_at_commit(self.filename, self.commit_hash)
 
     def refresh(self):
         line_count = 0

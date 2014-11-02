@@ -51,6 +51,11 @@ class Repo(object):
         assert p.returncode == 0
         return stdout, stderr
 
+    def git_show_at_commit(self, path, commit_hash):
+        with utils.temp_chdir(self.path):
+            return self._git_cmd(PIPE, 'show',
+                                 '%s:%s' % (commit_hash, path))[0]
+
     def _get_parent_commit_hash(self, commit_hash):
         with utils.temp_chdir(self.path):
             stdout = self._git_cmd(PIPE, 'show', commit_hash + '^',

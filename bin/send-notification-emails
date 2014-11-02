@@ -13,8 +13,8 @@ import datetime
 import email.utils
 from email.mime.text import MIMEText
 import os
-import sys
 import smtplib
+import sys
 
 
 from patch_report import config
@@ -51,12 +51,12 @@ class Message(object):
         return "<Message to='%s' subject='%s'>" % (self.recipient, self.subject)
 
 
-def _get_messages(patch_report, since_days):
+def _get_messages(email_config, patch_report, since_days):
     since = (datetime.datetime.utcnow() -
              datetime.timedelta(days=since_days)).date()
 
-    sender = config.get('email', 'sender')
-    recipients = config.get('email', 'recipients').split(',')
+    sender = email_config['sender']
+    recipients = email_config['recipients'].split(',')
 
     for repo in patch_report.repos:
         for activity in repo.get_patch_activities(since):
@@ -68,13 +68,8 @@ def _get_messages(patch_report, since_days):
                     yield Message(sender, recipient, subject, patch.contents)
 
 
-def _send_emails(messages, verbose):
-    hostname = config.get('email', 'hostname')
-    port = config.get('email', 'port')
-    username = config.get('email', 'username')
-    password = config.get('email', 'password')
-
-    server = smtplib.SMTP_SSL(hostname, port)
+def _send_emails(email_config, messages, verbose):
+    server = smtplib.SMTP_SSL(email_config['hostname'], email_config['port'])
     try:
         server.set_debuglevel(verbose)
 
@@ -86,32 +81,41 @@ def _send_emails(messages, verbose):
             server.starttls()
             server.ehlo() # re-identify ourselves over TLS connection
 
-        server.login(username, password)
+        server.login(email_config['username'], email_config['password'])
         for message in messages:
             server.sendmail(message.sender, [message.recipient], message.as_string())
     finally:
         server.quit()
 
 
-if os.path.exists(PIDFILE):
-    sys.exit(1)
+def main():
+    email_config = config.get_section('email')
+    if not email_config:
+        sys.exit(1)
 
-with open(PIDFILE, 'w') as f:
-    f.write(str(os.getpid()))
+    if os.path.exists(PIDFILE):
+        sys.exit(1)
 
-try:
-    args = sys.argv[1:]
-    verbose = '--verbose' in args
-    dry_run = '--dry-run' in args
-    simplelog.set_verbose(verbose)
+    with open(PIDFILE, 'w') as f:
+        f.write(str(os.getpid()))
 
-    patch_report = get_from_cache()
+    try:
+        args = sys.argv[1:]
+        verbose = '--verbose' in args
+        dry_run = '--dry-run' in args
+        simplelog.set_verbose(verbose)
 
-    messages = _get_messages(patch_report, SINCE_DAYS)
-    if dry_run:
-        for message in messages:
-            print message.as_string()
-    else:
-        _send_emails(messages, verbose)
-finally:
-    os.unlink(PIDFILE)
+        patch_report = get_from_cache()
+
+        messages = _get_messages(email_config, patch_report, SINCE_DAYS)
+        if dry_run:
+            for message in messages:
+                print message.as_string()
+        else:
+            _send_emails(email_config, messages, verbose)
+    finally:
+        os.unlink(PIDFILE)
+
+
+if __name__ == '__main__':
+    main()

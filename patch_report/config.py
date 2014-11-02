@@ -21,6 +21,14 @@ class ConfigSectionNotFound(ConfigError):
 _OPTION_REQUIRED = object()
 
 
+_REQUIRED_SECTIONS = [
+    'gerrit',
+    'patch_report',
+    'redmine',
+    'web',
+]
+
+
 _OPTIONS_SCHEMA = {
     "email": {
         "hostname": {"type": "str",
@@ -130,7 +138,7 @@ def _load():
         if ':' in section:
             continue
 
-        if section not in sections:
+        if section not in sections and section in _REQUIRED_SECTIONS:
             raise ConfigSectionNotFound(section)
 
     for section in sections:
@@ -150,11 +158,18 @@ def _load():
 _CONFIG_VALUES = {}
 
 
+def get_section(section):
+    if not _CONFIG_VALUES:
+        _load()
+
+    return _CONFIG_VALUES.get(section)
+
+
 def get(section, key):
     if not _CONFIG_VALUES:
         _load()
 
-    return _CONFIG_VALUES[section][key]
+    return get_section(section)[key]
 
 
 def get_from_multi_section(prefix, discriminator, key):
