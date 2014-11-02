@@ -20,6 +20,18 @@
 </a>
 {% endmacro %}
 
+{% macro activity_label(activity) %}
+    {% if activity.what == 'create' %}
+        {% set label = 'danger' %}
+    {% elif activity.what == 'delete' %}
+        {% set label = 'success' %}
+    {% else %}
+        {% set label = 'default' %}
+    {% endif %}
+    <span class="label label-{{ label }}">
+        {{ activity.what|title }}
+    </span>
+{% endmacro %}
 
 {% block title %}
 PatchReport Activity
@@ -42,7 +54,7 @@ PatchReport Activity
             <tr>
                 <td>{{ activity.when|time_ago_in_words|capitalize }}</td>
                 <td>{{ macros.repo_link(activity.repo) }}</td>
-                <td>{{ activity.what|title }}</td>
+                <td>{{ activity_label(activity) }}</td>
                 <td>{{ macros.patch_link(activity.patch, max_len=64) }}</td>
             </tr>
         {% endfor %}
