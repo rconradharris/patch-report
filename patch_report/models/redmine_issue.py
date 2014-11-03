@@ -102,7 +102,8 @@ class _Redmine(object):
     def __getstate__(self):
         #FIXME: redmine.Redmine is not picklable until upstream is fixed.
         picklable = self.__dict__.copy()
-        del picklable['_redmine']
+        if '_redmine' in picklable:
+            del picklable['_redmine']
         return picklable
 
     @property
