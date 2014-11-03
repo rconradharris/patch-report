@@ -98,10 +98,24 @@ class _Redmine(object):
         self.cache = cache.DictCache('redmine_issues')
         self.ignore_errors = config.get('redmine', 'ignore_errors')
         self.last_unrecoverable_error = None
-        self.redmine = redmine.Redmine(url,
-                                       requests={'verify': verify_cert},
-                                       key=key,
-                                       raise_attr_exception=True)
+
+    def __getstate__(self):
+        #FIXME: redmine.Redmine is not picklable until upstream is fixed.
+        picklable = self.__dict__.copy()
+        del picklable['_redmine']
+        return picklable
+
+    @property
+    def redmine(self):
+        if not getattr(self, '_redmine', None):
+            self._redmine = redmine.Redmine(
+                self.url,
+                requests={'verify': self.verify_cert},
+                key=self.key,
+                raise_attr_exception=True
+            )
+
+        return self._redmine
 
     def _fetch_remote_issue(self, patch, issue_id):
         log('Fetching Redmine Issue %s' % issue_id)

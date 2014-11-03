@@ -27,6 +27,9 @@ BECOME THEIR OWN PROJECT?
 
 
 BLOCKED
+    Remove pickle hack when this is fixed upstream:
+        https://github.com/maxtepkeev/python-redmine/issues/64 
+
     https://github.com/maxtepkeev/python-redmine/pull/60
         - When 1.0.2 is released, change requirement to >= 1.0.2
 

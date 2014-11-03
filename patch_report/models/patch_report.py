@@ -16,7 +16,6 @@ def refresh():
     repo_directory = config.get('patch_report', 'repo_directory')
     patch_report = PatchReport(repo_directory)
     patch_report.refresh()
-
     cache.write_file('patch_report', patch_report)
 
 

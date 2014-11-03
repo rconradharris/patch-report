@@ -45,6 +45,7 @@ def write_file(name, data):
             pickle.dump(data, tmpfile)
     except:
         os.unlink(tmpfile.name)
+        raise
     else:
         os.rename(tmpfile.name, filename)
 
