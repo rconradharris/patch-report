@@ -6,9 +6,13 @@ class PatchActivity(object):
         self.patch = patch
         self.old_filename = old_filename
 
+    @property
+    def filename(self):
+        return self.patch.filename
+
     def __repr__(self):
         if self.what == 'rename':
             return '<PatchActivity %s %s => %s>' % (self.what,
-                    self.old_filename, self.patch.filename)
+                    self.old_filename, self.filename)
         else:
-            return '<PatchActivity %s %s>' % (self.what, self.patch.filename)
+            return '<PatchActivity %s %s>' % (self.what, self.filename)
