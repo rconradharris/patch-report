@@ -130,6 +130,7 @@ class Repo(object):
             self.activities.append(activity)
 
     def refresh(self):
+        simplelog.log("Refreshing repo '%s'" % self.name)
         self._refresh_git()
         self.patch_series.refresh()
         self._refresh_patch_activities()
