@@ -1,3 +1,17 @@
+- Use commit subject line for category instead of filename
+    <category>: Rest
+
+- BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled
+  correctly in upstram reviews
+    Compute-Do-not-create-block_device_mapping-in-api-ce.patch
+
+- Send email as new patch arrives, not once a day?
+
+- Use shelve?
+
+- Should upstream-review tag be:
+    Upstream-Review: <link>
+
 - Add author filters
 - Use entry points for serve and refresh and clear-cache
 - Collect up exceptions in exceptions.py
