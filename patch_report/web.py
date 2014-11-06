@@ -191,6 +191,8 @@ def repo_patches(repo_name):
     # Category filter
     category_filter = request.args.get('category_filter', None)
     if category_filter:
+        if category_filter.lower() == 'none':
+            category_filter = None
         patches = filter(lambda p: p.category == category_filter, patches)
         kwargs['category_filter'] = category_filter
 

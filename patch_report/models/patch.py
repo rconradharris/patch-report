@@ -116,19 +116,28 @@ class Patch(object):
         self.idx = idx
         self.commit_hash = commit_hash
 
-        self.raw_author = None
-        self.author = None
-        self.author_email = None
+        self.author = ''
+        self.author_email = ''
         self.date = None
-        self.line_count = None
-        self.rm_issues = []
+        self.line_count = 0
         self.files = []
+        self.commit_message = ''
+
+        self.rm_issues = []
         self.upstream_reviews = []
 
     @property
+    def subject(self):
+        return self.commit_message.split('\n')[0]
+
+    @property
     def category(self):
-        parts = self.filename.split('-')
-        return parts[0] if len(parts) > 1 else None
+        subject = self.subject
+
+        if ':' not in subject:
+            return None
+
+        return subject.split(':', 1)[0]
 
     @property
     def rm_issue_count(self):
