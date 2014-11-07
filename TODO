@@ -1,21 +1,30 @@
+- Break up background tasks into smaller units
+
+    Units that fetch issues and upstream reviews should work off of a queue
+    and refresh relatively often (every 5 minutes)
+
+    discover-repos (once a day)
+
+    refresh-repos (every 5 minutes)
+        enqueue any unknown issues
+        enqueue any unknown upstream reviews
+
+    Should work off of a queue:
+        fetch-issues
+        fetch-upstream-reviews
+
+Once a day
+    clear-cache
+
 - BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled
   correctly in upstram reviews
     Compute-Do-not-create-block_device_mapping-in-api-ce.patch
-
-- Send email as new patch arrives, not once a day?
-
-- Use shelve?
 
 - Should upstream-review tag be:
     Upstream-Review: <link>
 
 - Add author filters
-- Use entry points for serve and refresh and clear-cache
-- Collect up exceptions in exceptions.py
 - Make rows with 0 patches appear grayed out
-- separate add and commit from redmine _add_issues
-- Add setup.py
-- Move templates and static out of project directory and up one level
 
 - Abstract Issues
     Issue
@@ -31,11 +40,15 @@
         BitBucketPullRequest
         EmailReview
 
-BECOME THEIR OWN PROJECT?
+CLEANUP
 
-- PickleCache?
-- Port Rails helpers to Jinja2 filters (Jinja2Helpers)
-
+- Add setup.py
+- Use shelve?
+- separate add and commit from redmine _add_issues
+- Use entry points for serve and refresh and clear-cache
+- Collect up exceptions in exceptions.py
+- Use argparse for command-line options
+- Move templates and static out of project directory and up one level
 
 BLOCKED
     Remove pickle hack when this is fixed upstream:

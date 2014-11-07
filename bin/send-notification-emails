@@ -2,14 +2,15 @@
 """
 Send notification emails
 
-usage: send-notification-emails [--verbose] [--dry-run]
+usage: send-notification-emails [--verbose] [--dry-run] <since>
 
 --verbose       Output logging information to stderr
 --dry-run       Don't actually send the email
+since           String representing how long ago to pull activities from (e.g.
+                '5 minutes ago')
 
 Intended to be run from a cron-job.
 """
-import datetime
 import email.utils
 from email.mime.text import MIMEText
 import os
@@ -22,7 +23,6 @@ from patch_report import simplelog
 from patch_report.models.patch_report import get_from_cache
 
 PIDFILE = '/tmp/send-notification-emails.pid'
-SINCE_DAYS = 1
 
 
 class Message(object):
@@ -51,10 +51,7 @@ class Message(object):
         return "<Message to='%s' subject='%s'>" % (self.recipient, self.subject)
 
 
-def _get_messages(email_config, patch_report, since_days):
-    since = (datetime.datetime.utcnow() -
-             datetime.timedelta(days=since_days)).date()
-
+def _get_messages(email_config, patch_report, since):
     sender = email_config['sender']
     recipients = email_config['recipients'].split(',')
 
@@ -103,11 +100,17 @@ def main():
         args = sys.argv[1:]
         verbose = '--verbose' in args
         dry_run = '--dry-run' in args
+        since = args[-1]
+        if since.startswith('--'):
+            print >> sys.stderr, "usage: send-notification-emails"\
+                                 " [--verbose] [--dry-run] <since>"
+            sys.exit(1)
+
         simplelog.set_verbose(verbose)
 
         patch_report = get_from_cache()
 
-        messages = _get_messages(email_config, patch_report, SINCE_DAYS)
+        messages = _get_messages(email_config, patch_report, since)
         if dry_run:
             for message in messages:
                 print message

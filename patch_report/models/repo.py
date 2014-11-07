@@ -63,7 +63,11 @@ class Repo(object):
             return stdout.split('\n')[0].strip()
 
     def get_patch_activities(self, since):
-        since = since.strftime("%Y-%m-%d")
+        """Return all activities since a given time.
+
+        :param since: string containing a time specifier. Could be a date or
+                      something like '5 minutes ago'
+        """
         with utils.temp_chdir(self.path):
             stdout = self._git_cmd(PIPE, 'log', '--summary', '-M',
                                    '--pretty=%H %ct', '--since', since)[0]
@@ -122,10 +126,7 @@ class Repo(object):
 
     def _refresh_patch_activities(self):
         activity_days = self.patch_report.patch_activity_days
-
-        since = (datetime.datetime.utcnow() -
-                 datetime.timedelta(days=activity_days)).date()
-
+        since = '%d days ago' % activity_days
         for activity in self.get_patch_activities(since):
             self.activities.append(activity)
 

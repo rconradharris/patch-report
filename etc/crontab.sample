@@ -1,3 +1,3 @@
 */5 * * * * PYTHONPATH=/path/to/patch-report /path/to/patch-report/bin/refresh
+*/10 * * * * PYTHONPATH=/path/to/patch-report /path/to/patch-report/bin/send-notification-emails '10 minutes ago'
 30 23 * * * PYTHONPATH=/path/to/patch-report /path/to/patch-report/bin/refresh --clear-cache
-00 09 * * * PYTHONPATH=/path/to/patch-report /path/to/patch-report/bin/send-notification-emails
