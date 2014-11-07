@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+"""
+Discover repos in GitHub.
+
+usage: discover-repos [--verbose]
+
+--verbose       Output logging information to stderr
+
+Intended to be run from a cron-job.
+"""
+import sys
+
+from patch_report import simplelog
+from patch_report import utils
+from patch_report.models.remote_repo import RemoteRepo
+
+
+PIDFILE = '/tmp/discover-repos.pid'
+
+
+def main():
+    args = sys.argv[1:]
+    verbose = '--verbose' in args
+    simplelog.set_verbose(verbose)
+
+    RemoteRepo.discover()
+
+
+if __name__ == '__main__':
+    try:
+        with utils.pidfile_guard(PIDFILE):
+            main()
+    except utils.PIDFileExists:
+        sys.exit(1)

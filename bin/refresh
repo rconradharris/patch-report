@@ -5,7 +5,7 @@ Refresh patch_report cache
 usage: refresh [--clear-cache] [--verbose]
 
 --clear-cache   Will clear the cache so that issues and upstream reviews can
-                be refreshed as well as GitHub scanned for new patch repos
+                be refreshed.
 
 --verbose       Output logging information to stderr
 
@@ -17,7 +17,6 @@ import sys
 
 from patch_report import cache
 from patch_report import simplelog
-from patch_report.models import github_scanner
 from patch_report.models import patch_report
 
 
@@ -38,7 +37,6 @@ try:
 
     if clear_cache:
         cache.clear()
-        github_scanner.refresh()
 
     patch_report.refresh()
 finally:

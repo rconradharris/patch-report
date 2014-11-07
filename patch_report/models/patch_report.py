@@ -3,8 +3,8 @@ import datetime
 
 from patch_report import config
 from patch_report import cache
-from patch_report.models import github_scanner
 from patch_report.models.patch_series import PatchSeries
+from patch_report.models.remote_repo import RemoteRepo
 from patch_report.models.repo import Repo
 
 
@@ -40,8 +40,7 @@ class PatchReport(object):
         return self._repos[name]
 
     def refresh(self):
-        scanner = github_scanner.get_from_cache()
-        for remote_repo in scanner.remote_repos:
+        for remote_repo in RemoteRepo.get_all():
             repo = Repo(self, remote_repo)
             repo.patch_series = PatchSeries(repo)
             repo.refresh()

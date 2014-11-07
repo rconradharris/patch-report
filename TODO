@@ -3,8 +3,6 @@
     Units that fetch issues and upstream reviews should work off of a queue
     and refresh relatively often (every 5 minutes)
 
-    discover-repos (once a day)
-
     refresh-repos (every 5 minutes)
         enqueue any unknown issues
         enqueue any unknown upstream reviews
@@ -42,6 +40,7 @@ Once a day
 
 CLEANUP
 
+- Cleanup use pidfile_guard
 - Add setup.py
 - Use shelve?
 - separate add and commit from redmine _add_issues

@@ -34,3 +34,21 @@ def get_file_modified_time(path):
 
     epoch_secs = os.path.getmtime(path)
     return datetime.datetime.utcfromtimestamp(epoch_secs)
+
+
+class PIDFileExists(Exception):
+    pass
+
+
+@contextlib.contextmanager
+def pidfile_guard(filename):
+    if os.path.exists(filename):
+        raise PIDFileExists
+
+    with open(filename, 'w') as f:
+        f.write(str(os.getpid()))
+
+    try:
+        yield
+    finally:
+        os.unlink(filename)
