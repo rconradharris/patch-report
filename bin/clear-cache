@@ -10,6 +10,10 @@ PIDFILE = '/tmp/clear-cache.pid'
 
 
 def main():
+    args = sys.argv[1:]
+    verbose = '--verbose' in args
+    simplelog.set_verbose(verbose)
+
     cache.clear()
 
 

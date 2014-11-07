@@ -6,6 +6,7 @@ except ImportError:
 import tempfile
 
 from patch_report import config
+from patch_report.simplelog import log
 from patch_report import utils
 
 
@@ -56,6 +57,7 @@ def get_last_updated_at(name):
 
 
 def clear():
+    log('Clearing the cache...')
     cachedir = _make_cache_directory()
     utils.rmtree_ignore_exists(cachedir)
 

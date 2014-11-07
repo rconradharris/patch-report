@@ -2,10 +2,7 @@
 """
 Refresh patch_report cache
 
-usage: refresh [--clear-cache] [--verbose]
-
---clear-cache   Will clear the cache so that issues and upstream reviews can
-                be refreshed.
+usage: refresh [--verbose]
 
 --verbose       Output logging information to stderr
 
@@ -25,13 +22,8 @@ PIDFILE = '/tmp/refresh.pid'
 
 def main():
     args = sys.argv[1:]
-
     verbose = '--verbose' in args
     simplelog.set_verbose(verbose)
-
-    clear_cache = '--clear-cache' in args
-    if clear_cache:
-        cache.clear()
 
     patch_report.refresh()
 

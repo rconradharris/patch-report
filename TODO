@@ -1,19 +1,3 @@
-- Break up background tasks into smaller units
-
-    Units that fetch issues and upstream reviews should work off of a queue
-    and refresh relatively often (every 5 minutes)
-
-    refresh-repos (every 5 minutes)
-        enqueue any unknown issues
-        enqueue any unknown upstream reviews
-
-    Should work off of a queue:
-        fetch-issues
-        fetch-upstream-reviews
-
-Once a day
-    clear-cache
-
 - BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled
   correctly in upstram reviews
     Compute-Do-not-create-block_device_mapping-in-api-ce.patch

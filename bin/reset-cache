@@ -1,0 +1,19 @@
+#!/bin/bash
+# usage: reset-cache [--verbose]
+#
+# Resets the cache by clearing and repopulating it.
+#
+# Intended to be run from a cron job nightly.
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VERBOSE_OPT=
+while [[ -n $1 ]]; do
+    if [[ $1 == '--verbose' ]]; then
+        VERBOSE_OPT=--verbose
+    fi
+    shift
+done
+
+$DIR/clear-cache $VERBOSE_OPT
+$DIR/discover-repos $VERBOSE_OPT
+$DIR/refresh $VERBOSE_OPT
