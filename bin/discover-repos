@@ -27,8 +27,5 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        with utils.pidfile_guard(PIDFILE):
-            main()
-    except utils.PIDFileExists:
-        sys.exit(1)
+    with utils.pidfile_guard(PIDFILE):
+        main()

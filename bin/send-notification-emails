@@ -13,13 +13,13 @@ Intended to be run from a cron-job.
 """
 import email.utils
 from email.mime.text import MIMEText
-import os
 import smtplib
 import sys
 
 
 from patch_report import config
 from patch_report import simplelog
+from patch_report import utils
 from patch_report.models.patch_report import get_from_cache
 
 PIDFILE = '/tmp/send-notification-emails.pid'
@@ -90,35 +90,28 @@ def main():
     if not email_config:
         sys.exit(1)
 
-    if os.path.exists(PIDFILE):
+    args = sys.argv[1:]
+    dry_run = '--dry-run' in args
+
+    since = args[-1]
+    if since.startswith('--'):
+        print >> sys.stderr, "usage: send-notification-emails"\
+                             " [--verbose] [--dry-run] <since>"
         sys.exit(1)
 
-    with open(PIDFILE, 'w') as f:
-        f.write(str(os.getpid()))
+    verbose = '--verbose' in args
+    simplelog.set_verbose(verbose)
 
-    try:
-        args = sys.argv[1:]
-        verbose = '--verbose' in args
-        dry_run = '--dry-run' in args
-        since = args[-1]
-        if since.startswith('--'):
-            print >> sys.stderr, "usage: send-notification-emails"\
-                                 " [--verbose] [--dry-run] <since>"
-            sys.exit(1)
+    patch_report = get_from_cache()
 
-        simplelog.set_verbose(verbose)
-
-        patch_report = get_from_cache()
-
-        messages = _get_messages(email_config, patch_report, since)
-        if dry_run:
-            for message in messages:
-                print message
-        else:
-            _send_emails(email_config, messages, verbose)
-    finally:
-        os.unlink(PIDFILE)
+    messages = _get_messages(email_config, patch_report, since)
+    if dry_run:
+        for message in messages:
+            print message
+    else:
+        _send_emails(email_config, messages, verbose)
 
 
 if __name__ == '__main__':
-    main()
+    with utils.pidfile_guard(PIDFILE):
+        main()

@@ -40,7 +40,6 @@ Once a day
 
 CLEANUP
 
-- Cleanup use pidfile_guard
 - Add setup.py
 - Use shelve?
 - separate add and commit from redmine _add_issues

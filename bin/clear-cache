@@ -3,5 +3,16 @@
 Clear patch_report cache
 """
 from patch_report import cache
+from patch_report import utils
 
-cache.clear()
+
+PIDFILE = '/tmp/clear-cache.pid'
+
+
+def main():
+    cache.clear()
+
+
+if __name__ == '__main__':
+    with utils.pidfile_guard(PIDFILE):
+        main()
