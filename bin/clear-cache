@@ -2,7 +2,10 @@
 """
 Clear patch_report cache
 """
+import sys
+
 from patch_report import cache
+from patch_report import simplelog
 from patch_report import utils
 
 
