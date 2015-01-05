@@ -2,10 +2,11 @@
 """
 Send notification emails
 
-usage: send-notification-emails [--verbose] [--dry-run] <since>
+usage: send-notification-emails [--dry-run] [--reset] [--verbose] <since>
 
---verbose       Output logging information to stderr
 --dry-run       Don't actually send the email
+--reset         Allow refresh during a cache reset
+--verbose       Output logging information to stderr
 since           String representing how long ago to pull activities from (e.g.
                 '5 minutes ago')
 
@@ -13,6 +14,7 @@ Intended to be run from a cron-job.
 """
 import email.utils
 from email.mime.text import MIMEText
+import os
 import smtplib
 import sys
 
@@ -23,6 +25,7 @@ from patch_report import utils
 from patch_report.models.patch_report import get_from_cache
 
 PIDFILE = '/tmp/send-notification-emails.pid'
+RESET_CACHE_PIDFILE= '/tmp/reset-cache.pid'
 
 
 class Message(object):
@@ -85,22 +88,18 @@ def _send_emails(email_config, messages, verbose):
         server.quit()
 
 
-def main():
+def main(since, dry_run, verbose):
+    simplelog.set_verbose(verbose)
+
     email_config = config.get_section('email')
     if not email_config:
         sys.exit(1)
 
-    args = sys.argv[1:]
-    dry_run = '--dry-run' in args
-
-    since = args[-1]
     if since.startswith('--'):
         print >> sys.stderr, "usage: send-notification-emails"\
-                             " [--verbose] [--dry-run] <since>"
+                             " [--dry-run] [--reset] [--verbose] <since>"
         sys.exit(1)
 
-    verbose = '--verbose' in args
-    simplelog.set_verbose(verbose)
 
     patch_report = get_from_cache()
 
@@ -113,5 +112,15 @@ def main():
 
 
 if __name__ == '__main__':
+    args = sys.argv[1:]
+    dry_run = '--dry-run' in args
+    reset = '--reset' in args
+    verbose = '--verbose' in args
+
+    since = args[-1]
+
+    if os.path.exists(RESET_CACHE_PIDFILE) and not reset:
+        sys.exit(0)
+
     with utils.pidfile_guard(PIDFILE):
-        main()
+        main(since, dry_run, verbose)

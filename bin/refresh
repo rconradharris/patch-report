@@ -2,7 +2,7 @@
 """
 Refresh patch_report cache
 
-usage: refresh [--reset --verbose]
+usage: refresh [--reset] [--verbose]
 
 --reset         Allow refresh during a cache reset
 --verbose       Output logging information to stderr
@@ -20,23 +20,17 @@ from patch_report.models import patch_report
 
 
 PIDFILE = '/tmp/refresh.pid'
-
-
-def main():
-    args = sys.argv[1:]
-    verbose = '--verbose' in args
-    simplelog.set_verbose(verbose)
-
-    # For a normal invocation of `refresh` we don't want to allow it to occur
-    # during a reset of the cache. However, `reset-cache` calls refresh, so
-    # the `--reset` arg allows us to bypass that restriction.
-    reset = '--reset' in args
-    if os.path.exists('/tmp/reset-cache.pid') and not reset:
-        return
-
-    patch_report.refresh()
+RESET_CACHE_PIDFILE= '/tmp/reset-cache.pid'
 
 
 if __name__ == '__main__':
+    args = sys.argv[1:]
+    verbose = '--verbose' in args
+    reset = '--reset' in args
+
+    if os.path.exists(RESET_CACHE_PIDFILE) and not reset:
+        sys.exit(0)
+
     with utils.pidfile_guard(PIDFILE):
-        main()
+        simplelog.set_verbose(verbose)
+        patch_report.refresh()
