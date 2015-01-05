@@ -2,12 +2,14 @@
 """
 Refresh patch_report cache
 
-usage: refresh [--verbose]
+usage: refresh [--reset --verbose]
 
+--reset         Allow refresh during a cache reset
 --verbose       Output logging information to stderr
 
 Intended to be run from a cron-job.
 """
+import os
 import sys
 
 
@@ -24,6 +26,13 @@ def main():
     args = sys.argv[1:]
     verbose = '--verbose' in args
     simplelog.set_verbose(verbose)
+
+    # For a normal invocation of `refresh` we don't want to allow it to occur
+    # during a reset of the cache. However, `reset-cache` calls refresh, so
+    # the `--reset` arg allows us to bypass that restriction.
+    reset = '--reset' in args
+    if os.path.exists('/tmp/reset-cache.pid') and not reset:
+        return
 
     patch_report.refresh()
 

@@ -1,3 +1,5 @@
+- Filter out Abandoned patches on upstream reviews page
+
 - BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled
   correctly in upstram reviews
     Compute-Do-not-create-block_device_mapping-in-api-ce.patch

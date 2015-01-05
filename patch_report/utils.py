@@ -43,7 +43,7 @@ class PIDFileExists(Exception):
 @contextlib.contextmanager
 def pidfile_guard(filename):
     if os.path.exists(filename):
-        raise PIDFileExists
+        raise PIDFileExists(filename)
 
     with open(filename, 'w') as f:
         f.write(str(os.getpid()))

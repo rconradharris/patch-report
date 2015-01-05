@@ -5,6 +5,9 @@
 #
 # Intended to be run from a cron job nightly.
 
+PIDFILE=/tmp/reset-cache.pid
+echo $$ > $PIDFILE
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VERBOSE_OPT=
 while [[ -n $1 ]]; do
@@ -16,4 +19,6 @@ done
 
 $DIR/clear-cache $VERBOSE_OPT
 $DIR/discover-repos $VERBOSE_OPT
-$DIR/refresh $VERBOSE_OPT
+$DIR/refresh --reset $VERBOSE_OPT
+
+rm $PIDFILE
