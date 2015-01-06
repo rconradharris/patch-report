@@ -3,6 +3,9 @@ import datetime
 import errno
 import os
 import shutil
+import sys
+
+from patch_report.simplelog import log
 
 
 def makedirs_ignore_exists(*args, **kwargs):
@@ -36,15 +39,14 @@ def get_file_modified_time(path):
     return datetime.datetime.utcfromtimestamp(epoch_secs)
 
 
-class PIDFileExists(Exception):
-    pass
+def pidfile_guard(filename):
+    if os.path.exists(filename):
+        log("pidfile '%s' exists, exiting..." % filename)
+        sys.exit(0)
 
 
 @contextlib.contextmanager
-def pidfile_guard(filename):
-    if os.path.exists(filename):
-        raise PIDFileExists(filename)
-
+def pidfile_context(filename):
     with open(filename, 'w') as f:
         f.write(str(os.getpid()))
 

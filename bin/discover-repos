@@ -18,14 +18,12 @@ from patch_report.models.remote_repo import RemoteRepo
 PIDFILE = '/tmp/discover-repos.pid'
 
 
-def main():
+if __name__ == '__main__':
     args = sys.argv[1:]
     verbose = '--verbose' in args
     simplelog.set_verbose(verbose)
 
-    RemoteRepo.discover()
+    utils.pidfile_guard(PIDFILE)
 
-
-if __name__ == '__main__':
-    with utils.pidfile_guard(PIDFILE):
-        main()
+    with utils.pidfile_context(PIDFILE):
+        RemoteRepo.discover()

@@ -9,7 +9,6 @@ usage: refresh [--reset] [--verbose]
 
 Intended to be run from a cron-job.
 """
-import os
 import sys
 
 
@@ -20,17 +19,19 @@ from patch_report.models import patch_report
 
 
 PIDFILE = '/tmp/refresh.pid'
-RESET_CACHE_PIDFILE= '/tmp/reset-cache.pid'
+RESET_CACHE_PIDFILE = '/tmp/reset-cache.pid'
 
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    verbose = '--verbose' in args
     reset = '--reset' in args
+    verbose = '--verbose' in args
+    simplelog.set_verbose(verbose)
 
-    if os.path.exists(RESET_CACHE_PIDFILE) and not reset:
-        sys.exit(0)
+    if not reset:
+        utils.pidfile_guard(RESET_CACHE_PIDFILE)
 
-    with utils.pidfile_guard(PIDFILE):
-        simplelog.set_verbose(verbose)
+    utils.pidfile_guard(PIDFILE)
+
+    with utils.pidfile_context(PIDFILE):
         patch_report.refresh()

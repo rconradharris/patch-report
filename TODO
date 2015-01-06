@@ -1,3 +1,7 @@
+- FEATURE: Add commit link to activity page
+
+- BUG: intermittent failures when talking to Gmail authentication
+
 - Filter out Abandoned patches on upstream reviews page
 
 - BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled
