@@ -241,7 +241,7 @@ def _init_app(app):
     if WEB_CONFIG:
         app.debug = WEB_CONFIG['debug']
 
-    app.config['SECRET_KEY'] = uuid.uuid4()
+    app.config['SECRET_KEY'] = str(uuid.uuid4())
     toolbar = DebugToolbarExtension(app)
 
 

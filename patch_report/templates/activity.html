@@ -28,9 +28,8 @@
     {% else %}
         {% set label = 'default' %}
     {% endif %}
-    <span class="label label-{{ label }}">
-        {{ activity.what|title }}
-    </span>
+
+    <a href="{{ activity.url }}"><span class="label label-{{ label }}">{{ activity.what|title }}</span></a>
 {% endmacro %}
 
 {% block title %}

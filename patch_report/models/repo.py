@@ -95,18 +95,18 @@ class Repo(object):
             if what == 'create':
                 filename = parts[3]
                 patch = Patch(self, filename, commit_hash=commit_hash)
-                activity = PatchActivity(self, when, what, patch)
+                activity = PatchActivity(self, commit_hash, when, what, patch)
                 activities.append(activity)
             elif what == 'delete':
                 filename = parts[3]
                 parent_hash = self._get_parent_commit_hash(commit_hash)
                 patch = Patch(self, filename, commit_hash=parent_hash)
-                activity = PatchActivity(self, when, what, patch)
+                activity = PatchActivity(self, commit_hash, when, what, patch)
                 activities.append(activity)
             elif what == 'rename':
                 filename = parts[3]
                 patch = Patch(self, filename, commit_hash=commit_hash)
-                activity = PatchActivity(self, when, what, patch,
+                activity = PatchActivity(self, commit_hash, when, what, patch,
                                          old_filename=parts[1]) 
                 activities.append(activity)
 
