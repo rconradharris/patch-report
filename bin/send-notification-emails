@@ -10,14 +10,37 @@ since           String representing how long ago to pull activities from (e.g.
                 '5 minutes ago')
 
 Intended to be run from a cron-job.
+
+NB: A good rule of thumb is to make `since` twice what your cronjob interval
+is.  So, if you're running this script every 10 minutes, set `since` to `20
+minutes ago`.
+
+This script uses a `sent-emails` file to keep track of which emails it has
+already sent. This is used for two purposes:
+
+    1) Prevent duplicate emails from being sent to a user
+
+    2) Avoid a race where an email might not be sent if it occurs right on the
+       edge of a send-email interval. For example, if our send-email interval
+       is 10 minutes, and we're pulling activities from 10 minutes ago, if it
+       takes a second or two to start the cronjob, then those 1 or 2 seconds
+       of activities will be lost.
+
+       The `sent-emails` file fixes this by allowing us to pull activities
+       from a much larger, overlapping window, and then filtering out any
+       already sent emails.
 """
+import calendar
+import datetime
 import email.utils
 from email.mime.text import MIMEText
+import hashlib
 import smtplib
 import sys
 
 import requests
 
+from patch_report import cache
 from patch_report import config
 from patch_report import simplelog
 from patch_report import utils
@@ -25,6 +48,8 @@ from patch_report.models.patch_report import get_from_cache
 
 PIDFILE = '/tmp/send-notification-emails.pid'
 RESET_CACHE_PIDFILE = '/tmp/reset-cache.pid'
+SENT_EMAILS_FILENAME = 'sent-emails'
+MAX_AGE = 86400
 
 
 class Message(object):
@@ -35,6 +60,7 @@ class Message(object):
         self.body = body
         self.date = date
         self.message_id = email.utils.make_msgid()
+        self.hash = self._compute_hash()
 
     def as_mime(self):
         msg = MIMEText(self.body)
@@ -51,6 +77,10 @@ class Message(object):
 
     def __repr__(self):
         return "<Message to='%s' subject='%s'>" % (self.recipient, self.subject)
+
+    def _compute_hash(self):
+        parts = [self.body, self.subject, self.sender, self.recipient]
+        return hashlib.sha1('+'.join(parts)).hexdigest()
 
 
 def _get_messages(email_config, patch_report, since):
@@ -134,6 +164,42 @@ def _send_emails(messages, email_config, verbose, dry_run):
         raise Exception('Unknown transport method for email: {0}'.format(
                         transport))
 
+
+def _filter_already_sent_messages(messages, sent_emails):
+    remove = []
+    for message in messages:
+        if message.hash in sent_emails:
+            remove.append(message)
+
+    for message in remove:
+        simplelog.log("Message {0} was already sent, skipping...".format(
+                      message))
+        messages.remove(message)
+
+
+def _prune_and_write_sent_emails(messages, sent_emails):
+    utcnow = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
+
+    # Add successfully sent messages to sent_emails dict
+    for message in messages:
+        sent_emails[message.hash] = utcnow
+
+    # Prune out old entries to keep file from growing too large
+    remove = []
+    for message_hash, sent in sent_emails.iteritems():
+        age = utcnow - sent
+        if age > MAX_AGE:
+            remove.append(message_hash)
+
+    for message_hash in remove:
+        simplelog.log("Pruning old sent_email key '{0}'".format(message_hash))
+        del sent_emails[message_hash]
+
+    # Write to disk
+    simplelog.log("Writing sent_emails cache")
+    cache.write_file(SENT_EMAILS_FILENAME, sent_emails)
+
+
 def main(dry_run, verbose, since):
     email_config = config.get_section('email')
     if not email_config:
@@ -157,7 +223,14 @@ def main(dry_run, verbose, since):
         patch_report = get_from_cache()
         messages = _get_messages(email_config, patch_report, since)
 
+    try:
+        sent_emails = cache.read_file(SENT_EMAILS_FILENAME)
+    except cache.CacheFileNotFound:
+        sent_emails = {}
+
+    _filter_already_sent_messages(messages, sent_emails)
     _send_emails(messages, email_config, verbose, dry_run)
+    _prune_and_write_sent_emails(messages, sent_emails)
 
 
 if __name__ == '__main__':
