@@ -57,6 +57,7 @@ def _get_messages(email_config, patch_report, since):
     sender = email_config['sender']
     recipients = email_config['recipients'].split(',')
 
+    messages = []
     for repo in patch_report.repos:
         for activity in repo.get_patch_activities(since):
             patch = activity.patch
@@ -64,8 +65,11 @@ def _get_messages(email_config, patch_report, since):
                 for recipient in recipients:
                     subject = "[NEW PATCH] [%s]: %s" % (activity.repo.name,
                                                         patch.filename)
-                    yield Message(sender, recipient, subject, patch.contents)
+                    message = Message(
+                            sender, recipient, subject, patch.contents)
+                    messages.append(message)
 
+    return messages
 
 def _send_smtp(messages, email_config, verbose):
     server = smtplib.SMTP_SSL(email_config['hostname'], email_config['port'])
@@ -108,10 +112,21 @@ def _send_mailgun(messages, email_config, verbose):
                           " to send {1}".format(r.status_code, message))
 
 
-def _send_emails(messages, email_config, verbose):
-    transport = email_config['transport']
+def _send_dry_run(messages, email_config, verbose):
+    for message in messages:
+        simplelog.log(message)
+
+
+def _send_emails(messages, email_config, verbose, dry_run):
+    if dry_run:
+        transport = 'dry_run'
+    else:
+        transport = email_config['transport']
+
     simplelog.log("Using transport '{0}' to send email".format(transport))
-    if transport == 'smtp':
+    if transport == 'dry_run':
+        _send_dry_run(messages, email_config, verbose)
+    elif transport == 'smtp':
         _send_smtp(messages, email_config, verbose)
     elif transport == 'mailgun':
         _send_mailgun(messages, email_config, verbose)
@@ -142,12 +157,7 @@ def main(dry_run, verbose, since):
         patch_report = get_from_cache()
         messages = _get_messages(email_config, patch_report, since)
 
-
-    for message in messages:
-        simplelog.log(message)
-
-    if not dry_run:
-        _send_emails(messages, email_config, verbose)
+    _send_emails(messages, email_config, verbose, dry_run)
 
 
 if __name__ == '__main__':
