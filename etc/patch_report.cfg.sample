@@ -5,6 +5,8 @@ port=25
 recipients=foo@example.com,bar@example.com
 sender=patchreport@example.com
 username=foo
+test_recipient=
+transport=smtp
 
 [gerrit]
 url = https://review.example.com

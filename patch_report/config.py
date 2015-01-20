@@ -29,7 +29,7 @@ _REQUIRED_SECTIONS = [
 _OPTIONS_SCHEMA = {
     "email": {
         "hostname": {"type": "str",
-                     "default": _OPTION_REQUIRED},
+                     "default": ""},
         "password": {"type": "str",
                      "default": _OPTION_REQUIRED},
         "port": {"type": "int",
@@ -38,6 +38,12 @@ _OPTIONS_SCHEMA = {
                        "default": _OPTION_REQUIRED},
         "sender": {"type": "str",
                    "default": _OPTION_REQUIRED},
+        "test_recipient": {"type": "str",
+                           "default": ""},
+        "transport": {"type": "str",
+                      "default": _OPTION_REQUIRED},
+        "url": {"type": "str",
+                "default": ""},
         "username": {"type": "str",
                      "default": _OPTION_REQUIRED},
     },

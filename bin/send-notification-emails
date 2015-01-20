@@ -16,6 +16,7 @@ from email.mime.text import MIMEText
 import smtplib
 import sys
 
+import requests
 
 from patch_report import config
 from patch_report import simplelog
@@ -66,7 +67,7 @@ def _get_messages(email_config, patch_report, since):
                     yield Message(sender, recipient, subject, patch.contents)
 
 
-def _send_emails(email_config, messages, verbose):
+def _send_smtp(messages, email_config, verbose):
     server = smtplib.SMTP_SSL(email_config['hostname'], email_config['port'])
     try:
         server.set_debuglevel(verbose)
@@ -82,13 +83,46 @@ def _send_emails(email_config, messages, verbose):
         server.login(email_config['username'], email_config['password'])
         for message in messages:
             server.sendmail(message.sender, [message.recipient], message.as_string())
+            simplelog.log("Successfully sent {0}".format(message))
     finally:
         server.quit()
 
 
+def _send_mailgun(messages, email_config, verbose):
+    if not email_config.get('url'):
+        raise Exception('Must set URL to send email via mailgun')
+
+    for message in messages:
+        data = {'from': message.sender,
+                'to': message.recipient,
+                'subject': message.subject,
+                'text': message.body}
+        r = requests.post(email_config['url'],
+                          data=data,
+                          auth=(email_config['username'],
+                                email_config['password']))
+        if r.status_code == 200:
+            simplelog.log("Successfully sent {0}".format(message))
+        else:
+            simplelog.log("error: Received HTTP status {0} trying"
+                          " to send {1}".format(r.status_code, message))
+
+
+def _send_emails(messages, email_config, verbose):
+    transport = email_config['transport']
+    simplelog.log("Using transport '{0}' to send email".format(transport))
+    if transport == 'smtp':
+        _send_smtp(messages, email_config, verbose)
+    elif transport == 'mailgun':
+        _send_mailgun(messages, email_config, verbose)
+    else:
+        raise Exception('Unknown transport method for email: {0}'.format(
+                        transport))
+
 def main(dry_run, verbose, since):
     email_config = config.get_section('email')
     if not email_config:
+        simplelog.log("error: Email is not configured")
         sys.exit(1)
 
     if since.startswith('--'):
@@ -96,14 +130,24 @@ def main(dry_run, verbose, since):
                              " [--dry-run] [--verbose] <since>"
         sys.exit(1)
 
-    patch_report = get_from_cache()
-
-    messages = _get_messages(email_config, patch_report, since)
-    if dry_run:
-        for message in messages:
-            print message
+    test_recipient = email_config['test_recipient']
+    if test_recipient:
+        simplelog.log('Sending test email to test recipient: {0}'.format(
+                      test_recipient))
+        messages = [Message(email_config['sender'],
+                            test_recipient,
+                            'PatchReport Test Email',
+                            'This is a test email')]
     else:
-        _send_emails(email_config, messages, verbose)
+        patch_report = get_from_cache()
+        messages = _get_messages(email_config, patch_report, since)
+
+
+    for message in messages:
+        simplelog.log(message)
+
+    if not dry_run:
+        _send_emails(messages, email_config, verbose)
 
 
 if __name__ == '__main__':
