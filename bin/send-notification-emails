@@ -177,12 +177,13 @@ def _filter_already_sent_messages(messages, sent_emails):
         messages.remove(message)
 
 
-def _prune_and_write_sent_emails(messages, sent_emails):
+def _prune_and_write_sent_emails(messages, sent_emails, dry_run):
     utcnow = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 
     # Add successfully sent messages to sent_emails dict
     for message in messages:
-        sent_emails[message.hash] = utcnow
+        if not dry_run:
+            sent_emails[message.hash] = utcnow
 
     # Prune out old entries to keep file from growing too large
     remove = []
@@ -230,7 +231,7 @@ def main(dry_run, verbose, since):
 
     _filter_already_sent_messages(messages, sent_emails)
     _send_emails(messages, email_config, verbose, dry_run)
-    _prune_and_write_sent_emails(messages, sent_emails)
+    _prune_and_write_sent_emails(messages, sent_emails, dry_run)
 
 
 if __name__ == '__main__':
