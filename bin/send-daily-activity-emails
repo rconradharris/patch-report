@@ -71,13 +71,14 @@ class Message(object):
         return hashlib.sha1('+'.join(parts)).hexdigest()
 
 
-def _get_messages(email_config, patch_report, since):
+def _get_messages(args, email_config, patch_report):
     sender = email_config['sender']
     recipients = email_config['recipients'].split(',')
 
+    txt_since = '{0} seconds ago'.format(args.since)
     messages = []
     for repo in patch_report.repos:
-        for activity in repo.get_patch_activities(since):
+        for activity in repo.get_patch_activities(txt_since):
             patch = activity.patch
             if activity.what == 'create':
                 for recipient in recipients:
@@ -208,7 +209,7 @@ def main(args):
                             'This is a test email')]
     else:
         patch_report = get_from_cache()
-        messages = _get_messages(email_config, patch_report, args.since)
+        messages = _get_messages(args, email_config, patch_report)
 
     try:
         sent_emails = cache.read_file(SENT_EMAILS_FILENAME)
