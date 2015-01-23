@@ -34,7 +34,7 @@ from patch_report import simplelog
 from patch_report import utils
 from patch_report.models.patch_report import get_from_cache
 
-PIDFILE = '/tmp/send-notification-emails.pid'
+PIDFILE = '/tmp/send-daily-activity-emails.pid'
 RESET_CACHE_PIDFILE = '/tmp/reset-cache.pid'
 SENT_EMAILS_FILENAME = 'sent-emails'
 DEFAULT_SINCE = 2 * 86400  # 2 days

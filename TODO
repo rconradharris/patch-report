@@ -1,7 +1,3 @@
-- Fix Patch daily emails
-    - rename as send-daily-activity-emails
-    - Make since into seconds
-
 - Trends Tab
     - Patches added/removed in last 7 days across all repos
     - Patches added/removed in last 30 days across all repos
