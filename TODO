@@ -1,3 +1,26 @@
+- Fix Patch daily emails
+    - rename as send-daily-activity-emails
+    - Make since into seconds
+
+- Trends Tab
+    - Patches added/removed in last 7 days across all repos
+    - Patches added/removed in last 30 days across all repos
+    - Patches added/removed in last year across all repos
+
+    # Patches       # Lines Added
+    +20 (+25/-5)
+
+    Last 7 Days
+    Last 30 Days
+    Last 120 Days
+    Last 365 days
+
+- Add dropped patches Tab
+
+- Weekly email based on that same data
+    - Trend data
+    - Dropped patch data
+
 - Filter out Abandoned patches on upstream reviews page
 
 - BUG: Compute-Add-build_instance-hook-in-compute-manager.patch is not handled

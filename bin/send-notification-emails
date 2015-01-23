@@ -1,19 +1,6 @@
 #!/usr/bin/env python
 """
-Send notification emails
-
-usage: send-notification-emails [--dry-run] [--verbose] <since>
-
---dry-run       Don't actually send the email
---verbose       Output logging information to stderr
-since           String representing how long ago to pull activities from (e.g.
-                '5 minutes ago')
-
-Intended to be run from a cron-job.
-
-NB: A good rule of thumb is to make `since` twice what your cronjob interval
-is.  So, if you're running this script every 10 minutes, set `since` to `20
-minutes ago`.
+Send daily activity emails from cron job.
 
 This script uses a `sent-emails` file to keep track of which emails it has
 already sent. This is used for two purposes:
@@ -30,6 +17,7 @@ already sent. This is used for two purposes:
        from a much larger, overlapping window, and then filtering out any
        already sent emails.
 """
+import argparse
 import calendar
 import datetime
 import email.utils
@@ -49,7 +37,7 @@ from patch_report.models.patch_report import get_from_cache
 PIDFILE = '/tmp/send-notification-emails.pid'
 RESET_CACHE_PIDFILE = '/tmp/reset-cache.pid'
 SENT_EMAILS_FILENAME = 'sent-emails'
-MAX_AGE = 86400
+DEFAULT_SINCE = 2 * 86400  # 2 days
 
 
 class Message(object):
@@ -101,10 +89,11 @@ def _get_messages(email_config, patch_report, since):
 
     return messages
 
-def _send_smtp(messages, email_config, verbose):
+
+def _send_smtp(args, messages, email_config):
     server = smtplib.SMTP_SSL(email_config['hostname'], email_config['port'])
     try:
-        server.set_debuglevel(verbose)
+        server.set_debuglevel(args.verbose)
 
         # identify ourselves, prompting server for supported features
         server.ehlo()
@@ -116,13 +105,15 @@ def _send_smtp(messages, email_config, verbose):
 
         server.login(email_config['username'], email_config['password'])
         for message in messages:
-            server.sendmail(message.sender, [message.recipient], message.as_string())
+            server.sendmail(message.sender,
+                            [message.recipient],
+                            message.as_string())
             simplelog.log("Successfully sent {0}".format(message))
     finally:
         server.quit()
 
 
-def _send_mailgun(messages, email_config, verbose):
+def _send_mailgun(args, messages, email_config):
     if not email_config.get('url'):
         raise Exception('Must set URL to send email via mailgun')
 
@@ -142,24 +133,24 @@ def _send_mailgun(messages, email_config, verbose):
                           " to send {1}".format(r.status_code, message))
 
 
-def _send_dry_run(messages, email_config, verbose):
+def _send_dry_run(args, messages, email_config):
     for message in messages:
         simplelog.log(message)
 
 
-def _send_emails(messages, email_config, verbose, dry_run):
-    if dry_run:
+def _send_emails(args, messages, email_config):
+    if args.dry_run:
         transport = 'dry_run'
     else:
         transport = email_config['transport']
 
     simplelog.log("Using transport '{0}' to send email".format(transport))
     if transport == 'dry_run':
-        _send_dry_run(messages, email_config, verbose)
+        _send_dry_run(args, messages, email_config)
     elif transport == 'smtp':
-        _send_smtp(messages, email_config, verbose)
+        _send_smtp(args, messages, email_config)
     elif transport == 'mailgun':
-        _send_mailgun(messages, email_config, verbose)
+        _send_mailgun(args, messages, email_config)
     else:
         raise Exception('Unknown transport method for email: {0}'.format(
                         transport))
@@ -177,19 +168,19 @@ def _filter_already_sent_messages(messages, sent_emails):
         messages.remove(message)
 
 
-def _prune_and_write_sent_emails(messages, sent_emails, dry_run):
+def _prune_and_write_sent_emails(args, messages, sent_emails):
     utcnow = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 
     # Add successfully sent messages to sent_emails dict
     for message in messages:
-        if not dry_run:
+        if not args.dry_run:
             sent_emails[message.hash] = utcnow
 
     # Prune out old entries to keep file from growing too large
     remove = []
     for message_hash, sent in sent_emails.iteritems():
         age = utcnow - sent
-        if age > MAX_AGE:
+        if age > args.since * 2:
             remove.append(message_hash)
 
     for message_hash in remove:
@@ -201,15 +192,10 @@ def _prune_and_write_sent_emails(messages, sent_emails, dry_run):
     cache.write_file(SENT_EMAILS_FILENAME, sent_emails)
 
 
-def main(dry_run, verbose, since):
+def main(args):
     email_config = config.get_section('email')
     if not email_config:
         simplelog.log("error: Email is not configured")
-        sys.exit(1)
-
-    if since.startswith('--'):
-        print >> sys.stderr, "usage: send-notification-emails"\
-                             " [--dry-run] [--verbose] <since>"
         sys.exit(1)
 
     test_recipient = email_config['test_recipient']
@@ -222,7 +208,7 @@ def main(dry_run, verbose, since):
                             'This is a test email')]
     else:
         patch_report = get_from_cache()
-        messages = _get_messages(email_config, patch_report, since)
+        messages = _get_messages(email_config, patch_report, args.since)
 
     try:
         sent_emails = cache.read_file(SENT_EMAILS_FILENAME)
@@ -230,20 +216,28 @@ def main(dry_run, verbose, since):
         sent_emails = {}
 
     _filter_already_sent_messages(messages, sent_emails)
-    _send_emails(messages, email_config, verbose, dry_run)
-    _prune_and_write_sent_emails(messages, sent_emails, dry_run)
+    _send_emails(args, messages, email_config)
+    _prune_and_write_sent_emails(args, messages, sent_emails)
 
 
 if __name__ == '__main__':
-    args = sys.argv[1:]
-    dry_run = '--dry-run' in args
-    verbose = '--verbose' in args
-    since = args[-1]
+    parser = argparse.ArgumentParser(description='Send daily activity emails.')
+    parser.add_argument('-d', '--dry-run', action='store_true',
+                        help='Do not actually send the emails')
+    parser.add_argument('-s', '--since', action='store', type=int,
+                        default=DEFAULT_SINCE,
+                        help='Number of seconds ago to look for patch'
+                             ' activity (Default: {0} seconds)'.format(
+                                 DEFAULT_SINCE))
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Enable verbose logging')
 
-    simplelog.set_verbose(verbose)
+    args = parser.parse_args()
+
+    simplelog.set_verbose(args.verbose)
 
     utils.pidfile_guard(RESET_CACHE_PIDFILE)
     utils.pidfile_guard(PIDFILE)
 
     with utils.pidfile_context(PIDFILE):
-        main(dry_run, verbose, since)
+        main(args)
