@@ -136,7 +136,7 @@ def _send_mailgun(args, messages, email_config):
 
 def _send_dry_run(args, messages, email_config):
     for message in messages:
-        simplelog.log(message)
+        simplelog.log('Would have sent {0}'.format(message))
 
 
 def _send_emails(args, messages, email_config):
