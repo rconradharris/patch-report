@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import collections
 import datetime
 import os
 import uuid
@@ -121,23 +122,65 @@ def activity():
     except cache.CacheFileNotFound:
         return _render_empty_cache_page()
 
+    try:
+        since_days = int(request.args.get('days', '7'))
+    except ValueError:
+        since_days = 7
+
+    since = 86400 * (since_days + 1)
     activities = []
     for repo in patch_report.repos:
-        for activity in repo.activities:
-            activities.append(activity)
+        repo_activities = repo.get_patch_activities(since)
+        activities.extend(repo_activities)
 
     sort_key = request.args.get('sort_key', 'when')
     sort_dir = request.args.get('sort_dir', 'desc')
+
     activities.sort(key=lambda a: getattr(a, sort_key),
                     reverse=sort_dir == 'desc')
 
     return render_template('activity.html',
+                           since_days=since_days,
                            activities=activities,
                            sort_dir=sort_dir,
                            sort_key=sort_key,
                            **_common('Activity', patch_report)
                            )
 
+
+@app.route('/trends')
+def trends():
+    try:
+        patch_report = get_from_cache()
+    except cache.CacheFileNotFound:
+        return _render_empty_cache_page()
+
+    def handle_activity(activity, delta_type):
+        num_patches[delta_type] += 1
+        file_count[delta_type] += activity.patch.file_count
+        line_count[delta_type] += activity.patch.line_count
+
+    trend_data = []
+    for since_days in (7, 14, 30, 120, 365):
+        this_trend = {}
+        num_patches = this_trend['num_patches'] = collections.Counter()
+        file_count = this_trend['file_count'] = collections.Counter()
+        line_count = this_trend['line_count'] = collections.Counter()
+
+        trend_data.append((since_days, this_trend))
+        since = 86400 * (since_days + 1)
+        for repo in patch_report.repos:
+            repo_activities = repo.get_patch_activities(since)
+            for activity in repo_activities:
+                if activity.what == 'create':
+                    handle_activity(activity, 'positive')
+                elif activity.what == 'delete':
+                    handle_activity(activity, 'negative')
+
+    return render_template('trends.html',
+                           trend_data=trend_data,
+                           **_common('Trends', patch_report)
+                           )
 
 
 @app.route('/upstream-reviews')

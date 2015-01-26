@@ -1,0 +1,51 @@
+{% extends '_layout.html' %}
+{% import 'macros.html' as macros %}
+
+{% macro _display_trend_metric(trend_metric) %}
+    {% set val = trend_metric['positive'] - trend_metric['negative'] %}
+
+    {% if val > 0 %}
+        +{{ val }}
+    {% else %}
+        {{ val }}
+    {% endif %}
+
+    (+{{ trend_metric['positive'] }}/-{{ trend_metric['negative'] }})
+{% endmacro %}
+
+{% macro display_trend_metric(trend_metric, danger='positive') %}
+    {% set val = trend_metric['positive'] - trend_metric['negative'] %}
+    {% set val = -val if danger == 'negative' else val %}
+    {% if val > 0 %}
+        {% set cls = 'danger' %}
+    {% elif val < 0 %}
+        {% set cls = 'success' %}
+    {% else %}
+        {% set cls = 'default' %}
+    {% endif %}
+    <span class="label label-{{ cls }}">{{ _display_trend_metric(trend_metric) }}</span>
+{% endmacro %}
+
+
+{% block main_container %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Since</th>
+            <th class="rightcol">Patches</th>
+            <th class="rightcol">Files Modified</th>
+            <th class="rightcol">Lines Modified</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for since_days, trend in trend_data %}
+            <tr>
+                <td>Last {{ since_days }} Days</td>
+                <td class="rightcol">{{ display_trend_metric(trend['num_patches']) }}</td>
+                <td class="rightcol">{{ display_trend_metric(trend['file_count']) }}</td>
+                <td class="rightcol">{{ display_trend_metric(trend['line_count']) }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock main_container %}

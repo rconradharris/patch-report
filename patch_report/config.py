@@ -64,8 +64,6 @@ _OPTIONS_SCHEMA = {
                             "default": '/tmp'},
         "ignore_missing_series_file": {"type": "bool",
                                        "default": False},
-        "patch_activity_days": {"type": "int",
-                                "default": 7},
         "repo_directory": {"type": "str",
                            "default": _OPTION_REQUIRED},
     },

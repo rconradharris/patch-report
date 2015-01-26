@@ -126,6 +126,9 @@ class Patch(object):
         self.rm_issues = []
         self.upstream_reviews = []
 
+    def __repr__(self):
+        return '<Patch {0}>'.format(self.filename)
+
     @property
     def subject(self):
         return self.commit_message.split('\n')[0]
@@ -179,10 +182,9 @@ class Patch(object):
         return self.repo.git_show_at_commit(self.filename, self.commit_hash)
 
     def refresh(self):
-        with open(self.path) as f:
-            metadata = _parse_metadata(f)
-            for attr, val in metadata.iteritems():
-                setattr(self, attr, val)
+        metadata = _parse_metadata(self.contents)
+        for attr, val in metadata.iteritems():
+            setattr(self, attr, val)
 
         for line in self.commit_message.split('\n'):
             self._parse_rm_issue(line)

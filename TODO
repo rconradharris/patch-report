@@ -1,15 +1,8 @@
 - Trends Tab
-    - Patches added/removed in last 7 days across all repos
-    - Patches added/removed in last 30 days across all repos
-    - Patches added/removed in last year across all repos
+    - Remove pull of patch activities from git in send-daily-activity-emails,
+      should pull from patch-report cache
 
-    # Patches       # Lines Added
-    +20 (+25/-5)
-
-    Last 7 Days
-    Last 30 Days
-    Last 120 Days
-    Last 365 days
+- Add upstream_review_count
 
 - Add dropped patches Tab
 

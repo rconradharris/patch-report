@@ -63,11 +63,41 @@ class Repo(object):
             return stdout.split('\n')[0].strip()
 
     def get_patch_activities(self, since):
+        """Return a selection of patch activities from a given time in
+        seconds.
+
+        This uses the patch_report cache so it should be cheaper than actually
+        hitting git.
+        """
+        utcnow = datetime.datetime.utcnow()
+
+        activities = []
+        for activity in self.activities:
+            age = utcnow - activity.when
+            age_secs = age.total_seconds()
+            if age_secs < since:
+                activities.append(activity)
+
+        return activities
+
+    def get_patch_activities_from_git(self, since):
         """Return all activities since a given time.
+
+        This actually hits git so is more expensive.
 
         :param since: string containing a time specifier. Could be a date or
                       something like '5 minutes ago'
         """
+        def add_activity(filename, commit_hash, old_filename=None):
+            if not filename.endswith('.patch'):
+                return
+
+            patch = Patch(self, filename, commit_hash=commit_hash)
+            patch.refresh()
+            activity = PatchActivity(self, commit_hash, when, what, patch,
+                                     old_filename=old_filename)
+            activities.append(activity)
+
         with utils.temp_chdir(self.path):
             stdout = self._git_cmd(PIPE, 'log', '--summary', '-M',
                                    '--pretty=%H %ct', '--since', since)[0]
@@ -93,22 +123,12 @@ class Repo(object):
 
             what = parts[0]
             if what == 'create':
-                filename = parts[3]
-                patch = Patch(self, filename, commit_hash=commit_hash)
-                activity = PatchActivity(self, commit_hash, when, what, patch)
-                activities.append(activity)
+                add_activity(parts[3], commit_hash)
             elif what == 'delete':
-                filename = parts[3]
                 parent_hash = self._get_parent_commit_hash(commit_hash)
-                patch = Patch(self, filename, commit_hash=parent_hash)
-                activity = PatchActivity(self, commit_hash, when, what, patch)
-                activities.append(activity)
+                add_activity(parts[3], parent_hash)
             elif what == 'rename':
-                filename = parts[3]
-                patch = Patch(self, filename, commit_hash=commit_hash)
-                activity = PatchActivity(self, commit_hash, when, what, patch,
-                                         old_filename=parts[1]) 
-                activities.append(activity)
+                add_activity(parts[3], commit_hash, old_filename=parts[1])
 
         return activities
 
@@ -124,10 +144,9 @@ class Repo(object):
             with utils.temp_chdir(os.path.dirname(self.path)):
                 self._git_cmd(pipe, 'clone', self.ssh_url)
 
-    def _refresh_patch_activities(self):
-        activity_days = self.patch_report.patch_activity_days
+    def _refresh_patch_activities(self, activity_days=365):
         since = '%d days ago' % activity_days
-        for activity in self.get_patch_activities(since):
+        for activity in self.get_patch_activities_from_git(since):
             self.activities.append(activity)
 
     def refresh(self):
