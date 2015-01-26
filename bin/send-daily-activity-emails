@@ -75,17 +75,30 @@ def _get_messages(args, email_config, patch_report):
     sender = email_config['sender']
     recipients = email_config['recipients'].split(',')
 
+    def add_activity_message(activity):
+        if activity.what == 'create':
+            prefix = "NEW PATCH"
+        elif activity.what == 'delete':
+            prefix = "REMOVED PATCH"
+        else:
+            return
+
+        subject = "[{prefix}] [{repo_name}]: {filename}".format(
+                prefix=prefix,
+                repo_name=activity.repo.name,
+                filename=activity.patch.filename)
+
+        for recipient in recipients:
+            message = Message(sender,
+                              recipient,
+                              subject,
+                              activity.patch.contents)
+            messages.append(message)
+
     messages = []
     for repo in patch_report.repos:
         for activity in repo.get_patch_activities(args.since):
-            patch = activity.patch
-            if activity.what == 'create':
-                for recipient in recipients:
-                    subject = "[NEW PATCH] [%s]: %s" % (activity.repo.name,
-                                                        patch.filename)
-                    message = Message(
-                            sender, recipient, subject, patch.contents)
-                    messages.append(message)
+            add_activity_message(activity)
 
     return messages
 
