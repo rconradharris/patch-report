@@ -75,10 +75,9 @@ def _get_messages(args, email_config, patch_report):
     sender = email_config['sender']
     recipients = email_config['recipients'].split(',')
 
-    txt_since = '{0} seconds ago'.format(args.since)
     messages = []
     for repo in patch_report.repos:
-        for activity in repo.get_patch_activities_from_git(txt_since):
+        for activity in repo.get_patch_activities(args.since):
             patch = activity.patch
             if activity.what == 'create':
                 for recipient in recipients:
