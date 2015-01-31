@@ -28,9 +28,9 @@ import sys
 
 import requests
 
-from patch_report import cache
 from patch_report import config
 from patch_report import simplelog
+from patch_report import state
 from patch_report import utils
 from patch_report.models.patch_report import get_from_cache
 
@@ -38,6 +38,10 @@ PIDFILE = '/tmp/send-daily-activity-emails.pid'
 RESET_CACHE_PIDFILE = '/tmp/reset-cache.pid'
 SENT_EMAILS_FILENAME = 'sent-emails'
 DEFAULT_SINCE = 2 * 86400  # 2 days
+
+
+def _make_state_directory():
+    return state.StateDirectory()
 
 
 class Message(object):
@@ -201,8 +205,9 @@ def _prune_and_write_sent_emails(args, messages, sent_emails):
         del sent_emails[message_hash]
 
     # Write to disk
-    simplelog.log("Writing sent_emails cache")
-    cache.write_file(SENT_EMAILS_FILENAME, sent_emails)
+    simplelog.log("Writing sent_emails state directory")
+    statedir = _make_state_directory()
+    statedir.write_file(SENT_EMAILS_FILENAME, sent_emails)
 
 
 def main(args):
@@ -223,9 +228,10 @@ def main(args):
         patch_report = get_from_cache()
         messages = _get_messages(args, email_config, patch_report)
 
+    statedir = _make_state_directory()
     try:
-        sent_emails = cache.read_file(SENT_EMAILS_FILENAME)
-    except cache.CacheFileNotFound:
+        sent_emails = statedir.read_file(SENT_EMAILS_FILENAME)
+    except state.FileNotFound:
         sent_emails = {}
 
     _filter_already_sent_messages(messages, sent_emails)

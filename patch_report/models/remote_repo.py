@@ -5,6 +5,7 @@ from github import Github
 from patch_report import cache
 from patch_report import config
 from patch_report.simplelog import log
+from patch_report import state
 
 
 class RemoteRepo(object):
@@ -38,5 +39,13 @@ class RemoteRepo(object):
         cache.write_file('discovered_repos', discovered_repos)
 
     @classmethod
-    def get_all(cls):
+    def _get_all(cls):
         return cache.read_file('discovered_repos')
+
+    @classmethod
+    def get_all(cls):
+        try:
+            return cls._get_all()
+        except state.FileNotFound:
+            cls.discover()
+            return cls._get_all()

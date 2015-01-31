@@ -60,7 +60,7 @@ _OPTIONS_SCHEMA = {
                          "default": _OPTION_REQUIRED},
     },
     "patch_report": {
-        "cache_directory": {"type": "str",
+        "state_directory": {"type": "str",
                             "default": '/tmp'},
         "ignore_missing_series_file": {"type": "bool",
                                        "default": False},

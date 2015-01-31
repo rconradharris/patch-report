@@ -1,10 +1,11 @@
-- Add upstream_review_count
+- Add upstream_review_count to Trends
 
 - Add dropped patches Tab
 
 - Weekly email based on that same data
     - Trend data
     - Dropped patch data
+    - Graphite graphs
 
 - Filter out Abandoned patches on upstream reviews page
 

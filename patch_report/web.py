@@ -12,6 +12,7 @@ app = Flask(__name__)
 import patch_report
 from patch_report import cache
 from patch_report import config
+from patch_report import state
 
 from patch_report.models.patch_report import get_from_cache
 
@@ -91,7 +92,7 @@ def _common(sidebar_tab, patch_report):
 def overview():
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     repos = patch_report.repos
@@ -119,7 +120,7 @@ def overview():
 def activity():
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     try:
@@ -152,7 +153,7 @@ def activity():
 def trends():
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     def handle_activity(activity, delta_type):
@@ -187,7 +188,7 @@ def trends():
 def upstream_reviews():
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     repos = patch_report.repos
@@ -223,7 +224,7 @@ def _repo_common(repo, repo_tab, patch_report):
 def repo_patches(repo_name):
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     repo = patch_report.get_repo(repo_name)
@@ -265,7 +266,7 @@ def repo_patches(repo_name):
 def repo_stats(repo_name):
     try:
         patch_report = get_from_cache()
-    except cache.CacheFileNotFound:
+    except state.FileNotFound:
         return _render_empty_cache_page()
 
     repo = patch_report.get_repo(repo_name)

@@ -1,65 +1,28 @@
-import os
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-import tempfile
-
-from patch_report import config
-from patch_report.simplelog import log
-from patch_report import utils
+from patch_report import state
 
 
-class CacheFileNotFound(Exception):
-    pass
-
-
-def _make_cache_directory():
-    cachedir = config.get('patch_report', 'cache_directory')
-    return os.path.join(cachedir, 'patch_report')
-
-
-def _make_filename(name):
-    cachedir = _make_cache_directory()
-    return os.path.join(cachedir, '%s.pickle' % name)
+def _make_state_directory():
+    return state.StateDirectory(subdirectory='cache')
 
 
 def read_file(name):
-    filename = _make_filename(name)
-
-    if not os.path.exists(filename):
-        raise CacheFileNotFound(filename)
-
-    with open(filename) as f:
-        return pickle.load(f)
+    statedir = _make_state_directory()
+    return statedir.read_file(name)
 
 
 def write_file(name, data):
-    cachedir = _make_cache_directory()
-    utils.makedirs_ignore_exists(cachedir)
-
-    filename = _make_filename(name)
-
-    tmpfile = tempfile.NamedTemporaryFile(delete=False)
-    try:
-        with tmpfile:
-            pickle.dump(data, tmpfile)
-    except:
-        os.unlink(tmpfile.name)
-        raise
-    else:
-        os.rename(tmpfile.name, filename)
+    statedir = _make_state_directory()
+    return statedir.write_file(name, data)
 
 
 def get_last_updated_at(name):
-    filename = _make_filename(name)
-    return utils.get_file_modified_time(filename)
+    statedir = _make_state_directory()
+    return statedir.get_last_updated_at(name)
 
 
 def clear():
-    log('Clearing the cache...')
-    cachedir = _make_cache_directory()
-    utils.rmtree_ignore_exists(cachedir)
+    statedir = _make_state_directory()
+    return statedir.clear()
 
 
 class DictCache(object):
@@ -70,7 +33,7 @@ class DictCache(object):
     def _load(self):
         try:
             self.data = read_file(self.filename)
-        except CacheFileNotFound:
+        except state.FileNotFound:
             self.data = {}
 
     def __getitem__(self, key):
